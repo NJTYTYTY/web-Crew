@@ -34,8 +34,8 @@ export function Navbar() {
             className="flex items-center gap-2.5 group text-left shrink-0"
             title={tx('Go to Home', 'กลับหน้าแรก')}
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
-              <Gamepad2 className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden flex items-center justify-center shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform shrink-0">
+              <img src="/logopic.webp" alt="NEXUS PLAY Logo" className="w-full h-full object-cover" />
             </div>
             <div className="whitespace-nowrap">
               <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 flex items-center">

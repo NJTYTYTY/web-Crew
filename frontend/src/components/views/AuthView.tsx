@@ -40,8 +40,8 @@ export function AuthView({ initialMode }: { initialMode?: AuthMode }) {
       <div className="max-w-md mx-auto px-4 py-10 sm:py-12">
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl relative overflow-hidden">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-md shadow-indigo-500/30 mb-3">
-              <Gamepad2 className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl overflow-hidden mx-auto flex items-center justify-center shadow-md shadow-indigo-500/30 mb-3">
+              <img src="/logopic.webp" alt="NEXUS PLAY Logo" className="w-full h-full object-cover" />
             </div>
             <h2 className="text-2xl font-black text-slate-900" id="auth-heading">
               {activeMode === 'register' ? tx('Create Fast Account', 'สมัครสมาชิกด่วน') : tx('Welcome Back', 'ยินดีต้อนรับกลับมา')}
