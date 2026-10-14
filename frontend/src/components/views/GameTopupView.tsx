@@ -230,26 +230,13 @@ export function GameTopupView() {
 
               <button onClick={handleTopupCheckout} className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition flex items-center justify-center space-x-2 whitespace-nowrap">
                 <QrCode className="w-4 h-4 shrink-0" />
-                <span>{tx('Confirm & Pay via IQ-Bank', 'ยืนยันและสแกนจ่ายผ่าน IQ-Bank')}</span>
+                <span>{tx('Confirm & Pay (PromptPay QR)', 'ยืนยันและสแกนจ่าย (PromptPay QR)')}</span>
               </button>
 
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-center space-x-2 text-[11px] text-slate-400">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                <span className="truncate">{tx('Automated IQ-Bank Webhook Detection', 'ตรวจจับยอดโอนอัตโนมัติผ่าน IQ-Bank Webhook')}</span>
+                <span className="truncate">{tx('Automated Instant Payment Verification', 'ตรวจสอบยอดโอนอัตโนมัติทันที 24 ชม.')}</span>
               </div>
-            </div>
-
-            <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-4 text-xs text-indigo-900">
-              <div className="font-bold flex items-center space-x-1.5 mb-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                <span>{tx('Need test payment without money?', 'ต้องการทดสอบการชำระเงินแบบไม่เสียเงินจริง?')}</span>
-              </div>
-              <p className="text-indigo-700 text-[11px] leading-relaxed">
-                {tx(
-                  'Click Confirm & Pay to open the Dynamic QR modal, then launch the IQ-Bank Simulator to trigger instant payment confirmation!',
-                  'กดยืนยันการสั่งซื้อเพื่อเปิด QR พร้อมเพย์ จากนั้นกดปุ่มจำลองธนาคาร IQ-Bank เพื่อทดสอบการยิง Webhook ยืนยันยอดได้ทันที!'
-                )}
-              </p>
             </div>
           </div>
         </div>

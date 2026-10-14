@@ -1,13 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   AccountProduct, ActiveOrder, AuthMode, BannerItem, CustomerOrder,
   ModalStateName, PackagesByGame, StoreContextValue, StoreViewName, TopupGameKey, TopupPackage, UserProfile,
 } from '@/types/store';
 import {
-  defaultActiveOrder, initialAccountProducts, initialBanners, initialCustomerOrders, initialPackagesData,
+  defaultActiveOrder, initialAccountProducts, initialBanners, initialPackagesData,
 } from '@/data/mockStoreData';
 import {
   createOrderApi, fetchAccountsApi, fetchBannersApi, fetchMeApi, fetchOrdersApi,
@@ -37,7 +37,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [uidInput, setUidInput] = useState('9842109841');
   const [robloxUser, setRobloxUser] = useState('BloxMaster_TH');
   const [robloxPass, setRobloxPass] = useState('SafePassword123');
-  const [customerOrders, setCustomerOrders] = useState<CustomerOrder[]>(initialCustomerOrders);
+  // Real orders from PostgreSQL database only (no pre-populated mock orders)
+  const [customerOrders, setCustomerOrders] = useState<CustomerOrder[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalState, setModalState] = useState<ModalStateName>('waiting');
   const [activeOrder, setActiveOrder] = useState<ActiveOrder>(defaultActiveOrder);
@@ -46,16 +47,30 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     `[INFO] Standby for payment dispatch. Active Ref: ${defaultActiveOrder.txRef}`,
   ]);
 
+  const loadOrdersFromDb = useCallback(async () => {
+    try {
+      const ordRes = await fetchOrdersApi();
+      if (Array.isArray(ordRes?.orders)) {
+        setCustomerOrders(ordRes.orders);
+      }
+    } catch {
+      // keep existing orders in state if backend is unreachable
+    }
+  }, []);
+
   useEffect(() => {
     if (!pathname) return;
     if (pathname === '/') setCurrentView('home');
     else if (pathname.startsWith('/accounts')) setCurrentView('accounts');
     else if (pathname.startsWith('/topup')) setCurrentView('topup');
-    else if (pathname.startsWith('/orders')) setCurrentView('orders');
+    else if (pathname.startsWith('/orders')) {
+      setCurrentView('orders');
+      loadOrdersFromDb();
+    }
     else if (pathname.startsWith('/login')) { setCurrentView('auth'); setAuthMode('login'); }
     else if (pathname.startsWith('/register')) { setCurrentView('auth'); setAuthMode('register'); }
     else if (pathname.startsWith('/iq-bank-simulator')) setCurrentView('simulator');
-  }, [pathname]);
+  }, [pathname, loadOrdersFromDb]);
 
   useEffect(() => {
     fetchBannersApi().then((r) => { const b = normalizeBanners(r); if (b) setBanners(b); }).catch(() => {});
@@ -68,7 +83,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const u = r?.user || r;
       if (u?.username) setUser({ id: u.id, username: u.username, role: u.role || 'CUSTOMER' });
     }).catch(() => {});
-  }, []);
+    loadOrdersFromDb();
+  }, [loadOrdersFromDb]);
 
   useEffect(() => {
     if (!isModalOpen || modalState !== 'waiting' || !activeOrder.dbId) return;
@@ -81,14 +97,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             setActiveOrder((prev) => ({ ...prev, username: creds.accountUsername, password: creds.accountPassword || prev.password }));
           }
           setModalState('success');
+          loadOrdersFromDb();
         }
       } catch {}
     }, 2000);
     return () => clearInterval(timer);
-  }, [isModalOpen, modalState, activeOrder.dbId]);
+  }, [isModalOpen, modalState, activeOrder.dbId, loadOrdersFromDb]);
 
   const switchView = (view: StoreViewName, modeOverride?: AuthMode) => {
     setCurrentView(view);
+    if (view === 'orders') loadOrdersFromDb();
     if (view === 'auth') {
       const mode = modeOverride || authMode;
       setAuthMode(mode);
@@ -157,15 +175,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const triggerWebhookSuccess = async () => {
-    await triggerIqBankSimulatorApi({ transactionRef: activeOrder.txRef, status: 'SUCCESS', amount: activeOrder.price }).catch(() => {});
+    try {
+      await triggerIqBankSimulatorApi({ transactionRef: activeOrder.txRef, status: 'SUCCESS', amount: activeOrder.price });
+      await loadOrdersFromDb();
+    } catch {
+      // Fallback if backend is offline: record completed order in memory
+      setCustomerOrders((prev) => [{
+        id: activeOrder.id, ref: activeOrder.txRef, title: activeOrder.title,
+        type: activeOrder.type === 'account' ? 'Account Purchase' : 'Top-Up Delivery',
+        date: 'Just now', amount: activeOrder.price, status: 'PAID',
+        revealedUser: activeOrder.username || 'auto_delivery',
+        revealedPass: activeOrder.type === 'account' ? activeOrder.password || 'NexPass#7741' : 'COMPLETED',
+      }, ...prev]);
+    }
     setSimLogs((prev) => [...prev, '[WEBHOOK DISPATCH] POST /api/webhooks/iqbank HTTP/1.1 (200 OK)', `[IQ-BANK SUCCESS] Payment verified for ${activeOrder.txRef}. Amount: ฿${activeOrder.price}`]);
-    setCustomerOrders((prev) => [{
-      id: activeOrder.id, ref: activeOrder.txRef, title: activeOrder.title,
-      type: activeOrder.type === 'account' ? 'Account Purchase' : 'Top-Up Delivery',
-      date: 'Just now', amount: activeOrder.price, status: 'PAID',
-      revealedUser: activeOrder.username || 'auto_delivery',
-      revealedPass: activeOrder.type === 'account' ? activeOrder.password || 'NexPass#7741' : 'COMPLETED',
-    }, ...prev]);
     openModal('success');
   };
 
@@ -179,21 +202,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     openModal('fulfillment');
   };
 
-  const seedNewDemoOrder = () => {
-    setCustomerOrders((prev) => [{
-      id: 'ORD-' + Math.floor(10000 + Math.random() * 90000), ref: 'IQB-TX-' + Math.floor(100000 + Math.random() * 900000),
-      title: 'Blox Fruits Perm Dragon + Godhuman', type: 'Account Purchase', date: 'Just now', amount: 850, status: 'PAID',
-      revealedUser: 'dragon_blox_king', revealedPass: 'PermDragon#2025',
-    }, ...prev]);
-  };
+  const seedNewDemoOrder = () => { loadOrdersFromDb(); };
 
   const login = async (username: string, password: string) => {
     try {
       const res = await loginApi(username, password);
       if (res?.token) setStoredToken(res.token);
       setUser({ id: res?.user?.id, username: res?.user?.username || username, role: res?.user?.role || 'CUSTOMER' });
-      const ordRes = await fetchOrdersApi().catch(() => null);
-      if (Array.isArray(ordRes?.orders) && ordRes.orders.length > 0) setCustomerOrders(ordRes.orders);
+      await loadOrdersFromDb();
     } catch { setUser({ username, role: 'CUSTOMER' }); }
     switchView('home');
   };
@@ -203,11 +219,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const res = await registerApi(username, password, confirmPassword);
       if (res?.token) setStoredToken(res.token);
       setUser({ id: res?.user?.id, username: res?.user?.username || username, role: res?.user?.role || 'CUSTOMER' });
+      await loadOrdersFromDb();
     } catch { setUser({ username, role: 'CUSTOMER' }); }
     switchView('home');
   };
 
-  const logout = async () => { await logoutApi().catch(() => {}); setStoredToken(null); setUser(null); };
+  const logout = async () => {
+    await logoutApi().catch(() => {});
+    setStoredToken(null);
+    setUser(null);
+    setCustomerOrders([]);
+  };
 
   return (
     <StoreContext.Provider value={{

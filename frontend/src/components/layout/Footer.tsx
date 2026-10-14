@@ -2,11 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function Footer() {
-  const { switchView } = useStore();
   const { tx } = useLanguage();
 
   return (
@@ -18,19 +16,12 @@ export function Footer() {
           </div>
           <span className="font-bold text-slate-900 whitespace-nowrap">NEXUS PLAY STORE THAILAND</span>
           <span className="text-slate-400">
-            • {tx('Automated PromptPay & IQ-Bank Certified Gateway', 'ระบบชำระเงินพร้อมเพย์อัตโนมัติเชื่อมต่อ IQ-Bank')}
+            • {tx('Automated PromptPay QR Gateway', 'ระบบชำระเงินพร้อมเพย์อัตโนมัติ 24 ชม.')}
           </span>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
           <span className="whitespace-nowrap">{tx('Fast Delivery (24/7)', 'จัดส่งอัตโนมัติ (24 ชม.)')}</span>
           <span className="whitespace-nowrap">{tx('Thai Baht (฿ THB)', 'สกุลเงินบาท (฿ THB)')}</span>
-          <button
-            type="button"
-            onClick={() => switchView('simulator')}
-            className="text-indigo-600 hover:underline font-bold whitespace-nowrap"
-          >
-            {tx('IQ-Bank Simulator', 'ระบบจำลองธนาคาร')}
-          </button>
           <Link
             href="/admin"
             className="text-slate-600 hover:text-indigo-600 hover:underline font-semibold whitespace-nowrap"

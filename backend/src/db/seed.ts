@@ -159,41 +159,9 @@ async function seed() {
         { gameId: rbxGame.id, packageName: '1,700 Robux', bonusTag: 'Best Value', price: 580, isActive: true },
         { gameId: rbxGame.id, packageName: '4,500 Robux', bonusTag: 'High Tier', price: 1450, isActive: true },
         { gameId: rbxGame.id, packageName: '10,000 Robux', bonusTag: 'Bulk VIP', price: 3200, isActive: true },
-      ])
-      .returning();
+      ]);
 
-    const sampleOrd = await db
-      .insert(orders)
-      .values([
-        {
-          orderNumber: 'ORD-20261014-001', userId: customerUserId, orderType: 'ACCOUNT',
-          gameAccountId: firstAccountId, totalAmount: 199, status: 'PAID', fulfillmentStatus: 'COMPLETED',
-        },
-        {
-          orderNumber: 'ORD-20261014-002', userId: customerUserId, orderType: 'TOPUP',
-          topupPackageId: insertedPackages[2].id, targetMetadata: { playerUid: '9842109841' },
-          totalAmount: 95, status: 'PAID', fulfillmentStatus: 'COMPLETED',
-        },
-      ])
-      .returning();
-
-    await db.insert(payments).values([
-      {
-        orderId: sampleOrd[0].id, transactionRef: 'IQB-TX-994821', provider: 'IQ_BANK', amount: 199,
-        qrPayload: '00020101021229370016A000000677010111011300668000000005802TH53037645406199.0062170513IQB-TX-9948216304ABCD',
-        status: 'SUCCESS',
-        rawWebhookPayload: { event: 'payment.verified', transactionRef: 'IQB-TX-994821', amount: 199, status: 'SUCCESS' },
-        paidAt: new Date(),
-      },
-      {
-        orderId: sampleOrd[1].id, transactionRef: 'IQB-TX-882194', provider: 'IQ_BANK', amount: 95,
-        qrPayload: '00020101021229370016A000000677010111011300668000000005802TH5303764540595.0062170513IQB-TX-8821946304EF01',
-        status: 'SUCCESS',
-        rawWebhookPayload: { event: 'payment.verified', transactionRef: 'IQB-TX-882194', amount: 95, status: 'SUCCESS' },
-        paidAt: new Date(),
-      },
-    ]);
-    console.log('✅ Seeded 3 top-up games, 17 denomination packages, and sample orders');
+    console.log('✅ Seeded 3 top-up games and 17 denomination packages');
   }
 
   console.log('🎉 Database seed completed successfully!');

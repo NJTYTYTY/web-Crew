@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Gamepad2, Globe, Landmark, Menu, ShieldCheck, User, X } from 'lucide-react';
+import { Gamepad2, Globe, Menu, ShieldCheck, User, X } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -11,13 +11,13 @@ export function Navbar() {
   const { lang, toggleLang, tx } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleNav = (view: 'home' | 'accounts' | 'topup' | 'orders' | 'simulator' | 'auth') => {
+  const handleNav = (view: 'home' | 'accounts' | 'topup' | 'orders' | 'auth') => {
     switchView(view);
     setMobileMenuOpen(false);
   };
 
   const navBtnClass = (active: boolean) =>
-    `whitespace-nowrap shrink-0 px-2.5 xl:px-3 py-1.5 rounded-lg text-[13px] xl:text-sm font-semibold transition inline-flex items-center gap-1.5 ${
+    `whitespace-nowrap shrink-0 px-3 py-2 rounded-lg text-sm font-semibold transition inline-flex items-center gap-1.5 ${
       active
         ? 'text-indigo-600 bg-indigo-50/90'
         : 'text-slate-700 hover:text-indigo-600 hover:bg-slate-50'
@@ -25,9 +25,9 @@ export function Navbar() {
 
   return (
     <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Left: Logo (Clicks to Home) + Main Navigation */}
-        <div className="flex items-center gap-3 xl:gap-6 shrink-0">
+        <div className="flex items-center gap-4 xl:gap-8 shrink-0">
           <button
             type="button"
             onClick={() => handleNav('home')}
@@ -47,8 +47,8 @@ export function Navbar() {
             </div>
           </button>
 
-          {/* Desktop Navigation Links (No redundant Home button; Logo navigates to Home) */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => handleNav('accounts')}
@@ -82,33 +82,23 @@ export function Navbar() {
         </div>
 
         {/* Right Header Actions */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
           {/* Language Switcher Pill */}
           <button
             type="button"
             onClick={toggleLang}
-            className="whitespace-nowrap shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 rounded-lg border border-slate-200/80 text-xs font-bold text-slate-700 transition"
+            className="whitespace-nowrap shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 rounded-lg border border-slate-200/80 text-xs font-bold text-slate-700 transition"
             title={tx('Switch to Thai language', 'สลับเป็นภาษาอังกฤษ')}
           >
             <Globe className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
             <span>{lang === 'en' ? 'EN | ไทย' : 'ไทย | EN'}</span>
           </button>
 
-          {/* Live Exchange Currency Pill — only shown on 2xl screens so it never crowds the navbar */}
-          <div className="hidden 2xl:inline-flex whitespace-nowrap shrink-0 items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-lg border border-slate-200/80 text-xs font-semibold text-slate-600">
+          {/* Live Exchange Currency Pill */}
+          <div className="hidden xl:inline-flex whitespace-nowrap shrink-0 items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-lg border border-slate-200/80 text-xs font-semibold text-slate-600">
             <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
             <span>{tx('THB (฿) PromptPay', 'บาท (฿) พร้อมเพย์')}</span>
           </div>
-
-          {/* Quick Simulator Launcher */}
-          <button
-            type="button"
-            onClick={() => handleNav('simulator')}
-            className="hidden md:inline-flex whitespace-nowrap shrink-0 items-center gap-1.5 px-2.5 xl:px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold transition"
-          >
-            <Landmark className="w-3.5 h-3.5 shrink-0" />
-            <span>{tx('IQ-Bank Simulator', 'จำลองธนาคาร IQ-Bank')}</span>
-          </button>
 
           {/* Auth State Button */}
           <div id="nav-user-area" className="shrink-0">
@@ -121,7 +111,7 @@ export function Navbar() {
                 <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
                   {user.username.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-xs font-bold text-slate-800 max-w-[100px] truncate">
+                <span className="text-xs font-bold text-slate-800 max-w-[110px] truncate">
                   {user.username}
                 </span>
               </button>
@@ -129,7 +119,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => switchView('auth', 'login')}
-                className="whitespace-nowrap shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition shadow-indigo-600/20"
+                className="whitespace-nowrap shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition shadow-indigo-600/20"
               >
                 <User className="w-4 h-4 shrink-0" />
                 <span>{tx('Sign In', 'เข้าสู่ระบบ')}</span>
@@ -179,19 +169,11 @@ export function Navbar() {
           >
             <span>{tx('Order History', 'ประวัติการสั่งซื้อ')}</span>
           </button>
-          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleNav('simulator')}
-              className="flex-1 whitespace-nowrap inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold"
-            >
-              <Landmark className="w-3.5 h-3.5 shrink-0" />
-              <span>{tx('IQ-Bank Simulator', 'จำลองธนาคาร IQ-Bank')}</span>
-            </button>
+          <div className="pt-2 border-t border-slate-100 flex items-center">
             <Link
               href="/admin"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex-1 whitespace-nowrap inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold"
+              className="w-full whitespace-nowrap inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold"
             >
               <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-indigo-600" />
               <span>{tx('Admin Console', 'ระบบหลังบ้าน')}</span>

@@ -2,11 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import {
-  ArrowRight, Check, CheckCircle2, Clock, Download, ExternalLink, Layers, ShieldCheck, X,
+  ArrowRight, Check, CheckCircle2, Clock, Download, ExternalLink, ShieldCheck, X,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { ModalStateName } from '@/types/store';
 
 export function PaymentCheckoutModal() {
   const {
@@ -33,36 +32,13 @@ export function PaymentCheckoutModal() {
     setTimeout(() => setCopiedLabel(null), 1500);
   };
 
-  const tabClass = (st: ModalStateName) =>
-    `px-2.5 py-1 rounded-md font-bold transition whitespace-nowrap shrink-0 ${
-      modalState === st ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:text-white'
-    }`;
-
   return (
     <div id="payment-modal-backdrop" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
-        {/* Clean Production-Grade Checkout Step Bar */}
-        <div className="bg-slate-900 text-slate-300 px-4 py-2.5 flex items-center justify-between gap-2 text-[11px] border-b border-slate-800 sticky top-0 z-20">
-          <span className="font-bold flex items-center space-x-1.5 text-white whitespace-nowrap shrink-0">
-            <Layers className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span>{tx('Checkout Step:', 'ขั้นตอนการสั่งซื้อ:')}</span>
-          </span>
-          <div className="flex items-center space-x-1 overflow-x-auto hide-scrollbar">
-            <button onClick={() => setModalState('waiting')} id="modal-tab-waiting" className={tabClass('waiting')}>
-              {tx('1. Scan QR', '1. สแกน QR')}
-            </button>
-            <button onClick={() => setModalState('success')} id="modal-tab-success" className={tabClass('success')}>
-              {tx('2. Verified', '2. ยืนยันยอด')}
-            </button>
-            <button onClick={() => setModalState('fulfillment')} id="modal-tab-fulfillment" className={tabClass('fulfillment')}>
-              {tx('3. Delivery', '3. รับสินค้า')}
-            </button>
-          </div>
-        </div>
-
         <button
           onClick={closeModal}
-          className="absolute top-12 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition z-10"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition z-10"
+          aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
@@ -73,7 +49,7 @@ export function PaymentCheckoutModal() {
             <div className="text-center pb-4 border-b border-slate-100">
               <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200 mb-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-ring shrink-0" />
-                <span>{tx('IQ-Bank Official Payment — Dynamic QR PromptPay', 'ระบบชำระเงินทางการ IQ-Bank — พร้อมเพย์ Dynamic QR')}</span>
+                <span>{tx('Official Payment — Dynamic QR PromptPay', 'ระบบชำระเงินทางการ — พร้อมเพย์ Dynamic QR')}</span>
               </div>
               <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 px-4" id="modal-item-title">{activeOrder.title}</h3>
               <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-1 font-mono">

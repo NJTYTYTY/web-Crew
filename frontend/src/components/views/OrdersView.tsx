@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { RefreshCw, ShoppingBag } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function OrdersView() {
-  const { user, customerOrders, seedNewDemoOrder, revealOrderCredentials } = useStore();
+  const { user, customerOrders, revealOrderCredentials, switchView } = useStore();
   const { tx } = useLanguage();
-  const displayUsername = user?.username || 'alex_gamer';
+  const displayUsername = user?.username || tx('Guest / Customer', 'ลูกค้าทั่วไป');
 
   return (
     <div id="view-orders" className="page-view">
@@ -24,22 +24,12 @@ export function OrdersView() {
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              {tx('Logged-in as', 'เข้าสู่ระบบในชื่อ')}{' '}
+              {tx('Account:', 'บัญชีผู้ใช้งาน:')}{' '}
               <span className="font-bold text-slate-800" id="orders-user-label">
                 {displayUsername}
               </span>
-              . {tx('View order receipts and reveal purchased game account credentials.', 'ตรวจสอบใบเสร็จคำสั่งซื้อและเปิดดูรหัสผ่านไอดีเกมที่สั่งซื้อสำเร็จ')}
+              . {tx('Showing real-time orders from PostgreSQL database.', 'แสดงรายการคำสั่งซื้อจริงจากฐานข้อมูลระบบ')}
             </p>
-          </div>
-
-          <div className="flex items-center space-x-3 shrink-0">
-            <button
-              onClick={seedNewDemoOrder}
-              className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 whitespace-nowrap shrink-0"
-            >
-              <Plus className="w-3.5 h-3.5 shrink-0" />
-              <span>{tx('Simulate New Completed Order', 'จำลองคำสั่งซื้อสำเร็จใหม่')}</span>
-            </button>
           </div>
         </div>
 
@@ -59,37 +49,80 @@ export function OrdersView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100" id="orders-table-body">
-                {customerOrders.map((ord) => (
-                  <tr key={ord.id + ord.ref} className="hover:bg-slate-50/70 transition">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
-                      <div>{ord.id}</div>
-                      <span className="text-[10px] text-slate-400 font-normal">{ord.ref}</span>
-                    </td>
-                    <td className="py-3 px-4 font-semibold text-slate-800 min-w-[180px]">{ord.title}</td>
-                    <td className="py-3 px-4 text-slate-500 whitespace-nowrap">{ord.type}</td>
-                    <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{ord.date}</td>
-                    <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">฿{ord.amount}</td>
-                    <td className="py-3 px-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
-                        ● {ord.status === 'PAID' ? tx('PAID', 'ชำระแล้ว') : ord.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right whitespace-nowrap">
-                      {ord.revealedPass !== 'COMPLETED' ? (
-                        <button
-                          onClick={() => revealOrderCredentials(ord.revealedUser, ord.revealedPass, ord.title)}
-                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-[11px] border border-indigo-200 whitespace-nowrap"
-                        >
-                          {tx('View Account ID / Pass', 'ดูรหัสไอดีเกม / พาสเวิร์ด')}
-                        </button>
-                      ) : (
-                        <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
-                          {tx('Delivered to Account', 'เติมเข้าบัญชีเกมสำเร็จ')}
-                        </span>
-                      )}
+                {customerOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 px-4 text-center text-slate-400">
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <ShoppingBag className="w-8 h-8 text-slate-300" />
+                        <p className="text-sm font-bold text-slate-600">
+                          {tx('No purchase history found yet', 'ยังไม่มีประวัติการสั่งซื้อในระบบ')}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          {tx(
+                            'Orders you complete will automatically appear here from the database.',
+                            'เมื่อคุณสั่งซื้อไอดีเกมหรือเติมเกมสำเร็จ รายการจะแสดงที่นี่จากฐานข้อมูลโดยอัตโนมัติ'
+                          )}
+                        </p>
+                        <div className="pt-2 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => switchView('accounts')}
+                            className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition whitespace-nowrap"
+                          >
+                            {tx('Browse Game Accounts', 'เลือกซื้อไอดีเกม')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => switchView('topup')}
+                            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition whitespace-nowrap"
+                          >
+                            {tx('24/7 Game Top-Up', 'เติมเกม 24 ชม.')}
+                          </button>
+                        </div>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  customerOrders.map((ord) => (
+                    <tr key={ord.id + ord.ref} className="hover:bg-slate-50/70 transition">
+                      <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
+                        <div>{ord.id}</div>
+                        <span className="text-[10px] text-slate-400 font-normal">{ord.ref}</span>
+                      </td>
+                      <td className="py-3 px-4 font-semibold text-slate-800 min-w-[180px]">{ord.title}</td>
+                      <td className="py-3 px-4 text-slate-500 whitespace-nowrap">{ord.type}</td>
+                      <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{ord.date}</td>
+                      <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">฿{ord.amount}</td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${
+                            ord.status === 'PAID'
+                              ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                              : 'bg-amber-100 text-amber-800 border-amber-200'
+                          }`}
+                        >
+                          ● {ord.status === 'PAID' ? tx('PAID', 'ชำระแล้ว') : tx('PENDING', 'รอชำระเงิน')}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right whitespace-nowrap">
+                        {ord.status === 'PAID' && ord.revealedPass && ord.revealedPass !== 'COMPLETED' && ord.revealedPass !== 'PENDING' ? (
+                          <button
+                            onClick={() => revealOrderCredentials(ord.revealedUser, ord.revealedPass, ord.title)}
+                            className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-[11px] border border-indigo-200 whitespace-nowrap"
+                          >
+                            {tx('View Account ID / Pass', 'ดูรหัสไอดีเกม / พาสเวิร์ด')}
+                          </button>
+                        ) : (
+                          <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
+                            {ord.status === 'PAID'
+                              ? tx('Delivered to Account', 'เติมเข้าบัญชีเกมสำเร็จ')
+                              : tx('Waiting for Payment', 'รอการชำระเงิน')}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
