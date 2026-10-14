@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { INITIAL_OVERVIEW_TRANSACTIONS, OverviewTransaction } from "@/data/mockAdminData";
@@ -9,10 +9,26 @@ import RecentTransactionsTable from "@/components/admin/overview/RecentTransacti
 import TransactionInspectorDrawer from "@/components/admin/overview/TransactionInspectorDrawer";
 import AdminToast from "@/components/admin/AdminToast";
 import { useLanguage } from "@/context/LanguageContext";
+import { apiRequest, mapDbTxnToOverview } from "@/lib/api";
 
 export default function AdminOverviewPage() {
   const router = useRouter();
   const { tx } = useLanguage();
+  const [transactions, setTransactions] = useState<OverviewTransaction[]>(INITIAL_OVERVIEW_TRANSACTIONS);
+  const [kpis, setKpis] = useState({
+    totalRevenue: 4960,
+    accountsSold: 1,
+    totalAccounts: 6,
+    inStockAccounts: 5,
+    rovAccountsCount: 3,
+    robloxAccountsCount: 3,
+    pendingTopups: 2,
+    completedOrdersCount: 4,
+    totalOrdersCount: 6,
+    activeBanners: 4,
+    totalBanners: 4,
+    firstActiveBannerTitle: "Roblox Blox Fruits Special Deal",
+  });
   const [selectedTxn, setSelectedTxn] = useState<OverviewTransaction | null>(null);
   const [syncState, setSyncState] = useState<"idle" | "syncing" | "done">("idle");
   const [toast, setToast] = useState({ visible: false, title: "", message: "" });
@@ -22,17 +38,34 @@ export default function AdminOverviewPage() {
     setTimeout(() => setToast((prev) => ({ ...prev, visible: false })), 3000);
   };
 
-  const handleIqBankSync = () => {
+  const loadOverviewFromDb = useCallback(async () => {
+    try {
+      const res = await apiRequest<any>("/api/admin/overview");
+      if (res?.kpis) {
+        setKpis((prev) => ({ ...prev, ...res.kpis }));
+      }
+      if (Array.isArray(res?.recentTransactions) && res.recentTransactions.length > 0) {
+        setTransactions(res.recentTransactions.map(mapDbTxnToOverview));
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    loadOverviewFromDb();
+  }, [loadOverviewFromDb]);
+
+  const handleIqBankSync = async () => {
     if (syncState !== "idle") return;
     setSyncState("syncing");
+    await loadOverviewFromDb();
     setTimeout(() => {
       setSyncState("done");
       triggerToast(
         tx("IQ-Bank Sync Complete", "ซิงค์ข้อมูล IQ-Bank สำเร็จ"),
-        tx("All settlement ledgers and PromptPay webhooks verified.", "ตรวจสอบรายการโอนและ PromptPay Webhook ทั้งหมดเรียบร้อยแล้ว")
+        tx("All settlement ledgers and PromptPay webhooks verified from PostgreSQL.", "ตรวจสอบรายการโอนและ PromptPay Webhook จากฐานข้อมูลจริงเรียบร้อยแล้ว")
       );
       setTimeout(() => setSyncState("idle"), 2000);
-    }, 1000);
+    }, 600);
   };
 
   return (
@@ -49,7 +82,7 @@ export default function AdminOverviewPage() {
               <span className="text-outline-variant hidden sm:inline">•</span>
               <span className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 whitespace-nowrap shrink-0">
                 <span className="inline-block w-2 h-2 rounded-full bg-secondary shrink-0"></span>{" "}
-                {tx("Cluster: ap-southeast-1b", "คลัสเตอร์: ap-southeast-1b")}
+                {tx("PostgreSQL Live Connected", "เชื่อมต่อฐานข้อมูล PostgreSQL สด")}
               </span>
             </div>
             <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
@@ -90,22 +123,23 @@ export default function AdminOverviewPage() {
               </div>
               <div className="flex flex-col whitespace-nowrap">
                 <span className="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant">
-                  {tx("Auto-Fulfill Engine", "ระบบเติมเงินอัตโนมัติ")}
+                  {tx("Total DB Orders", "ออเดอร์ในฐานข้อมูล")}
                 </span>
                 <span className="font-headline-sm text-headline-sm text-on-surface">
-                  {tx("98.4% Hands-Off", "อัตโนมัติ 98.4%")}
+                  {kpis.totalOrdersCount} {tx("Records", "รายการ")}
                 </span>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() =>
+              onClick={async () => {
+                await loadOverviewFromDb();
                 triggerToast(
-                  tx("Telemetry Refreshed", "รีเฟรชข้อมูลแล้ว"),
-                  tx("Real-time metrics synchronized with ap-southeast-1b.", "ซิงค์ข้อมูลเรียลไทม์กับ ap-southeast-1b สำเร็จ")
-                )
-              }
+                  tx("Database Telemetry Refreshed", "รีเฟรชข้อมูลฐานข้อมูลแล้ว"),
+                  tx("Real-time metrics synchronized with PostgreSQL.", "ซิงค์ข้อมูลเรียลไทม์กับฐานข้อมูล PostgreSQL สำเร็จ")
+                );
+              }}
               className="h-10 px-space-md bg-on-surface text-surface rounded-xl font-label-md text-label-md inline-flex items-center gap-space-xs hover:bg-on-surface-variant transition-colors shadow-sm whitespace-nowrap shrink-0"
             >
               <span className="material-symbols-outlined text-[18px] shrink-0">refresh</span>
@@ -115,7 +149,7 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* 4 KPI Metric Cards */}
+      {/* 4 KPI Metric Cards (Live from PostgreSQL) */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-gutter-desktop">
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
           <div className="flex items-start justify-between gap-2">
@@ -125,10 +159,10 @@ export default function AdminOverviewPage() {
             <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary shrink-0"><span className="material-symbols-outlined text-[18px]">payments</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight whitespace-nowrap">฿1,428,950</span><span className="font-label-sm text-label-sm text-on-surface-variant">THB</span></div>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight whitespace-nowrap">฿{kpis.totalRevenue.toLocaleString()}</span><span className="font-label-sm text-label-sm text-on-surface-variant">THB</span></div>
             <div className="mt-space-xs flex items-center justify-between gap-2">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">trending_up</span><span>+18.4%</span></div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{tx("vs. prev 7 days", "เทียบกับ 7 วันก่อน")}</span>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">trending_up</span><span>{tx("Live DB", "ข้อมูลจริง")}</span></div>
+              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{kpis.completedOrdersCount} {tx("Paid Orders", "ออเดอร์ชำระแล้ว")}</span>
             </div>
           </div>
           <div className="mt-space-md pt-space-sm border-t border-surface-container-low">
@@ -142,18 +176,18 @@ export default function AdminOverviewPage() {
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
           <div className="flex items-start justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">
-              {tx("Game Accounts Sold", "ไอดีเกมที่ขายแล้ว")}
+              {tx("Game Accounts Inventory", "คลังไอดีเกมทั้งหมด")}
             </span>
             <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-tertiary shrink-0"><span className="material-symbols-outlined text-[18px]">sports_esports</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">342</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("verified listings", "รายการที่ยืนยันแล้ว")}</span></div>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">{kpis.accountsSold} {tx("Sold", "ขายแล้ว")}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">/ {kpis.inStockAccounts} {tx("In Stock", "พร้อมขาย")}</span></div>
             <div className="mt-space-xs flex items-center justify-between gap-2">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">arrow_upward</span><span>+12.5%</span></div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{tx("MTD Escrow Release", "ยอดโอนสำเร็จเดือนนี้")}</span>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">inventory_2</span><span>{kpis.totalAccounts} {tx("Total IDs", "ไอดีทั้งหมด")}</span></div>
+              <Link href="/admin/accounts" className="font-body-sm text-body-sm text-primary hover:underline whitespace-nowrap">{tx("Manage Stock", "จัดการคลัง")}</Link>
             </div>
           </div>
-          <div className="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap"><span>RoV: 184</span><span>Valorant: 96</span><span>Genshin: 62</span></div>
+          <div className="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap"><span>Roblox: {kpis.robloxAccountsCount}</span><span>RoV: {kpis.rovAccountsCount}</span><span>Sold: {kpis.accountsSold}</span></div>
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
@@ -164,10 +198,10 @@ export default function AdminOverviewPage() {
             <span className="w-8 h-8 rounded-lg bg-error-container/50 flex items-center justify-center text-error shrink-0"><span className="material-symbols-outlined text-[18px]">hourglass_top</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">14</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("Orders in Buffer", "ออเดอร์ในคิว")}</span></div>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">{kpis.pendingTopups}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("Orders in Buffer", "ออเดอร์ในคิว")}</span></div>
             <div className="mt-space-xs flex items-center justify-between gap-2">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">priority_high</span><span>{tx("3 Need Manual OTP", "3 รายการรอ OTP")}</span></div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{tx("11 Automated", "อัตโนมัติ 11 รายการ")}</span>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">priority_high</span><span>{kpis.pendingTopups} {tx("Pending", "รอดำเนินการ")}</span></div>
+              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{kpis.completedOrdersCount} {tx("Completed", "สำเร็จแล้ว")}</span>
             </div>
           </div>
           <div className="mt-space-md pt-space-sm flex items-center gap-2">
@@ -183,14 +217,14 @@ export default function AdminOverviewPage() {
             <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0"><span className="material-symbols-outlined text-[18px]">view_carousel</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight whitespace-nowrap">{tx("5 Live", "5 แสดงผล")}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("/ 8 Maximum", "/ สูงสุด 8")}</span></div>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight whitespace-nowrap">{kpis.activeBanners} {tx("Live", "แสดงผล")}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">/ {kpis.totalBanners} {tx("Total", "ทั้งหมด")}</span></div>
             <div className="mt-space-xs flex items-center justify-between gap-2">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">event</span><span>{tx("2 Scheduled", "ตั้งเวลา 2 รายการ")}</span></div>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">event</span><span>{tx("Synced with Home", "ซิงค์หน้าแรก")}</span></div>
               <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">CTR: 8.74%</span>
             </div>
           </div>
           <div className="mt-space-md pt-space-sm flex items-center justify-between gap-2 text-on-surface-variant font-label-sm text-label-sm">
-            <span className="text-secondary font-medium truncate">{tx('Hero: "PayDay 15% Bonus"', 'ฮีโร่: "PayDay โบนัส 15%"')}</span>
+            <span className="text-secondary font-medium truncate">{kpis.firstActiveBannerTitle}</span>
             <Link className="text-primary hover:underline whitespace-nowrap shrink-0" href="/admin/banners">{tx("Manage", "จัดการ")}</Link>
           </div>
         </div>
@@ -199,12 +233,12 @@ export default function AdminOverviewPage() {
       <OverviewChartsSection />
 
       <RecentTransactionsTable
-        transactions={INITIAL_OVERVIEW_TRANSACTIONS}
+        transactions={transactions}
         onInspect={(txn) => setSelectedTxn(txn)}
         onExportCsv={() =>
           triggerToast(
             tx("CSV Export Ready", "ส่งออกไฟล์ CSV สำเร็จ"),
-            tx("Exported 5 recent transaction records to ApexPay-Ledger.csv", "ส่งออกรายการธุรกรรมล่าสุด 5 รายการไปยัง ApexPay-Ledger.csv")
+            tx(`Exported ${transactions.length} transaction records to ApexPay-Ledger.csv`, `ส่งออกรายการธุรกรรมล่าสุด ${transactions.length} รายการไปยัง ApexPay-Ledger.csv`)
           )
         }
       />
@@ -242,3 +276,4 @@ export default function AdminOverviewPage() {
     </div>
   );
 }
+

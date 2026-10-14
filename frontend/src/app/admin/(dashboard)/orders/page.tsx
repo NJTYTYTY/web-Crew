@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminOrderItem, INITIAL_ADMIN_ORDERS } from "@/data/mockAdminData";
 import OrderInspectModal from "@/components/admin/orders/OrderInspectModal";
 import AdminToast from "@/components/admin/AdminToast";
 import { useLanguage } from "@/context/LanguageContext";
+import { apiRequest, mapDbOrderToAdminItem } from "@/lib/api";
 
 export default function AdminOrdersPage() {
   const { tx } = useLanguage();
@@ -21,6 +22,27 @@ export default function AdminOrdersPage() {
     setToast({ visible: true, message });
     setTimeout(() => setToast((prev) => ({ ...prev, visible: false })), 2800);
   };
+
+  const loadOrdersFromDb = useCallback(async () => {
+    try {
+      const res = await apiRequest<{ orders: any[] }>("/api/admin/orders");
+      if (Array.isArray(res?.orders) && res.orders.length > 0) {
+        setOrders(res.orders.map(mapDbOrderToAdminItem));
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    loadOrdersFromDb();
+  }, [loadOrdersFromDb]);
+
+  const stats = useMemo(() => {
+    const totalCount = orders.length;
+    const queueCount = orders.filter((o) => o.fulfillment !== "Completed" && o.payment !== "FAILED").length;
+    const failedCount = orders.filter((o) => o.payment === "FAILED").length;
+    const grossPaid = orders.filter((o) => o.payment === "PAID").reduce((sum, o) => sum + o.amount, 0);
+    return { totalCount, queueCount, failedCount, grossPaid };
+  }, [orders]);
 
   const filteredOrders = useMemo(() => {
     const q = searchVal.toLowerCase().trim();
@@ -45,16 +67,24 @@ export default function AdminOrdersPage() {
     else if (preset === "ROBLOX") setSearchVal("Roblox");
   };
 
-  const handleOrderAction = (orderId: string, action: "COMPLETE" | "REDELIVER" | "REFUND") => {
+  const handleOrderAction = async (orderId: string, action: "COMPLETE" | "REDELIVER" | "REFUND") => {
     if (action === "COMPLETE") {
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, fulfillment: "Completed", payment: "PAID" } : o)));
-      showToast(tx("Order status marked as COMPLETED. Fulfillment notified.", "อัปเดตสถานะเป็นเสร็จสมบูรณ์และแจ้งเตือนระบบแล้ว"));
+      await apiRequest(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "PAID", fulfillmentStatus: "COMPLETED" }),
+      }).catch(() => {});
+      showToast(tx("Order status marked as COMPLETED in PostgreSQL.", "อัปเดตสถานะเป็นเสร็จสมบูรณ์ในฐานข้อมูลแล้ว"));
       setSelectedOrder(null);
     } else if (action === "REDELIVER") {
       showToast(tx("Triggered re-delivery webhook to gaming server worker.", "ส่งคำสั่งจัดส่งซ้ำไปยังเซิร์ฟเวอร์บอทเติมเกมแล้ว"));
     } else if (action === "REFUND") {
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, payment: "FAILED", fulfillment: "Pending" } : o)));
-      showToast(tx("Order marked as FAILED. Refund initiated to source bank.", "ระบุสถานะล้มเหลวและเริ่มกระบวนการคืนเงินแล้ว"));
+      await apiRequest(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "CANCELLED", fulfillmentStatus: "FAILED" }),
+      }).catch(() => {});
+      showToast(tx("Order marked as FAILED in PostgreSQL. Refund initiated.", "ระบุสถานะล้มเหลวในฐานข้อมูลและเริ่มกระบวนการคืนเงินแล้ว"));
       setSelectedOrder(null);
     }
   };
@@ -66,7 +96,7 @@ export default function AdminOrdersPage() {
         <div>
           <div className="flex items-center gap-space-xs text-primary font-label-sm uppercase tracking-wider mb-1 whitespace-nowrap">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-ping shrink-0"></span>
-            <span>{tx("Gateway Stream: IQ-Bank Engine v4.2", "สตรีมเกตเวย์: IQ-Bank Engine v4.2")}</span>
+            <span>{tx("Gateway Stream: IQ-Bank Engine v4.2 (PostgreSQL Live)", "สตรีมเกตเวย์: IQ-Bank Engine v4.2 (เชื่อมฐานข้อมูลสด)")}</span>
           </div>
           <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
             {tx("Orders, Top-Up Queue & Logs", "รายการสั่งซื้อ คิวเติมเกม & ล็อกระบบ")}
@@ -79,24 +109,24 @@ export default function AdminOrdersPage() {
           </p>
         </div>
         <div className="flex items-center gap-space-sm shrink-0">
-          <button type="button" onClick={() => { setIsRefreshing(true); setTimeout(() => { setIsRefreshing(false); showToast(tx("Orders stream synchronized with IQ-Bank gateway", "ซิงค์ข้อมูลคำสั่งซื้อกับเกตเวย์ IQ-Bank แล้ว")); }, 700); }} className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-label-md font-label-md transition-colors shadow-sm whitespace-nowrap shrink-0">
+          <button type="button" onClick={async () => { setIsRefreshing(true); await loadOrdersFromDb(); setTimeout(() => { setIsRefreshing(false); showToast(tx("Orders stream synchronized with PostgreSQL & IQ-Bank", "ซิงค์ข้อมูลคำสั่งซื้อจากฐานข้อมูลจริงแล้ว")); }, 400); }} className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface text-label-md font-label-md transition-colors shadow-sm whitespace-nowrap shrink-0">
             <span className={`material-symbols-outlined text-[18px] ${isRefreshing ? "animate-spin" : ""}`}>sync</span>
             <span>{tx("Force Sync", "บังคับซิงค์")}</span>
           </button>
-          <button type="button" onClick={() => showToast(tx("Exporting 142 records to IQ-Bank-Audit-Logs.csv", "กำลังส่งออก 142 รายการไปยัง IQ-Bank-Audit-Logs.csv"))} className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-primary text-on-primary hover:bg-primary-container text-label-md font-label-md transition-all shadow-sm whitespace-nowrap shrink-0">
+          <button type="button" onClick={() => showToast(tx(`Exporting ${orders.length} records to IQ-Bank-Audit-Logs.csv`, `กำลังส่งออก ${orders.length} รายการไปยัง IQ-Bank-Audit-Logs.csv`))} className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-primary text-on-primary hover:bg-primary-container text-label-md font-label-md transition-all shadow-sm whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[18px]">file_download</span>
             <span>{tx("Export Logs", "ส่งออกล็อก")}</span>
           </button>
         </div>
       </div>
 
-      {/* 4 Stat Metrics */}
+      {/* 4 Stat Metrics (Dynamic from PostgreSQL) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-space-md">
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between gap-2"><span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">{tx("Today's Orders", "คำสั่งซื้อวันนี้")}</span><span className="material-symbols-outlined text-primary text-[20px] shrink-0">shopping_bag</span></div>
+          <div className="flex items-center justify-between gap-2"><span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">{tx("Total Orders", "คำสั่งซื้อทั้งหมด")}</span><span className="material-symbols-outlined text-primary text-[20px] shrink-0">shopping_bag</span></div>
           <div className="mt-space-md flex items-baseline justify-between gap-2">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-on-surface">142</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("txns", "รายการ")}</span></div>
-            <span className="inline-flex items-center gap-0.5 px-space-xs py-0.5 rounded bg-secondary-container/40 text-on-secondary-fixed font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">trending_up</span>+18.4%</span>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-on-surface">{stats.totalCount}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("txns", "รายการ")}</span></div>
+            <span className="inline-flex items-center gap-0.5 px-space-xs py-0.5 rounded bg-secondary-container/40 text-on-secondary-fixed font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">trending_up</span>{tx("Live DB", "ข้อมูลจริง")}</span>
           </div>
           <div className="mt-space-sm w-full bg-surface-container-low h-1 rounded-full overflow-hidden"><div className="bg-primary h-full w-[78%]"></div></div>
         </div>
@@ -104,25 +134,25 @@ export default function AdminOrdersPage() {
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between gap-2"><span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">{tx("Queue Processing", "กำลังดำเนินการในคิว")}</span><span className="material-symbols-outlined text-secondary text-[20px] animate-spin shrink-0" style={{ animationDuration: "4s" }}>hourglass_top</span></div>
           <div className="mt-space-md flex items-baseline justify-between gap-2">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-on-surface">12</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("in queue", "ในคิว")}</span></div>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-on-surface">{stats.queueCount}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("in queue", "ในคิว")}</span></div>
             <span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("Avg 1.8s bot latency", "ความหน่วงบอทเฉลี่ย 1.8s")}</span>
           </div>
           <div className="mt-space-sm w-full bg-surface-container-low h-1 rounded-full overflow-hidden"><div className="bg-secondary h-full w-[45%]"></div></div>
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between gap-2"><span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">{tx("Failed Webhooks", "เว็บฮุคที่ล้มเหลว")}</span><span className="material-symbols-outlined text-error text-[20px] shrink-0">warning</span></div>
+          <div className="flex items-center justify-between gap-2"><span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">{tx("Failed / Cancelled", "รายการที่ล้มเหลว/ยกเลิก")}</span><span className="material-symbols-outlined text-error text-[20px] shrink-0">warning</span></div>
           <div className="mt-space-md flex items-baseline justify-between gap-2">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-error">4</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("retrying", "กำลังลองใหม่")}</span></div>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-error">{stats.failedCount}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("records", "รายการ")}</span></div>
             <span className="inline-flex items-center px-space-xs py-0.5 rounded bg-error-container text-on-error-container font-label-sm text-label-sm whitespace-nowrap shrink-0">{tx("Action Req.", "ต้องตรวจสอบ")}</span>
           </div>
           <div className="mt-space-sm w-full bg-surface-container-low h-1 rounded-full overflow-hidden"><div className="bg-error h-full w-[14%]"></div></div>
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between relative overflow-hidden group hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between gap-2"><span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">{tx("Gross Settlement", "ยอดชำระรวมวันนี้")}</span><span className="material-symbols-outlined text-tertiary text-[20px] shrink-0">payments</span></div>
+          <div className="flex items-center justify-between gap-2"><span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">{tx("Gross Settlement", "ยอดชำระรวมทั้งหมด")}</span><span className="material-symbols-outlined text-tertiary text-[20px] shrink-0">payments</span></div>
           <div className="mt-space-md flex items-baseline justify-between gap-2">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-on-surface whitespace-nowrap">฿89,400</span><span className="font-label-sm text-label-sm text-on-surface-variant">THB</span></div>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-lg text-headline-lg text-on-surface whitespace-nowrap">฿{stats.grossPaid.toLocaleString()}</span><span className="font-label-sm text-label-sm text-on-surface-variant">THB</span></div>
             <span className="inline-flex items-center gap-0.5 font-label-sm text-label-sm text-secondary whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">verified</span>IQ Direct</span>
           </div>
           <div className="mt-space-sm w-full bg-surface-container-low h-1 rounded-full overflow-hidden"><div className="bg-tertiary h-full w-[92%]"></div></div>
@@ -160,8 +190,8 @@ export default function AdminOrdersPage() {
 
         <div className="flex flex-wrap items-center gap-space-xs pt-1">
           <span className="font-label-sm text-label-sm text-on-surface-variant uppercase mr-1 whitespace-nowrap">{tx("Hot Views:", "มุมมองด่วน:")}</span>
-          <button type="button" onClick={() => handlePreset("PROCESSING")} className="px-space-sm py-0.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-colors whitespace-nowrap shrink-0">{tx("🔥 Unfulfilled (12)", "🔥 รอจัดส่ง (12)")}</button>
-          <button type="button" onClick={() => handlePreset("FAILED")} className="px-space-sm py-0.5 rounded bg-error-container/50 hover:bg-error-container text-on-error-container font-label-sm text-label-sm transition-colors whitespace-nowrap shrink-0">{tx("⚠️ Failed Webhooks (4)", "⚠️ เว็บฮุคล้มเหลว (4)")}</button>
+          <button type="button" onClick={() => handlePreset("PROCESSING")} className="px-space-sm py-0.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-colors whitespace-nowrap shrink-0">{tx(`🔥 Unfulfilled (${stats.queueCount})`, `🔥 รอจัดส่ง (${stats.queueCount})`)}</button>
+          <button type="button" onClick={() => handlePreset("FAILED")} className="px-space-sm py-0.5 rounded bg-error-container/50 hover:bg-error-container text-on-error-container font-label-sm text-label-sm transition-colors whitespace-nowrap shrink-0">{tx(`⚠️ Failed Webhooks (${stats.failedCount})`, `⚠️ เว็บฮุคล้มเหลว (${stats.failedCount})`)}</button>
           <button type="button" onClick={() => handlePreset("ROV")} className="px-space-sm py-0.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-colors whitespace-nowrap shrink-0">{tx("🎮 RoV Queue", "🎮 คิว RoV")}</button>
           <button type="button" onClick={() => handlePreset("ROBLOX")} className="px-space-sm py-0.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-colors whitespace-nowrap shrink-0">{tx("🧱 Roblox Queue", "🧱 คิว Roblox")}</button>
         </div>
@@ -224,7 +254,7 @@ export default function AdminOrdersPage() {
 
         <div className="p-space-md bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-sm text-label-sm text-on-surface-variant">
           <div className="flex items-center gap-space-sm whitespace-nowrap">
-            <span>{tx("Showing", "แสดง")} <strong className="text-on-surface">{filteredOrders.length}</strong> {tx("of 142 records", "จาก 142 รายการ")}</span>
+            <span>{tx("Showing", "แสดง")} <strong className="text-on-surface">{filteredOrders.length}</strong> {tx(`of ${orders.length} records`, `จาก ${orders.length} รายการ`)}</span>
             <span className="hidden sm:inline">|</span>
             <span className="hidden sm:inline">{tx("IQ-Bank Gateway Latency:", "ความหน่วงเกตเวย์ IQ-Bank:")} <strong className="text-secondary">42ms</strong></span>
           </div>

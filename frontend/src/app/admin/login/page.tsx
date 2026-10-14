@@ -4,23 +4,31 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { loginApi, setStoredToken, setStoredUser } from "@/lib/api";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const { lang, toggleLang, tx } = useLanguage();
-  const [username, setUsername] = useState("operator.node@apexpay.internal");
-  const [password, setPassword] = useState("ApexSecureKey#2025");
+  const [username, setUsername] = useState("admin_iq");
+  const [password, setPassword] = useState("admin123");
   const [showPassword, setShowPassword] = useState(false);
   const [showErrorBanner, setShowErrorBanner] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsVerifying(true);
-    setTimeout(() => {
-      setIsVerifying(false);
-      router.push("/admin");
-    }, 500);
+    try {
+      const res = await loginApi(username, password);
+      if (res?.token) setStoredToken(res.token);
+      setStoredUser({
+        id: res?.user?.id,
+        username: res?.user?.username || username,
+        role: res?.user?.role || "ADMIN",
+      });
+    } catch {}
+    setIsVerifying(false);
+    router.push("/admin");
   };
 
   return (

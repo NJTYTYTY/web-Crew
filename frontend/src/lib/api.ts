@@ -1,9 +1,10 @@
-import { AccountProduct, BannerItem, PackagesByGame, TopupGameKey, TopupGamesMetaByKey } from '@/types/store';
+import { AccountProduct, BannerItem, CustomerOrder, PackagesByGame, TopupGameKey, TopupGamesMetaByKey, UserProfile } from '@/types/store';
 import { initialAccountProducts, initialBanners, initialPackagesData, initialTopupGamesMeta } from '@/data/mockStoreData';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 const TOKEN_KEY = 'nexus_play_token';
+const USER_KEY = 'nexus_play_user';
 
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -15,6 +16,27 @@ export function setStoredToken(token: string | null): void {
   if (token) window.localStorage.setItem(TOKEN_KEY, token);
   else window.localStorage.removeItem(TOKEN_KEY);
 }
+
+export function getStoredUser(): UserProfile | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed.username === 'string' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredUser(user: UserProfile | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (user) window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+    else window.localStorage.removeItem(USER_KEY);
+  } catch {}
+}
+
 
 export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getStoredToken();
@@ -159,3 +181,67 @@ export function normalizeTopupGamesMeta(res: any): TopupGamesMetaByKey | null {
   });
   return mapped;
 }
+
+export function mapDbTxnToOverview(row: any) {
+  const isAccount = row.orderType === 'ACCOUNT';
+  const gName = row.gameName || (isAccount ? 'Roblox' : 'RoV');
+  const badge: 'R' | 'V' | 'A' | 'F' = gName.toLowerCase().includes('rov') ? 'V' : gName.toLowerCase().includes('free') ? 'F' : isAccount ? 'A' : 'R';
+  const status: 'SUCCESS' | 'WAITING OTP' | 'FAILED (TIMEOUT)' =
+    row.status === 'PAID' ? 'SUCCESS' : row.status === 'CANCELLED' || row.paymentStatus === 'FAILED' ? 'FAILED (TIMEOUT)' : 'WAITING OTP';
+  const actionLabel: 'Inspect' | 'Resolve' | 'Retry' = status === 'SUCCESS' ? 'Inspect' : status === 'WAITING OTP' ? 'Resolve' : 'Retry';
+  const targetUid = row.targetMetadata?.playerUid || row.targetMetadata?.robloxUsername || (row.gameAccountId ? `ACC-${row.gameAccountId}` : 'DIRECT');
+  const subLabel = isAccount ? `ACCOUNT #ACC-${row.gameAccountId || 1}` : row.targetMetadata?.playerUid ? `UID: ${row.targetMetadata.playerUid}` : `User: ${row.targetMetadata?.robloxUsername || row.username}`;
+  const timeStr = row.createdAt ? new Date(row.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Just now';
+  return {
+    id: `#${row.orderNumber || `ORD-${row.id}`}`,
+    customerName: row.username || 'customer',
+    customerSub: subLabel,
+    gameBadge: badge,
+    gameSku: row.itemTitle || 'Order Item',
+    amount: `฿${Number(row.totalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+    iqBankRef: `#${row.transactionRef || 'IQB-TX'}`,
+    status,
+    timestamp: timeStr,
+    actionLabel,
+    gameName: gName,
+    skuCode: isAccount ? `ACC-${row.gameAccountId || 1}` : `PKG-${row.topupPackageId || 1}`,
+    targetUid: String(targetUid),
+  };
+}
+
+export function mapDbOrderToAdminItem(row: any, idx: number) {
+  const isTopup = row.orderType === 'TOPUP';
+  const payStatus: 'PAID' | 'WAITING' | 'FAILED' =
+    row.status === 'PAID' || row.payment?.status === 'SUCCESS' ? 'PAID' : row.status === 'CANCELLED' || row.payment?.status === 'FAILED' ? 'FAILED' : 'WAITING';
+  const fulfillStatus: 'Completed' | 'Processing' | 'Pending' =
+    row.fulfillmentStatus === 'COMPLETED' ? 'Completed' : row.fulfillmentStatus === 'PROCESSING' ? 'Processing' : 'Pending';
+  const uidOrUser = row.targetMetadata?.playerUid || row.targetMetadata?.robloxUsername || row.accountUsername || `ACC-${row.gameAccountId || idx + 1}`;
+  const targetTitle = isTopup
+    ? row.targetMetadata?.playerUid ? `${row.gameName || 'Game'} UID: ${row.targetMetadata.playerUid}` : `Roblox: ${row.targetMetadata?.robloxUsername || row.username}`
+    : row.itemTitle || 'Game Account';
+  const targetSubtitle = isTopup ? row.itemTitle || 'Top-Up Package' : `Account ID: ${row.accountUsername || 'Verified'}`;
+  const iqRef = row.payment?.transactionRef || `IQB-TX-${100000 + Number(row.id || idx)}`;
+  const orderId = row.orderNumber || `ORD-${row.id}`;
+  const tones: Array<'surface' | 'tertiary' | 'secondary'> = ['secondary', 'tertiary', 'surface'];
+  return {
+    id: orderId,
+    customerName: row.username || 'customer',
+    customerTier: row.status === 'PAID' ? 'Verified Buyer' : 'Customer',
+    avatarInitials: String(row.username || 'CU').slice(0, 2).toUpperCase(),
+    avatarTone: tones[idx % tones.length],
+    type: (isTopup ? 'TOPUP' : 'ACCOUNT') as 'TOPUP' | 'ACCOUNT',
+    targetTitle,
+    targetSubtitle,
+    amount: Number(row.totalAmount || 0),
+    iqRef,
+    payment: payStatus,
+    fulfillment: fulfillStatus,
+    searchMeta: `${orderId} ${row.username || ''} ${targetTitle} ${targetSubtitle} ${iqRef}`.toLowerCase(),
+    targetUid: String(uidOrUser),
+    targetRegion: isTopup ? 'Region: Thailand / Direct Server' : 'Region: Global / Clean Handover',
+    robloxUser: row.targetMetadata?.robloxUsername || row.accountUsername || row.username || 'N/A',
+    robloxPass: row.targetMetadata?.robloxPassword || row.accountPassword || 'N/A (Direct UID)',
+    paymentChannel: 'IQ_BANK_PROMPTPAY_QR',
+  };
+}
+

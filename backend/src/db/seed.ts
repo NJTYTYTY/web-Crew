@@ -164,6 +164,98 @@ async function seed() {
     console.log('✅ Seeded 3 top-up games and 17 denomination packages');
   }
 
+  // 5. Seed Initial Orders & Payments (if < 4) so Admin Overview & Orders reflect real DB data
+  const [{ value: orderCount }] = await db.select({ value: count() }).from(orders);
+  if (orderCount < 4) {
+    const allUsers = await db.select().from(users);
+    const allAccounts = await db.select().from(gameAccounts);
+    const allPackages = await db.select().from(topupPackages);
+    const defaultUser = allUsers.find((u) => u.username === 'alex_gamer') || allUsers[0];
+    const uid = defaultUser?.id || 1;
+
+    const rovPkg = allPackages.find((p) => p.packageName.includes('1,420')) || allPackages[0];
+    const rbxPkg = allPackages.find((p) => p.packageName.includes('1,700')) || allPackages[1];
+    const ffPkg = allPackages.find((p) => p.packageName.includes('1,060')) || allPackages[2];
+    const rbxAcc = allAccounts.find((a) => a.gameCategory === 'ROBLOX') || allAccounts[0];
+    const rovAcc = allAccounts.find((a) => a.gameCategory === 'ROV') || allAccounts[1];
+
+    const seededOrders = await db
+      .insert(orders)
+      .values([
+        {
+          orderNumber: 'ORD-20261014-8821',
+          userId: uid,
+          orderType: 'ACCOUNT',
+          gameAccountId: rbxAcc?.id || 1,
+          topupPackageId: null,
+          targetMetadata: null,
+          totalAmount: rbxAcc?.price || 450,
+          status: 'PAID',
+          fulfillmentStatus: 'COMPLETED',
+        },
+        {
+          orderNumber: 'ORD-20261014-8822',
+          userId: uid,
+          orderType: 'TOPUP',
+          gameAccountId: null,
+          topupPackageId: rovPkg?.id || 1,
+          targetMetadata: { playerUid: '9842109841' },
+          totalAmount: rovPkg?.price || 380,
+          status: 'PAID',
+          fulfillmentStatus: 'COMPLETED',
+        },
+        {
+          orderNumber: 'ORD-20261014-8823',
+          userId: uid,
+          orderType: 'TOPUP',
+          gameAccountId: null,
+          topupPackageId: rbxPkg?.id || 2,
+          targetMetadata: { robloxUsername: 'BloxMaster_TH', robloxPassword: 'SafePassword123' },
+          totalAmount: rbxPkg?.price || 580,
+          status: 'PAID',
+          fulfillmentStatus: 'PROCESSING',
+        },
+        {
+          orderNumber: 'ORD-20261014-8824',
+          userId: uid,
+          orderType: 'ACCOUNT',
+          gameAccountId: rovAcc?.id || 2,
+          topupPackageId: null,
+          targetMetadata: null,
+          totalAmount: rovAcc?.price || 2500,
+          status: 'PAID',
+          fulfillmentStatus: 'COMPLETED',
+        },
+        {
+          orderNumber: 'ORD-20261014-8825',
+          userId: uid,
+          orderType: 'TOPUP',
+          gameAccountId: null,
+          topupPackageId: ffPkg?.id || 3,
+          targetMetadata: { playerUid: '81920491' },
+          totalAmount: ffPkg?.price || 300,
+          status: 'PENDING',
+          fulfillmentStatus: 'PENDING',
+        },
+      ])
+      .returning();
+
+    for (let i = 0; i < seededOrders.length; i++) {
+      const ord = seededOrders[i];
+      const txRef = `IQB-TX-90218${i + 1}`;
+      await db.insert(payments).values({
+        orderId: ord.id,
+        transactionRef: txRef,
+        provider: 'IQ_BANK',
+        amount: ord.totalAmount,
+        qrPayload: `00020101021229370016A000000677010111011300668000000005802TH530376454${ord.totalAmount}.0062170513${txRef}6304IQBK`,
+        status: ord.status === 'PAID' ? 'SUCCESS' : 'WAITING',
+        paidAt: ord.status === 'PAID' ? new Date() : null,
+      });
+    }
+    console.log('✅ Seeded 5 initial orders & IQ-Bank payment records');
+  }
+
   console.log('🎉 Database seed completed successfully!');
 }
 
@@ -175,3 +267,4 @@ seed()
   .finally(async () => {
     await pool.end();
   });
+

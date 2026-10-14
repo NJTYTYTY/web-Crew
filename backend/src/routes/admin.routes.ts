@@ -64,33 +64,59 @@ router.get('/overview', async (_req: Request, res: Response) => {
   try {
     const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
     const allAccounts = await db.select().from(gameAccounts);
-    const allBanners = await db.select().from(banners);
+    const allBanners = await db.select().from(banners).orderBy(asc(banners.sortOrder));
     const allPayments = await db.select().from(payments);
+    const allPackages = await db.select().from(topupPackages);
+    const allGames = await db.select().from(topupGames);
     const allUsers = await db.select({ id: users.id, username: users.username }).from(users);
 
     const totalRevenue = allOrders
       .filter((o) => o.status === 'PAID')
       .reduce((sum, o) => sum + o.totalAmount, 0);
     const accountsSold = allAccounts.filter((a) => a.status === 'SOLD').length;
+    const totalAccounts = allAccounts.length;
+    const inStockAccounts = allAccounts.filter((a) => a.status === 'AVAILABLE').length;
+    const rovAccountsCount = allAccounts.filter((a) => a.gameCategory === 'ROV').length;
+    const robloxAccountsCount = allAccounts.filter((a) => a.gameCategory === 'ROBLOX').length;
     const pendingTopups = allOrders.filter(
-      (o) => o.orderType === 'TOPUP' && o.fulfillmentStatus !== 'COMPLETED'
+      (o) => o.fulfillmentStatus !== 'COMPLETED' && o.status !== 'CANCELLED'
     ).length;
-    const activeBanners = allBanners.filter((b) => b.isActive).length;
+    const completedOrdersCount = allOrders.filter((o) => o.fulfillmentStatus === 'COMPLETED').length;
+    const activeBannersList = allBanners.filter((b) => b.isActive);
+    const activeBanners = activeBannersList.length;
 
     const recentTransactions = allOrders.slice(0, 15).map((ord) => {
       const payment = allPayments.find((p) => p.orderId === ord.id);
       const customer = allUsers.find((u) => u.id === ord.userId);
+      const account = ord.gameAccountId ? allAccounts.find((a) => a.id === ord.gameAccountId) : null;
+      const pkg = ord.topupPackageId ? allPackages.find((p) => p.id === ord.topupPackageId) : null;
+      const game = pkg ? allGames.find((g) => g.id === pkg.gameId) : null;
       return {
         ...ord,
         username: customer?.username || 'customer',
+        itemTitle: account?.title || (game ? `${game.name} — ${pkg?.packageName}` : pkg?.packageName) || 'Order Item',
+        gameName: account ? (account.gameCategory === 'ROV' ? 'RoV' : 'Roblox') : game?.name || 'Roblox',
         transactionRef: payment?.transactionRef || 'N/A',
-        paymentStatus: payment?.status || 'WAITING',
+        paymentStatus: payment?.status || (ord.status === 'PAID' ? 'SUCCESS' : 'WAITING'),
         rawWebhookPayload: payment?.rawWebhookPayload || null,
       };
     });
 
     res.json({
-      kpis: { totalRevenue, accountsSold, pendingTopups, activeBanners },
+      kpis: {
+        totalRevenue,
+        accountsSold,
+        totalAccounts,
+        inStockAccounts,
+        rovAccountsCount,
+        robloxAccountsCount,
+        pendingTopups,
+        completedOrdersCount,
+        totalOrdersCount: allOrders.length,
+        activeBanners,
+        totalBanners: allBanners.length,
+        firstActiveBannerTitle: activeBannersList[0]?.title || 'Active Hero Campaign',
+      },
       recentTransactions,
     });
   } catch (err) {
@@ -205,16 +231,21 @@ router.get('/orders', async (_req: Request, res: Response) => {
   const allUsers = await db.select({ id: users.id, username: users.username }).from(users);
   const allAccounts = await db.select().from(gameAccounts);
   const allPackages = await db.select().from(topupPackages);
+  const allGames = await db.select().from(topupGames);
 
   const enriched = allOrders.map((ord) => {
     const payment = allPayments.find((p) => p.orderId === ord.id);
     const user = allUsers.find((u) => u.id === ord.userId);
     const account = ord.gameAccountId ? allAccounts.find((a) => a.id === ord.gameAccountId) : null;
     const pkg = ord.topupPackageId ? allPackages.find((p) => p.id === ord.topupPackageId) : null;
+    const game = pkg ? allGames.find((g) => g.id === pkg.gameId) : null;
     return {
       ...ord,
       username: user?.username || 'customer',
       itemTitle: account?.title || pkg?.packageName || 'Order Item',
+      gameName: account ? (account.gameCategory === 'ROV' ? 'RoV' : 'Roblox') : game?.name || 'Game Top-Up',
+      accountUsername: account?.accountUsername || null,
+      accountPassword: account?.accountPassword || null,
       payment: payment || null,
     };
   });
@@ -223,13 +254,19 @@ router.get('/orders', async (_req: Request, res: Response) => {
 });
 
 router.patch('/orders/:id', async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
+  const param = String(req.params.id);
+  const numId = Number(param);
   const parsed = orderUpdateSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid order update' });
     return;
   }
-  const [updated] = await db.update(orders).set(parsed.data).where(eq(orders.id, id)).returning();
+  const whereClause = !Number.isNaN(numId) ? eq(orders.id, numId) : eq(orders.orderNumber, param);
+  const [updated] = await db.update(orders).set(parsed.data).where(whereClause).returning();
+  if (updated && parsed.data.status) {
+    const nextPayStatus = parsed.data.status === 'PAID' ? 'SUCCESS' : parsed.data.status === 'CANCELLED' ? 'FAILED' : 'WAITING';
+    await db.update(payments).set({ status: nextPayStatus }).where(eq(payments.orderId, updated.id));
+  }
   res.json({ order: updated });
 });
 

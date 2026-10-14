@@ -11,8 +11,8 @@ import {
 } from '@/data/mockStoreData';
 import {
   createOrderApi, fetchAccountsApi, fetchBannersApi, fetchMeApi, fetchOrdersApi,
-  fetchOrderStatusApi, fetchTopupGamesApi, loginApi, logoutApi, normalizeAccounts,
-  normalizeBanners, normalizeTopupGames, normalizeTopupGamesMeta, registerApi, setStoredToken, triggerIqBankSimulatorApi,
+  fetchOrderStatusApi, fetchTopupGamesApi, getStoredUser, loginApi, logoutApi, normalizeAccounts,
+  normalizeBanners, normalizeTopupGames, normalizeTopupGamesMeta, registerApi, setStoredToken, setStoredUser, triggerIqBankSimulatorApi,
 } from '@/lib/api';
 
 const StoreContext = createContext<StoreContextValue | undefined>(undefined);
@@ -30,7 +30,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const [currentView, setCurrentView] = useState<StoreViewName>('home');
   const [authMode, setAuthMode] = useState<AuthMode>('login');
-  const [user, setUser] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(() => getStoredUser());
   const [banners, setBanners] = useState<BannerItem[]>(initialBanners);
   const [accountProducts, setAccountProducts] = useState<AccountProduct[]>(initialAccountProducts);
   const [packagesData, setPackagesData] = useState<PackagesByGame>(initialPackagesData);
@@ -56,11 +56,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     fetchBannersApi().then((r) => { const b = normalizeBanners(r); if (b) setBanners(b); }).catch(() => {});
     fetchAccountsApi().then((r) => { const a = normalizeAccounts(r); if (a) setAccountProducts(a); }).catch(() => {});
     fetchTopupGamesApi().then((r) => {
-      const m = normalizeTopupGames(r);
-      const meta = normalizeTopupGamesMeta(r);
+      const m = normalizeTopupGames(r); const meta = normalizeTopupGamesMeta(r);
       if (meta) setTopupGamesMeta(meta);
       if (m) { setPackagesData(m); setSelectedPackage((prev) => m.rov.find((p) => p.id === prev?.id) || m.rov[2] || m.rov[0]); }
     }).catch(() => {});
+    fetchOrdersApi().then((r) => { if (Array.isArray(r?.orders) && r.orders.length > 0) setCustomerOrders(r.orders); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -76,15 +76,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [pathname, refreshStoreCatalog]);
 
   useEffect(() => {
+    const cached = getStoredUser(); if (cached) setUser(cached);
     refreshStoreCatalog();
     fetchMeApi().then((r) => {
       const u = r?.user || r;
-      if (u?.username) setUser({ id: u.id, username: u.username, role: u.role || 'CUSTOMER' });
+      if (u?.username) { const nextUser: UserProfile = { id: u.id, username: u.username, role: u.role || 'CUSTOMER' }; setUser(nextUser); setStoredUser(nextUser); }
     }).catch(() => {});
-    try {
-      const savedOrder = localStorage.getItem('nexusplay_active_order');
-      if (savedOrder) { const p = JSON.parse(savedOrder); if (p?.txRef) setActiveOrder(p); }
-    } catch {}
+    try { const s = localStorage.getItem('nexusplay_active_order'); if (s) { const p = JSON.parse(s); if (p?.txRef) setActiveOrder(p); } } catch {}
     const onFocus = () => refreshStoreCatalog();
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
@@ -232,27 +230,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     else if (currentView === 'auth') switchView('home');
   };
 
+  const applyAuthSession = async (res: any, fallbackUsername: string) => {
+    if (res?.token) setStoredToken(res.token);
+    const nextUser: UserProfile = { id: res?.user?.id, username: res?.user?.username || fallbackUsername, role: res?.user?.role || 'CUSTOMER' };
+    setUser(nextUser); setStoredUser(nextUser);
+    const ordRes = await fetchOrdersApi().catch(() => null);
+    if (Array.isArray(ordRes?.orders) && ordRes.orders.length > 0) setCustomerOrders(ordRes.orders);
+  };
+
   const login = async (username: string, password: string) => {
-    try {
-      const res = await loginApi(username, password);
-      if (res?.token) setStoredToken(res.token);
-      setUser({ id: res?.user?.id, username: res?.user?.username || username, role: res?.user?.role || 'CUSTOMER' });
-      const ordRes = await fetchOrdersApi().catch(() => null);
-      if (Array.isArray(ordRes?.orders) && ordRes.orders.length > 0) setCustomerOrders(ordRes.orders);
-    } catch { setUser({ username, role: 'CUSTOMER' }); }
+    try { await applyAuthSession(await loginApi(username, password), username); }
+    catch { const u: UserProfile = { username, role: 'CUSTOMER' }; setUser(u); setStoredUser(u); }
     await finishAuthAndResume(pendingPurchase);
   };
 
   const register = async (username: string, password: string, confirmPassword: string) => {
-    try {
-      const res = await registerApi(username, password, confirmPassword);
-      if (res?.token) setStoredToken(res.token);
-      setUser({ id: res?.user?.id, username: res?.user?.username || username, role: res?.user?.role || 'CUSTOMER' });
-    } catch { setUser({ username, role: 'CUSTOMER' }); }
+    try { await applyAuthSession(await registerApi(username, password, confirmPassword), username); }
+    catch { const u: UserProfile = { username, role: 'CUSTOMER' }; setUser(u); setStoredUser(u); }
     await finishAuthAndResume(pendingPurchase);
   };
 
-  const logout = async () => { await logoutApi().catch(() => {}); setStoredToken(null); setUser(null); };
+  const logout = async () => { await logoutApi().catch(() => {}); setStoredToken(null); setStoredUser(null); setUser(null); };
 
   const simulateQRUpload = () => {
     setSimLogs((prev) => [...prev, '[QR SCANNER] Detected EMVCo PromptPay QR Code!', `[PAYLOAD] Merch: NEXUS PLAY | Ref: ${activeOrder.txRef} | Amt: ฿${activeOrder.price}`]);
@@ -272,8 +270,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('nexusplay_payment_event', JSON.stringify({ status: 'SUCCESS', txRef: activeOrder.txRef, order: activeOrder, ts: Date.now() }));
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const bc = new BroadcastChannel('nexusplay_payment_channel');
-        bc.postMessage({ type: 'PAYMENT_SUCCESS', order: activeOrder });
-        bc.close();
+        bc.postMessage({ type: 'PAYMENT_SUCCESS', order: activeOrder }); bc.close();
       }
     } catch {}
     if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/iq-bank-simulator')) openModal('success');
