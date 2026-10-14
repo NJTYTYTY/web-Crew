@@ -23,7 +23,7 @@ export function AccountMarketplaceView() {
   }, [accountProducts, categoryFilter, sortOption]);
 
   const filterBtnClass = (cat: 'all' | 'Roblox' | 'RoV') =>
-    `acc-filter px-3 py-1.5 rounded-lg transition ${
+    `acc-filter px-3 py-1.5 rounded-lg transition whitespace-nowrap shrink-0 ${
       categoryFilter === cat ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
     }`;
 
@@ -34,11 +34,11 @@ export function AccountMarketplaceView() {
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs mb-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center space-x-2">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 whitespace-nowrap shrink-0">
                   {tx('SECTION 1.1', 'หมวดหมู่ 1.1')}
                 </span>
-                <h1 className="text-2xl font-black text-slate-900">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900">
                   {tx('Game Account Marketplace', 'ตลาดซื้อขายไอดีเกมพร้อมเล่น')}
                 </h1>
               </div>
@@ -52,7 +52,7 @@ export function AccountMarketplaceView() {
 
             {/* Filter Controls */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="bg-slate-100 p-1 rounded-xl flex items-center space-x-1 text-xs font-bold">
+              <div className="bg-slate-100 p-1 rounded-xl flex items-center space-x-1 text-xs font-bold overflow-x-auto hide-scrollbar max-w-full">
                 <button onClick={() => setCategoryFilter('all')} id="filter-all" className={filterBtnClass('all')}>
                   {tx('All Games', 'ทุกเกม')}
                 </button>
@@ -73,7 +73,7 @@ export function AccountMarketplaceView() {
                 id="acc-sort"
                 value={sortOption}
                 onChange={(e) => setSortOption(e.target.value as 'featured' | 'price-asc' | 'price-desc')}
-                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                className="text-xs font-semibold bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 whitespace-nowrap shrink-0"
               >
                 <option value="featured">{tx('Sort: Featured First', 'เรียงตาม: แนะนำพิเศษ')}</option>
                 <option value="price-asc">{tx('Price: Low to High', 'ราคา: ต่ำ ไป สูง')}</option>
@@ -101,7 +101,7 @@ export function AccountMarketplaceView() {
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
 
                   <span
-                    className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-sm ${
+                    className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-sm whitespace-nowrap ${
                       acc.game === 'Roblox' ? 'bg-indigo-600' : 'bg-red-600'
                     }`}
                   >
@@ -109,14 +109,14 @@ export function AccountMarketplaceView() {
                   </span>
 
                   <span
-                    className={`absolute top-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    className={`absolute top-3 right-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap ${
                       isInStock ? 'bg-emerald-500/90 text-white' : 'bg-slate-700 text-slate-300'
                     }`}
                   >
                     {isInStock ? tx('In Stock', 'พร้อมส่ง') : tx('Sold Out', 'ขายแล้ว')}
                   </span>
 
-                  <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-lg shadow-sm">
+                  <div className="absolute bottom-3 right-3 bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded-lg shadow-sm whitespace-nowrap">
                     <span className="text-sm font-black text-slate-900">฿{acc.price}</span>
                   </div>
                 </div>
@@ -131,7 +131,7 @@ export function AccountMarketplaceView() {
                       {acc.tags.map((t) => (
                         <span
                           key={t}
-                          className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200/60"
+                          className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200/60 whitespace-nowrap"
                         >
                           {t}
                         </span>
@@ -139,20 +139,20 @@ export function AccountMarketplaceView() {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400 font-medium">
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap truncate">
                       {tx('Instant ID Handover', 'รับไอดีทันทีหลังโอน')}
                     </span>
                     <button
                       onClick={() => buyAccount(acc.id)}
                       disabled={!isInStock}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 whitespace-nowrap shrink-0 ${
                         isInStock
                           ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
                           : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                       }`}
                     >
-                      <ShoppingCart className="w-3.5 h-3.5" />
+                      <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
                       <span>{isInStock ? tx('Buy Account', 'ซื้อไอดีนี้') : tx('Out of Stock', 'สินค้าหมด')}</span>
                     </button>
                   </div>

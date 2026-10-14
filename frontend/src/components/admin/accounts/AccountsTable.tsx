@@ -38,13 +38,13 @@ export default function AccountsTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
-              <th className="py-space-md px-space-lg font-semibold">{tx("Item & Title", "รายการ & ชื่อไอดี")}</th>
-              <th className="py-space-md px-space-md font-semibold">{tx("Platform", "แพลตฟอร์ม")}</th>
-              <th className="py-space-md px-space-md font-semibold">{tx("Specs Summary", "รายละเอียดสเปค")}</th>
-              <th className="py-space-md px-space-md font-semibold text-right">{tx("Price (THB)", "ราคา (บาท)")}</th>
-              <th className="py-space-md px-space-md font-semibold text-center">{tx("Status", "สถานะ")}</th>
-              <th className="py-space-md px-space-md font-semibold">{tx("Instant Vault Credentials", "ข้อมูลรหัสผ่านในคลังนิรภัย")}</th>
-              <th className="py-space-md px-space-lg font-semibold text-right">{tx("Actions", "จัดการ")}</th>
+              <th className="py-space-md px-space-lg font-semibold whitespace-nowrap">{tx("Item & Title", "รายการ & ชื่อไอดี")}</th>
+              <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Platform", "แพลตฟอร์ม")}</th>
+              <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Specs Summary", "รายละเอียดสเปค")}</th>
+              <th className="py-space-md px-space-md font-semibold text-right whitespace-nowrap">{tx("Price (THB)", "ราคา (บาท)")}</th>
+              <th className="py-space-md px-space-md font-semibold text-center whitespace-nowrap">{tx("Status", "สถานะ")}</th>
+              <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Instant Vault Credentials", "ข้อมูลรหัสผ่านในคลังนิรภัย")}</th>
+              <th className="py-space-md px-space-lg font-semibold text-right whitespace-nowrap">{tx("Actions", "จัดการ")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-surface-container font-body-sm text-body-sm text-on-surface">
@@ -58,7 +58,7 @@ export default function AccountsTable({
                       <div className="relative w-14 h-14 rounded-lg overflow-hidden bg-surface-container shrink-0 shadow-sm">
                         <img className="w-full h-full object-cover" src={acc.imageUrl} alt={acc.title} />
                         <span
-                          className={`absolute top-1 left-1 bg-surface-container-lowest/90 px-1 rounded font-label-sm text-[9px] font-bold ${
+                          className={`absolute top-1 left-1 bg-surface-container-lowest/90 px-1 rounded font-label-sm text-[9px] font-bold whitespace-nowrap ${
                             acc.platform === "roblox" ? "text-primary" : "text-tertiary"
                           }`}
                         >
@@ -69,8 +69,8 @@ export default function AccountsTable({
                         <span className="font-headline-sm text-headline-sm text-on-surface truncate font-semibold">
                           {acc.title}
                         </span>
-                        <span className="font-label-sm text-label-sm text-outline flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[14px]">{acc.subIcon}</span>
+                        <span className="font-label-sm text-label-sm text-outline flex items-center gap-1 whitespace-nowrap">
+                          <span className="material-symbols-outlined text-[14px] shrink-0">{acc.subIcon}</span>
                           {acc.subtitle}
                         </span>
                       </div>
@@ -79,13 +79,13 @@ export default function AccountsTable({
 
                   <td className="py-space-md px-space-md whitespace-nowrap">
                     {acc.platform === "roblox" ? (
-                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-inverse-surface text-inverse-on-surface font-medium">
-                        <span className="material-symbols-outlined text-[13px] text-tertiary-fixed">smart_toy</span>
+                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-inverse-surface text-inverse-on-surface font-medium whitespace-nowrap">
+                        <span className="material-symbols-outlined text-[13px] text-tertiary-fixed shrink-0">smart_toy</span>
                         {acc.platformLabel}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-surface-container-high text-on-primary-container font-medium">
-                        <span className="material-symbols-outlined text-[13px] text-primary">sports_esports</span>
+                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-surface-container-high text-on-primary-container font-medium whitespace-nowrap">
+                        <span className="material-symbols-outlined text-[13px] text-primary shrink-0">sports_esports</span>
                         {acc.platformLabel}
                       </span>
                     )}
@@ -112,13 +112,13 @@ export default function AccountsTable({
 
                   <td className="py-space-md px-space-md text-center whitespace-nowrap">
                     {isSold ? (
-                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-highest text-on-surface-variant font-semibold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full font-label-sm text-label-sm bg-surface-container-highest text-on-surface-variant font-semibold whitespace-nowrap">
+                        <span className="w-1.5 h-1.5 rounded-full bg-outline shrink-0"></span>
                         {tx("Sold", "ขายแล้ว")}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full font-label-sm text-label-sm bg-secondary-container text-on-secondary-fixed font-semibold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full font-label-sm text-label-sm bg-secondary-container text-on-secondary-fixed font-semibold whitespace-nowrap">
+                        <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0"></span>
                         {tx("Available", "พร้อมขาย")}
                       </span>
                     )}
@@ -126,7 +126,7 @@ export default function AccountsTable({
 
                   <td className="py-space-md px-space-md whitespace-nowrap">
                     <div
-                      className={`flex items-center gap-space-sm bg-surface-container-low px-space-sm py-1.5 rounded-lg max-w-fit ${
+                      className={`flex items-center gap-space-sm bg-surface-container-low px-space-sm py-1.5 rounded-lg max-w-fit whitespace-nowrap ${
                         isSold ? "opacity-70" : ""
                       }`}
                     >
@@ -136,7 +136,7 @@ export default function AccountsTable({
                       <button
                         type="button"
                         onClick={() => toggleReveal(acc.id)}
-                        className="text-outline hover:text-primary transition-colors"
+                        className="text-outline hover:text-primary transition-colors shrink-0"
                         title={tx("Toggle view", "แสดง/ซ่อนรหัสผ่าน")}
                       >
                         <span className="material-symbols-outlined text-[16px]">
@@ -146,7 +146,7 @@ export default function AccountsTable({
                       <button
                         type="button"
                         onClick={() => handleCopyPair(acc)}
-                        className="text-outline hover:text-on-surface transition-colors"
+                        className="text-outline hover:text-on-surface transition-colors shrink-0"
                         title={tx("Copy pair", "คัดลอกไอดีและรหัสผ่าน")}
                       >
                         <span className="material-symbols-outlined text-[16px]">content_copy</span>
@@ -209,7 +209,7 @@ export default function AccountsTable({
       </div>
 
       <div className="px-space-lg py-space-md bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-md">
-        <div className="flex items-center gap-space-sm">
+        <div className="flex items-center gap-space-sm whitespace-nowrap">
           <span className="font-label-sm text-label-sm text-on-surface-variant">
             {tx("Page 1 of 25", "หน้า 1 จาก 25")}
           </span>
@@ -218,11 +218,11 @@ export default function AccountsTable({
             {tx("Queue latency: 18ms", "ความหน่วงคิว: 18ms")}
           </span>
         </div>
-        <div className="flex items-center gap-space-xs">
+        <div className="flex items-center gap-space-xs shrink-0">
           <button
             type="button"
             disabled
-            className="px-space-md py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors disabled:opacity-40"
+            className="px-space-md py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors disabled:opacity-40 whitespace-nowrap"
           >
             {tx("Previous", "ก่อนหน้า")}
           </button>
@@ -233,7 +233,7 @@ export default function AccountsTable({
           <button type="button" className="w-8 h-8 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center hover:bg-surface-container transition-colors">25</button>
           <button
             type="button"
-            className="px-space-md py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors"
+            className="px-space-md py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors whitespace-nowrap"
           >
             {tx("Next", "ถัดไป")}
           </button>

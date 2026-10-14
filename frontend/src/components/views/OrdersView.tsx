@@ -15,11 +15,11 @@ export function OrdersView() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-slate-200 gap-4">
           <div>
-            <div className="flex items-center space-x-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 whitespace-nowrap shrink-0">
                 {tx('SECTION 1.3', 'หมวดหมู่ 1.3')}
               </span>
-              <h1 className="text-2xl font-black text-slate-900">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900">
                 {tx('Customer Purchase History', 'ประวัติการสั่งซื้อและรับสินค้า')}
               </h1>
             </div>
@@ -32,12 +32,12 @@ export function OrdersView() {
             </p>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 shrink-0">
             <button
               onClick={seedNewDemoOrder}
-              className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition flex items-center space-x-1.5"
+              className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 whitespace-nowrap shrink-0"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 shrink-0" />
               <span>{tx('Simulate New Completed Order', 'จำลองคำสั่งซื้อสำเร็จใหม่')}</span>
             </button>
           </div>
@@ -49,41 +49,41 @@ export function OrdersView() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
-                  <th className="py-3 px-4">{tx('Order ID & Ref', 'รหัสคำสั่งซื้อ & อ้างอิง')}</th>
-                  <th className="py-3 px-4">{tx('Item Details', 'รายละเอียดสินค้า')}</th>
-                  <th className="py-3 px-4">{tx('Type', 'ประเภท')}</th>
-                  <th className="py-3 px-4">{tx('Date / Time', 'วัน / เวลา')}</th>
-                  <th className="py-3 px-4">{tx('Amount', 'ยอดชำระ')}</th>
-                  <th className="py-3 px-4">{tx('Payment Status', 'สถานะชำระเงิน')}</th>
-                  <th className="py-3 px-4 text-right">{tx('Fulfillment / Action', 'การส่งมอบ / จัดการ')}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{tx('Order ID & Ref', 'รหัสคำสั่งซื้อ & อ้างอิง')}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{tx('Item Details', 'รายละเอียดสินค้า')}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{tx('Type', 'ประเภท')}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{tx('Date / Time', 'วัน / เวลา')}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{tx('Amount', 'ยอดชำระ')}</th>
+                  <th className="py-3 px-4 whitespace-nowrap">{tx('Payment Status', 'สถานะชำระเงิน')}</th>
+                  <th className="py-3 px-4 text-right whitespace-nowrap">{tx('Fulfillment / Action', 'การส่งมอบ / จัดการ')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100" id="orders-table-body">
                 {customerOrders.map((ord) => (
                   <tr key={ord.id + ord.ref} className="hover:bg-slate-50/70 transition">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-900">
+                    <td className="py-3 px-4 font-mono font-bold text-slate-900 whitespace-nowrap">
                       <div>{ord.id}</div>
                       <span className="text-[10px] text-slate-400 font-normal">{ord.ref}</span>
                     </td>
-                    <td className="py-3 px-4 font-semibold text-slate-800">{ord.title}</td>
-                    <td className="py-3 px-4 text-slate-500">{ord.type}</td>
-                    <td className="py-3 px-4 text-slate-400">{ord.date}</td>
-                    <td className="py-3 px-4 font-bold text-slate-900">฿{ord.amount}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    <td className="py-3 px-4 font-semibold text-slate-800 min-w-[180px]">{ord.title}</td>
+                    <td className="py-3 px-4 text-slate-500 whitespace-nowrap">{ord.type}</td>
+                    <td className="py-3 px-4 text-slate-400 whitespace-nowrap">{ord.date}</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">฿{ord.amount}</td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
                         ● {ord.status === 'PAID' ? tx('PAID', 'ชำระแล้ว') : ord.status}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-right">
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
                       {ord.revealedPass !== 'COMPLETED' ? (
                         <button
                           onClick={() => revealOrderCredentials(ord.revealedUser, ord.revealedPass, ord.title)}
-                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-[11px] border border-indigo-200"
+                          className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-[11px] border border-indigo-200 whitespace-nowrap"
                         >
                           {tx('View Account ID / Pass', 'ดูรหัสไอดีเกม / พาสเวิร์ด')}
                         </button>
                       ) : (
-                        <span className="text-[11px] text-slate-400 font-medium">
+                        <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap">
                           {tx('Delivered to Account', 'เติมเข้าบัญชีเกมสำเร็จ')}
                         </span>
                       )}

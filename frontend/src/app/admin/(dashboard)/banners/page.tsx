@@ -58,16 +58,16 @@ export default function AdminBannersPage() {
   };
 
   return (
-    <div className="px-gutter-desktop py-space-xl max-w-[1600px] mx-auto w-full space-y-space-xl">
+    <div className="px-4 sm:px-6 lg:px-gutter-desktop py-space-xl max-w-[1600px] mx-auto w-full space-y-space-xl">
       {/* Top Action Bar & Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-lg">
         <div className="space-y-space-xs">
-          <div className="flex items-center gap-space-sm">
-            <span className="font-label-sm text-label-sm uppercase tracking-wider text-primary bg-primary-fixed px-space-sm py-0.5 rounded-full">
+          <div className="flex flex-wrap items-center gap-space-sm">
+            <span className="font-label-sm text-label-sm uppercase tracking-wider text-primary bg-primary-fixed px-space-sm py-0.5 rounded-full whitespace-nowrap shrink-0">
               {tx("Storefront CMS", "ระบบจัดการหน้าร้าน")}
             </span>
             <span className="text-outline text-body-sm">•</span>
-            <span className="font-label-sm text-label-sm text-outline">
+            <span className="font-label-sm text-label-sm text-outline whitespace-nowrap">
               {tx("Hero Slider Controller", "ควบคุมสไลด์แบนเนอร์หลัก")}
             </span>
           </div>
@@ -82,12 +82,12 @@ export default function AdminBannersPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-space-sm self-start md:self-auto">
-          <Link href="/" className="h-9 px-space-md rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-body-sm text-body-sm flex items-center gap-space-xs shadow-sm transition-all">
+        <div className="flex flex-wrap items-center gap-space-sm self-start md:self-auto shrink-0">
+          <Link href="/" className="h-9 px-space-md rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-body-sm text-body-sm inline-flex items-center gap-space-xs shadow-sm transition-all whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[18px]">visibility</span>
             <span>{tx("Live Storefront Preview", "ดูตัวอย่างหน้าร้านจริง")}</span>
           </Link>
-          <button type="button" onClick={() => { setEditingBanner(null); setDrawerOpen(true); }} className="h-9 px-space-lg rounded-lg bg-inverse-surface text-inverse-on-surface hover:opacity-90 font-body-sm text-body-sm flex items-center gap-space-xs shadow-sm transition-all">
+          <button type="button" onClick={() => { setEditingBanner(null); setDrawerOpen(true); }} className="h-9 px-space-lg rounded-lg bg-inverse-surface text-inverse-on-surface hover:opacity-90 font-body-sm text-body-sm inline-flex items-center gap-space-xs shadow-sm transition-all whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[18px]">add_photo_alternate</span>
             <span className="font-medium">{tx("+ Add New Banner", "+ เพิ่มแบนเนอร์ใหม่")}</span>
           </button>
@@ -97,46 +97,46 @@ export default function AdminBannersPage() {
       {/* 4 KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
         <div className="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden group">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant">{tx("Total Active Banners", "แบนเนอร์ที่แสดงผลอยู่")}</span>
-            <span className="w-8 h-8 rounded-lg bg-secondary-container/40 text-on-secondary-fixed flex items-center justify-center"><span className="material-symbols-outlined text-[18px]">view_carousel</span></span>
+            <span className="w-8 h-8 rounded-lg bg-secondary-container/40 text-on-secondary-fixed flex items-center justify-center shrink-0"><span className="material-symbols-outlined text-[18px]">view_carousel</span></span>
           </div>
-          <div className="mt-space-md flex items-baseline justify-between">
-            <span className="font-headline-lg text-headline-lg text-on-surface">{banners.filter((b) => b.active).length} <span className="font-body-sm text-body-sm text-on-surface-variant font-normal">{tx("/ 6 Slots", "/ 6 ตำแหน่ง")}</span></span>
-            <span className="font-label-sm text-label-sm text-secondary bg-secondary-container/30 px-space-xs py-0.5 rounded-full flex items-center gap-0.5"><span className="material-symbols-outlined text-[14px]">check_circle</span> {tx("100% Health", "ปกติ 100%")}</span>
+          <div className="mt-space-md flex items-baseline justify-between gap-2">
+            <span className="font-headline-lg text-headline-lg text-on-surface whitespace-nowrap">{banners.filter((b) => b.active).length} <span className="font-body-sm text-body-sm text-on-surface-variant font-normal">{tx("/ 6 Slots", "/ 6 ตำแหน่ง")}</span></span>
+            <span className="font-label-sm text-label-sm text-secondary bg-secondary-container/30 px-space-xs py-0.5 rounded-full inline-flex items-center gap-0.5 whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">check_circle</span> {tx("100% Health", "ปกติ 100%")}</span>
           </div>
         </div>
 
         <div className="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant">{tx("Total Click-throughs", "ยอดคลิกแบนเนอร์รวม")}</span>
-            <span className="w-8 h-8 rounded-lg bg-primary-fixed text-primary flex items-center justify-center"><span className="material-symbols-outlined text-[18px]">ads_click</span></span>
+            <span className="w-8 h-8 rounded-lg bg-primary-fixed text-primary flex items-center justify-center shrink-0"><span className="material-symbols-outlined text-[18px]">ads_click</span></span>
           </div>
-          <div className="mt-space-md flex items-baseline justify-between">
+          <div className="mt-space-md flex items-baseline justify-between gap-2">
             <span className="font-headline-lg text-headline-lg text-on-surface font-label-md">28,490</span>
-            <div className="flex items-center gap-1 font-label-sm text-label-sm text-secondary"><span className="material-symbols-outlined text-[16px]">trending_up</span><span>+18.4%</span></div>
+            <div className="flex items-center gap-1 font-label-sm text-label-sm text-secondary whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[16px]">trending_up</span><span>+18.4%</span></div>
           </div>
         </div>
 
         <div className="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant">{tx("Average Storefront CTR", "อัตราการคลิกเฉลี่ย (CTR)")}</span>
-            <span className="w-8 h-8 rounded-lg bg-tertiary-fixed text-tertiary flex items-center justify-center"><span className="material-symbols-outlined text-[18px]">query_stats</span></span>
+            <span className="w-8 h-8 rounded-lg bg-tertiary-fixed text-tertiary flex items-center justify-center shrink-0"><span className="material-symbols-outlined text-[18px]">query_stats</span></span>
           </div>
-          <div className="mt-space-md flex items-baseline justify-between">
+          <div className="mt-space-md flex items-baseline justify-between gap-2">
             <span className="font-headline-lg text-headline-lg text-on-surface font-label-md">9.2%</span>
-            <span className="font-body-sm text-body-sm text-outline">{tx("Benchmark: 4.5%", "เกณฑ์มาตรฐาน: 4.5%")}</span>
+            <span className="font-body-sm text-body-sm text-outline whitespace-nowrap">{tx("Benchmark: 4.5%", "เกณฑ์มาตรฐาน: 4.5%")}</span>
           </div>
         </div>
 
         <div className="p-space-lg rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant">{tx("Top Conversion Campaign", "แคมเปญยอดนิยมสูงสุด")}</span>
-            <span className="w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant flex items-center justify-center"><span className="material-symbols-outlined text-[18px]">military_tech</span></span>
+            <span className="w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant flex items-center justify-center shrink-0"><span className="material-symbols-outlined text-[18px]">military_tech</span></span>
           </div>
           <div className="mt-space-md">
             <div className="font-headline-sm text-headline-sm text-on-surface truncate">PayDay 15% Bonus</div>
-            <div className="font-label-sm text-label-sm text-tertiary flex items-center gap-1 mt-0.5"><span className="material-symbols-outlined text-[14px]">local_fire_department</span><span>14,200 {tx("clicks", "คลิก")} (11.8% CTR)</span></div>
+            <div className="font-label-sm text-label-sm text-tertiary flex items-center gap-1 mt-0.5 whitespace-nowrap"><span className="material-symbols-outlined text-[14px]">local_fire_department</span><span>14,200 {tx("clicks", "คลิก")} (11.8% CTR)</span></div>
           </div>
         </div>
       </div>
@@ -144,27 +144,27 @@ export default function AdminBannersPage() {
       {/* Banner Manager Grid & Table Section */}
       <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
         <div className="p-space-md bg-surface-container-lowest flex flex-wrap items-center justify-between gap-space-md">
-          <div className="flex items-center gap-space-sm flex-1 min-w-[280px] max-w-md">
+          <div className="flex items-center gap-space-sm flex-1 min-w-[240px] max-w-md">
             <div className="relative w-full">
               <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">search</span>
               <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full h-9 pl-9 pr-3 rounded-lg bg-surface-container-low font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary shadow-inner" placeholder={tx("Search banner title, campaign tag, target link...", "ค้นหาชื่อแบนเนอร์, แคมเปญ หรือลิงก์ปลายทาง...")} type="text" />
             </div>
           </div>
 
-          <div className="flex items-center gap-space-sm">
-            <div className="flex items-center rounded-lg bg-surface-container-low p-0.5">
-              <button type="button" onClick={() => setTabFilter("all")} className={`px-space-md py-1 rounded-md font-label-sm text-label-sm flex items-center gap-1 ${tabFilter === "all" ? "bg-surface-container-lowest shadow-sm text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>
+          <div className="flex flex-wrap items-center gap-space-sm">
+            <div className="flex items-center rounded-lg bg-surface-container-low p-0.5 overflow-x-auto max-w-full">
+              <button type="button" onClick={() => setTabFilter("all")} className={`px-space-md py-1 rounded-md font-label-sm text-label-sm inline-flex items-center gap-1 whitespace-nowrap shrink-0 ${tabFilter === "all" ? "bg-surface-container-lowest shadow-sm text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>
                 <span className="material-symbols-outlined text-[16px]">view_list</span><span>{tx("All", "ทั้งหมด")} ({banners.length})</span>
               </button>
-              <button type="button" onClick={() => setTabFilter("active")} className={`px-space-md py-1 rounded-md font-label-sm text-label-sm flex items-center gap-1 ${tabFilter === "active" ? "bg-surface-container-lowest shadow-sm text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>
+              <button type="button" onClick={() => setTabFilter("active")} className={`px-space-md py-1 rounded-md font-label-sm text-label-sm inline-flex items-center gap-1 whitespace-nowrap shrink-0 ${tabFilter === "active" ? "bg-surface-container-lowest shadow-sm text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>
                 <span>{tx("Active", "เปิดใช้งาน")} ({banners.filter((b) => b.active).length})</span>
               </button>
-              <button type="button" onClick={() => setTabFilter("scheduled")} className={`px-space-md py-1 rounded-md font-label-sm text-label-sm flex items-center gap-1 ${tabFilter === "scheduled" ? "bg-surface-container-lowest shadow-sm text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>
+              <button type="button" onClick={() => setTabFilter("scheduled")} className={`px-space-md py-1 rounded-md font-label-sm text-label-sm inline-flex items-center gap-1 whitespace-nowrap shrink-0 ${tabFilter === "scheduled" ? "bg-surface-container-lowest shadow-sm text-on-surface" : "text-on-surface-variant hover:text-on-surface"}`}>
                 <span>{tx("Scheduled", "พัก/ตั้งเวลา")} ({banners.filter((b) => !b.active).length})</span>
               </button>
             </div>
 
-            <button type="button" onClick={() => setSortAsc((prev) => !prev)} className="h-9 px-space-md rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm flex items-center gap-space-xs transition-colors">
+            <button type="button" onClick={() => setSortAsc((prev) => !prev)} className="h-9 px-space-md rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-body-sm text-body-sm inline-flex items-center gap-space-xs transition-colors whitespace-nowrap shrink-0">
               <span className="material-symbols-outlined text-[18px]">swap_vert</span><span>{tx("Sort: Order #", "เรียงตามลำดับ #")}</span>
             </button>
           </div>
@@ -172,42 +172,42 @@ export default function AdminBannersPage() {
 
         <div className="divide-y divide-surface-container-low">
           {filteredBanners.map((item) => (
-            <div key={item.id} className="p-space-lg hover:bg-surface-container-low/50 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg group">
-              <div className="flex items-start sm:items-center gap-space-md flex-1 min-w-0">
-                <div className="flex items-center gap-space-xs text-outline group-hover:text-on-surface cursor-grab">
+            <div key={item.id} className="p-4 sm:p-space-lg hover:bg-surface-container-low/50 transition-colors flex flex-col lg:flex-row lg:items-center justify-between gap-space-lg group">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-space-md flex-1 min-w-0">
+                <div className="flex items-center gap-space-xs text-outline group-hover:text-on-surface cursor-grab shrink-0">
                   <span className="material-symbols-outlined text-[20px]">drag_indicator</span>
                   <span className="w-7 h-7 rounded-md bg-surface-container flex items-center justify-center font-label-sm text-label-sm text-on-surface font-semibold">{item.order}</span>
                 </div>
 
-                <div className="relative w-44 sm:w-56 h-24 rounded-lg overflow-hidden bg-surface-container-high shrink-0 shadow-sm">
+                <div className="relative w-full sm:w-56 h-28 sm:h-24 rounded-lg overflow-hidden bg-surface-container-high shrink-0 shadow-sm">
                   <img className="w-full h-full object-cover" src={item.imageUrl} alt={item.title} />
                   <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-inverse-surface/80 backdrop-blur-md text-inverse-on-surface font-label-sm text-[10px]">1920x600</span>
-                  {item.heroBadge && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-primary-container text-on-primary-container font-label-sm text-[10px] font-medium">{item.heroBadge}</span>}
+                  {item.heroBadge && <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-primary-container text-on-primary-container font-label-sm text-[10px] font-medium whitespace-nowrap">{item.heroBadge}</span>}
                 </div>
 
-                <div className="space-y-1 min-w-0 flex-1">
+                <div className="space-y-1 min-w-0 flex-1 w-full">
                   <div className="flex flex-wrap items-center gap-space-xs">
                     <span className="font-headline-sm text-headline-sm text-on-surface truncate">{item.title}</span>
-                    <span className={`font-label-sm text-label-sm px-2 py-0.5 rounded-full font-medium ${item.badgeTone === "external" ? "bg-surface-container-high text-on-surface-variant" : "bg-secondary-container/40 text-secondary"}`}>
+                    <span className={`font-label-sm text-label-sm px-2 py-0.5 rounded-full font-medium whitespace-nowrap shrink-0 ${item.badgeTone === "external" ? "bg-surface-container-high text-on-surface-variant" : "bg-secondary-container/40 text-secondary"}`}>
                       {item.active ? item.badgeText : tx("Paused", "หยุดชั่วคราว")}
                     </span>
                   </div>
                   <p className="font-body-sm text-body-sm text-on-surface-variant truncate">{item.caption}</p>
                   <div className="flex flex-wrap items-center gap-space-md text-on-surface-variant font-label-sm text-label-sm pt-1">
-                    <span className="flex items-center gap-1 text-primary">
-                      <span className="material-symbols-outlined text-[14px]">{item.isExternal ? "open_in_new" : "link"}</span>
+                    <span className="flex items-center gap-1 text-primary whitespace-nowrap">
+                      <span className="material-symbols-outlined text-[14px] shrink-0">{item.isExternal ? "open_in_new" : "link"}</span>
                       <code className="bg-surface-container px-1.5 py-0.5 rounded text-on-surface">{item.targetUrl}</code>
                     </span>
-                    <span className="flex items-center gap-1 text-outline">
-                      <span className="material-symbols-outlined text-[14px]">{item.scheduleIcon}</span>
+                    <span className="flex items-center gap-1 text-outline whitespace-nowrap">
+                      <span className="material-symbols-outlined text-[14px] shrink-0">{item.scheduleIcon}</span>
                       <span>{item.scheduleLabel}</span>
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between lg:justify-end gap-space-xl pt-space-sm lg:pt-0">
-                <div className="text-right">
+              <div className="flex items-center justify-between lg:justify-end gap-space-xl pt-space-sm lg:pt-0 shrink-0">
+                <div className="text-right whitespace-nowrap">
                   <div className="font-label-md text-label-md text-on-surface font-semibold">{item.clicks} <span className="text-on-surface-variant font-normal">{tx("clicks", "คลิก")}</span></div>
                   <div className="font-label-sm text-label-sm text-secondary flex items-center justify-end gap-1"><span className="material-symbols-outlined text-[13px]">show_chart</span><span>{item.ctr}</span></div>
                 </div>
@@ -241,8 +241,8 @@ export default function AdminBannersPage() {
         </div>
 
         <div className="px-space-lg py-space-md bg-surface-container-low/60 flex flex-col sm:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
-          <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[16px] text-primary">info</span>{tx("Drag row icons or change numeric priority to adjust hero carousel sequencing.", "ลากไอคอนหรือเปลี่ยนตัวเลขลำดับเพื่อจัดเรียงสไลด์แบนเนอร์หน้าแรก")}</span>
-          <div className="flex items-center gap-space-sm font-label-sm text-label-sm">
+          <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[16px] text-primary shrink-0">info</span>{tx("Drag row icons or change numeric priority to adjust hero carousel sequencing.", "ลากไอคอนหรือเปลี่ยนตัวเลขลำดับเพื่อจัดเรียงสไลด์แบนเนอร์หน้าแรก")}</span>
+          <div className="flex items-center gap-space-sm font-label-sm text-label-sm whitespace-nowrap shrink-0">
             <span>{tx("Carousel Speed:", "ความเร็วสไลด์:")} <strong className="text-on-surface font-medium">5.0s</strong></span><span>•</span><span>{tx("Max Concurrent:", "สูงสุดพร้อมกัน:")} <strong className="text-on-surface font-medium">6</strong></span>
           </div>
         </div>

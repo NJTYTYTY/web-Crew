@@ -24,15 +24,15 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="min-h-screen w-full flex items-center justify-center p-space-lg bg-surface font-body-md text-on-surface relative">
+    <main className="min-h-screen w-full flex items-center justify-center p-4 sm:p-space-lg bg-surface font-body-md text-on-surface relative">
       {/* Top-right Language Switcher */}
-      <div className="fixed top-4 right-6 z-50">
+      <div className="fixed top-4 right-4 sm:right-6 z-50">
         <button
           type="button"
           onClick={toggleLang}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container-lowest shadow-sm hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors border border-surface-container-high"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface-container-lowest shadow-sm hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors border border-surface-container-high whitespace-nowrap shrink-0"
         >
-          <span className="material-symbols-outlined text-[16px] text-primary">
+          <span className="material-symbols-outlined text-[16px] text-primary shrink-0">
             translate
           </span>
           <span className={lang === "en" ? "font-bold text-primary" : "text-on-surface-variant"}>
@@ -53,12 +53,12 @@ export default function AdminLoginPage() {
                 security_update_warning
               </span>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <p className="font-headline-sm text-headline-sm text-on-error-container">
                     {tx("Access Denied & Logged", "ปฏิเสธการเข้าถึงและบันทึกประวัติแล้ว")}
                   </p>
                   <button
-                    className="text-on-error-container hover:opacity-75 transition-opacity"
+                    className="text-on-error-container hover:opacity-75 transition-opacity shrink-0"
                     onClick={() => setShowErrorBanner(false)}
                     type="button"
                   >
@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
                     "Invalid operator credentials. Access attempt logged under IP ",
                     "ข้อมูลผู้ดูแลระบบไม่ถูกต้อง บันทึกความพยายามเข้าถึงภายใต้ IP "
                   )}
-                  <span className="font-label-sm text-label-sm font-semibold tracking-wider">
+                  <span className="font-label-sm text-label-sm font-semibold tracking-wider whitespace-nowrap">
                     203.144.144.22
                   </span>
                 </p>
@@ -80,14 +80,14 @@ export default function AdminLoginPage() {
         )}
 
         <div className="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-md overflow-hidden relative">
-          <div className="bg-inverse-surface px-space-lg py-space-xs flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
-              <span className="font-label-sm text-label-sm text-inverse-on-surface uppercase tracking-wider">
+          <div className="bg-inverse-surface px-4 sm:px-space-lg py-space-xs flex items-center justify-between gap-2">
+            <div className="flex items-center space-x-2 min-w-0">
+              <span className="inline-block w-2 h-2 rounded-full bg-secondary-container animate-pulse shrink-0"></span>
+              <span className="font-label-sm text-label-sm text-inverse-on-surface uppercase tracking-wider truncate">
                 {tx("Node: US-EAST-SECURE-09", "โหนด: US-EAST-SECURE-09")}
               </span>
             </div>
-            <div className="flex items-center space-x-1 text-surface-container-high">
+            <div className="flex items-center space-x-1 text-surface-container-high whitespace-nowrap shrink-0">
               <span className="material-symbols-outlined text-[14px]">terminal</span>
               <span className="font-label-sm text-label-sm text-inverse-on-surface">
                 SYS.PORT 4438
@@ -95,7 +95,7 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
-          <div className="p-space-2xl flex flex-col">
+          <div className="p-6 sm:p-space-2xl flex flex-col">
             <div className="flex flex-col items-center text-center">
               <div className="w-12 h-12 bg-primary flex items-center justify-center rounded-lg shadow-sm mb-space-md">
                 <span
@@ -114,14 +114,14 @@ export default function AdminLoginPage() {
                   "ระบบยืนยันตัวตนโครงสร้างพื้นฐานหลักโดยตรง"
                 )}
               </p>
-              <div className="mt-space-md inline-flex items-center gap-1.5 px-space-md py-1 bg-surface-container text-on-surface-variant rounded-full">
+              <div className="mt-space-md inline-flex items-center gap-1.5 px-space-md py-1 bg-surface-container text-on-surface-variant rounded-full whitespace-nowrap">
                 <span
-                  className="material-symbols-outlined text-error text-[15px]"
+                  className="material-symbols-outlined text-error text-[15px] shrink-0"
                   style={{ fontVariationSettings: "'FILL' 1" }}
                 >
                   lock
                 </span>
-                <span className="font-label-sm text-label-sm tracking-wide uppercase font-semibold text-error">
+                <span className="font-label-sm text-label-sm tracking-wide uppercase font-semibold text-error whitespace-nowrap">
                   {tx(
                     "Restricted Access • Internal Operator Only",
                     "จำกัดสิทธิ์ • เฉพาะเจ้าหน้าที่ภายในเท่านั้น"
@@ -154,11 +154,11 @@ export default function AdminLoginPage() {
               </div>
 
               <div className="flex flex-col space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="font-label-md text-label-md text-on-surface" htmlFor="adminPassword">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="font-label-md text-label-md text-on-surface whitespace-nowrap" htmlFor="adminPassword">
                     {tx("Passcode & Hardware Key", "รหัสผ่านและฮาร์ดแวร์คีย์")}
                   </label>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                  <span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap shrink-0">
                     {tx("RSA / YubiKey Ready", "รองรับ RSA / YubiKey")}
                   </span>
                 </div>
@@ -190,13 +190,13 @@ export default function AdminLoginPage() {
 
               <button
                 disabled={isVerifying}
-                className="w-full h-11 bg-on-surface hover:bg-inverse-surface active:scale-[0.99] text-inverse-on-surface rounded-lg font-headline-sm text-headline-sm flex items-center justify-center space-x-2 transition-all shadow-sm mt-space-sm disabled:opacity-75"
+                className="w-full h-11 bg-on-surface hover:bg-inverse-surface active:scale-[0.99] text-inverse-on-surface rounded-lg font-headline-sm text-headline-sm flex items-center justify-center space-x-2 transition-all shadow-sm mt-space-sm disabled:opacity-75 whitespace-nowrap"
                 type="submit"
               >
-                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                <span className="material-symbols-outlined text-[18px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
                   lock
                 </span>
-                <span>
+                <span className="whitespace-nowrap">
                   {isVerifying
                     ? tx("Verifying Enclave...", "กำลังตรวจสอบสิทธิ์...")
                     : tx("Sign In to Backoffice", "เข้าสู่ระบบหลังบ้าน")}
@@ -204,11 +204,11 @@ export default function AdminLoginPage() {
               </button>
             </form>
 
-            <div className="mt-space-xl pt-space-lg bg-surface-container-low rounded-lg p-space-md flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <span className="material-symbols-outlined text-primary text-[18px]">dashboard</span>
+            <div className="mt-space-xl pt-space-lg bg-surface-container-low rounded-lg p-space-md flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center space-x-2 whitespace-nowrap">
+                <span className="material-symbols-outlined text-primary text-[18px] shrink-0">dashboard</span>
                 <Link
-                  className="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-1"
+                  className="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-1 whitespace-nowrap"
                   href="/admin"
                 >
                   <span>{tx("View Live Dashboard", "ดูแดชบอร์ดสด")}</span>
@@ -216,7 +216,7 @@ export default function AdminLoginPage() {
                 </Link>
               </div>
               <button
-                className="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface bg-surface-container px-2.5 py-1 rounded transition-colors"
+                className="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface bg-surface-container px-2.5 py-1 rounded transition-colors whitespace-nowrap shrink-0"
                 onClick={() => setShowErrorBanner((prev) => !prev)}
                 type="button"
               >
@@ -225,14 +225,14 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
-          <div className="bg-surface-container px-space-lg py-space-md flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
-            <div className="flex items-center space-x-1.5 text-on-surface-variant">
-              <span className="material-symbols-outlined text-secondary text-[16px]">verified_user</span>
+          <div className="bg-surface-container px-4 sm:px-space-lg py-space-md flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-2">
+            <div className="flex items-center space-x-1.5 text-on-surface-variant whitespace-nowrap">
+              <span className="material-symbols-outlined text-secondary text-[16px] shrink-0">verified_user</span>
               <span className="font-label-sm text-label-sm">
                 {tx("256-Bit SSL Secured", "ปลอดภัยด้วย 256-Bit SSL")}
               </span>
             </div>
-            <div className="font-label-sm text-label-sm text-on-surface-variant">
+            <div className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
               {tx("IQ-Bank Automated Gateway Admin Node", "โหนดแอดมินเกตเวย์อัตโนมัติ IQ-Bank")}
             </div>
           </div>

@@ -37,8 +37,8 @@ export function AuthView({ initialMode }: { initialMode?: AuthMode }) {
 
   return (
     <div id="view-auth" className="page-view">
-      <div className="max-w-md mx-auto px-4 py-12">
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl relative overflow-hidden">
+      <div className="max-w-md mx-auto px-4 py-10 sm:py-12">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl relative overflow-hidden">
           <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-500" />
 
           <div className="text-center mb-6">
@@ -60,7 +60,7 @@ export function AuthView({ initialMode }: { initialMode?: AuthMode }) {
               type="button"
               onClick={() => handleModeSwitch('login')}
               id="btn-mode-login"
-              className={`flex-1 py-2 rounded-lg transition text-center ${
+              className={`flex-1 py-2 px-3 rounded-lg transition text-center whitespace-nowrap ${
                 activeMode === 'login' ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -70,7 +70,7 @@ export function AuthView({ initialMode }: { initialMode?: AuthMode }) {
               type="button"
               onClick={() => handleModeSwitch('register')}
               id="btn-mode-register"
-              className={`flex-1 py-2 rounded-lg transition text-center ${
+              className={`flex-1 py-2 px-3 rounded-lg transition text-center whitespace-nowrap ${
                 activeMode === 'register' ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -151,18 +151,18 @@ export function AuthView({ initialMode }: { initialMode?: AuthMode }) {
             <button
               type="submit"
               id="auth-submit-btn"
-              className="w-full mt-2 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition text-sm flex items-center justify-center space-x-2"
+              className="w-full mt-2 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition text-sm flex items-center justify-center space-x-2 whitespace-nowrap"
             >
               <span id="auth-btn-label">
                 {activeMode === 'register' ? tx('Create Account & Sign In', 'สมัครสมาชิกและเข้าสู่ระบบ') : tx('Sign In', 'เข้าสู่ระบบ')}
               </span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 shrink-0" />
             </button>
           </form>
 
           <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-            <p className="text-[11px] text-slate-400 flex items-center justify-center space-x-1">
-              <Shield className="w-3.5 h-3.5 text-emerald-500" />
+            <p className="text-[11px] text-slate-400 flex items-center justify-center space-x-1.5">
+              <Shield className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
               <span>{tx('High-speed username session. No email registration required.', 'ระบบล็อกอินความเร็วสูงด้วย Username ไม่ต้องใช้อีเมล')}</span>
             </p>
           </div>

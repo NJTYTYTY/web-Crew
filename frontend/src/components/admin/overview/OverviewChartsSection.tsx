@@ -18,9 +18,9 @@ export default function OverviewChartsSection() {
   const [period, setPeriod] = useState<"7D" | "30D" | "YTD">("7D");
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-gutter-desktop">
       {/* 7-Day Chart & Game Volume Breakdown */}
-      <div className="lg:col-span-8 bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col justify-between">
+      <div className="lg:col-span-8 bg-surface-container-lowest rounded-xl p-5 sm:p-space-xl shadow-sm flex flex-col justify-between">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pb-space-lg border-b border-surface-container">
           <div>
             <h2 className="font-headline-md text-headline-md text-on-surface">
@@ -33,7 +33,7 @@ export default function OverviewChartsSection() {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-space-xs bg-surface-container-low p-1 rounded-xl">
+          <div className="flex items-center gap-space-xs bg-surface-container-low p-1 rounded-xl self-start sm:self-auto shrink-0">
             {(
               [
                 { id: "7D", labelEn: "7 Days", labelTh: "7 วัน" },
@@ -47,8 +47,8 @@ export default function OverviewChartsSection() {
                 onClick={() => setPeriod(tab.id)}
                 className={
                   period === tab.id
-                    ? "px-space-md py-1 rounded-lg bg-surface-container-lowest font-label-sm text-label-sm text-on-surface shadow-xs"
-                    : "px-space-md py-1 rounded-lg font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors"
+                    ? "px-space-md py-1 rounded-lg bg-surface-container-lowest font-label-sm text-label-sm text-on-surface shadow-xs whitespace-nowrap shrink-0"
+                    : "px-space-md py-1 rounded-lg font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-colors whitespace-nowrap shrink-0"
                 }
               >
                 {tx(tab.labelEn, tab.labelTh)}
@@ -59,26 +59,26 @@ export default function OverviewChartsSection() {
 
         {/* High-tech Stacked Bar Chart */}
         <div className="py-space-xl">
-          <div className="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm mb-2">
-            <span>{tx("THB (Thousands)", "บาท (พันบาท)")}</span>
-            <div className="flex items-center gap-space-lg">
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-sm bg-primary"></span> Roblox Robux
+          <div className="flex flex-wrap items-center justify-between gap-2 text-on-surface-variant font-label-sm text-label-sm mb-2">
+            <span className="whitespace-nowrap">{tx("THB (Thousands)", "บาท (พันบาท)")}</span>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-space-lg">
+              <span className="flex items-center gap-1.5 whitespace-nowrap">
+                <span className="w-3 h-3 rounded-sm bg-primary shrink-0"></span> Roblox Robux
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-sm bg-secondary"></span> RoV Vouchers
+              <span className="flex items-center gap-1.5 whitespace-nowrap">
+                <span className="w-3 h-3 rounded-sm bg-secondary shrink-0"></span> RoV Vouchers
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-sm bg-tertiary"></span> Free Fire Diamonds
+              <span className="flex items-center gap-1.5 whitespace-nowrap">
+                <span className="w-3 h-3 rounded-sm bg-tertiary shrink-0"></span> Free Fire Diamonds
               </span>
             </div>
           </div>
 
-          <div className="h-56 w-full flex items-end gap-space-md justify-between pt-4">
+          <div className="h-56 w-full flex items-end gap-2 sm:gap-space-md justify-between pt-4">
             {CHART_DAYS.map((item) => (
               <div
                 key={item.dayEn}
-                className="flex-1 flex flex-col items-center gap-space-xs h-full justify-end group"
+                className="flex-1 flex flex-col items-center gap-space-xs h-full justify-end group min-w-0"
               >
                 <div className="w-full max-w-[42px] flex flex-col gap-1 items-stretch">
                   <div
@@ -94,7 +94,7 @@ export default function OverviewChartsSection() {
                     title="Roblox Robux"
                   ></div>
                 </div>
-                <span className={`font-label-sm text-label-sm ${item.labelStyle}`}>
+                <span className={`font-label-sm text-label-sm whitespace-nowrap ${item.labelStyle}`}>
                   {tx(item.dayEn, item.dayTh)}
                 </span>
               </div>
@@ -102,28 +102,28 @@ export default function OverviewChartsSection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-space-md pt-space-md border-t border-surface-container bg-surface-container-low/50 p-space-md rounded-xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-md pt-space-md border-t border-surface-container bg-surface-container-low/50 p-space-md rounded-xl">
           <div className="flex flex-col">
-            <span className="font-label-sm text-label-sm text-on-surface-variant">
+            <span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
               {tx("Roblox Volume Share", "สัดส่วนยอดขาย Roblox")}
             </span>
-            <span className="font-headline-sm text-headline-sm text-primary font-semibold">
+            <span className="font-headline-sm text-headline-sm text-primary font-semibold whitespace-nowrap">
               51.2% (฿731k)
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="font-label-sm text-label-sm text-on-surface-variant">
+            <span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
               {tx("RoV Arena Share", "สัดส่วนยอดขาย RoV")}
             </span>
-            <span className="font-headline-sm text-headline-sm text-secondary font-semibold">
+            <span className="font-headline-sm text-headline-sm text-secondary font-semibold whitespace-nowrap">
               31.8% (฿454k)
             </span>
           </div>
           <div className="flex flex-col">
-            <span className="font-label-sm text-label-sm text-on-surface-variant">
+            <span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
               {tx("Free Fire Share", "สัดส่วนยอดขาย Free Fire")}
             </span>
-            <span className="font-headline-sm text-headline-sm text-tertiary font-semibold">
+            <span className="font-headline-sm text-headline-sm text-tertiary font-semibold whitespace-nowrap">
               17.0% (฿243k)
             </span>
           </div>
@@ -131,7 +131,7 @@ export default function OverviewChartsSection() {
       </div>
 
       {/* Fulfillment Speed Radial Gauge */}
-      <div className="lg:col-span-4 bg-surface-container-lowest rounded-xl p-space-xl shadow-sm flex flex-col justify-between">
+      <div className="lg:col-span-4 bg-surface-container-lowest rounded-xl p-5 sm:p-space-xl shadow-sm flex flex-col justify-between">
         <div className="flex items-center justify-between pb-space-md border-b border-surface-container">
           <div className="flex flex-col">
             <span className="font-headline-md text-headline-md text-on-surface">
@@ -141,7 +141,7 @@ export default function OverviewChartsSection() {
               {tx("Automated IQ-Bank API Speed", "ความเร็ว API อัตโนมัติของ IQ-Bank")}
             </span>
           </div>
-          <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-secondary animate-ping shrink-0"></span>
         </div>
 
         <div className="relative flex flex-col items-center justify-center my-space-lg">
@@ -172,27 +172,27 @@ export default function OverviewChartsSection() {
             <span className="font-headline-xl text-headline-xl font-bold text-on-surface">
               42s
             </span>
-            <span className="font-label-sm text-label-sm text-secondary uppercase font-semibold tracking-wide">
+            <span className="font-label-sm text-label-sm text-secondary uppercase font-semibold tracking-wide whitespace-nowrap">
               {tx("Target: < 60s", "เป้าหมาย: < 60 วินาที")}
             </span>
-            <span className="font-body-sm text-body-sm text-on-surface-variant mt-1">
+            <span className="font-body-sm text-body-sm text-on-surface-variant mt-1 whitespace-nowrap">
               {tx("Avg Execution Time", "เวลาดำเนินการเฉลี่ย")}
             </span>
           </div>
         </div>
 
         <div className="flex flex-col gap-space-sm bg-surface-container-low p-space-md rounded-xl">
-          <div className="flex items-center justify-between text-body-sm font-body-sm">
-            <span className="text-on-surface-variant">{tx("IQ Webhook ACK", "การตอบรับ IQ Webhook")}</span>
-            <span className="font-label-sm text-label-sm text-on-surface font-semibold">0.8s</span>
+          <div className="flex items-center justify-between text-body-sm font-body-sm gap-2">
+            <span className="text-on-surface-variant whitespace-nowrap">{tx("IQ Webhook ACK", "การตอบรับ IQ Webhook")}</span>
+            <span className="font-label-sm text-label-sm text-on-surface font-semibold whitespace-nowrap">0.8s</span>
           </div>
-          <div className="flex items-center justify-between text-body-sm font-body-sm">
-            <span className="text-on-surface-variant">{tx("Game Bot Dispatch", "ส่งคำสั่งบอทเติมเกม")}</span>
-            <span className="font-label-sm text-label-sm text-on-surface font-semibold">3.4s</span>
+          <div className="flex items-center justify-between text-body-sm font-body-sm gap-2">
+            <span className="text-on-surface-variant whitespace-nowrap">{tx("Game Bot Dispatch", "ส่งคำสั่งบอทเติมเกม")}</span>
+            <span className="font-label-sm text-label-sm text-on-surface font-semibold whitespace-nowrap">3.4s</span>
           </div>
-          <div className="flex items-center justify-between text-body-sm font-body-sm">
-            <span className="text-on-surface-variant">{tx("Pin Injection & Receipt", "เติมพินและออกใบเสร็จ")}</span>
-            <span className="font-label-sm text-label-sm text-on-surface font-semibold">37.8s</span>
+          <div className="flex items-center justify-between text-body-sm font-body-sm gap-2">
+            <span className="text-on-surface-variant whitespace-nowrap">{tx("Pin Injection & Receipt", "เติมพินและออกใบเสร็จ")}</span>
+            <span className="font-label-sm text-label-sm text-on-surface font-semibold whitespace-nowrap">37.8s</span>
           </div>
         </div>
       </div>

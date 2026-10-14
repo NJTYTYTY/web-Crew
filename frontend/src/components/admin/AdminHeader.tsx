@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { APEX_ADMIN_LOGO_URL } from "@/data/mockAdminData";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function AdminHeader() {
+interface AdminHeaderProps {
+  onToggleMobileMenu?: () => void;
+}
+
+export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
   const router = useRouter();
   const { lang, toggleLang, tx } = useLanguage();
   const [globalQuery, setGlobalQuery] = useState("");
@@ -19,21 +23,29 @@ export default function AdminHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter-desktop">
-      <div className="flex items-center gap-space-lg">
+    <header className="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-30 flex items-center justify-between px-4 sm:px-6 lg:px-gutter-desktop gap-3">
+      <div className="flex items-center gap-2 sm:gap-space-md min-w-0 flex-1">
+        <button
+          type="button"
+          onClick={onToggleMobileMenu}
+          className="lg:hidden w-9 h-9 rounded-xl bg-surface-container-low hover:bg-surface-container flex items-center justify-center text-on-surface shrink-0"
+          aria-label="Open sidebar navigation"
+        >
+          <span className="material-symbols-outlined text-[20px]">menu</span>
+        </button>
         <img
           alt="ApexPay Admin Logo"
-          className="h-8 w-auto object-contain"
+          className="h-7 sm:h-8 w-auto object-contain shrink-0 hidden sm:block"
           src={APEX_ADMIN_LOGO_URL}
         />
-        <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-          <span className="material-symbols-outlined absolute left-space-md text-[18px] text-outline">
+        <form onSubmit={handleSearchSubmit} className="relative flex items-center flex-1 max-w-xs sm:max-w-sm">
+          <span className="material-symbols-outlined absolute left-3 text-[18px] text-outline pointer-events-none">
             search
           </span>
           <input
             value={globalQuery}
             onChange={(e) => setGlobalQuery(e.target.value)}
-            className="w-80 h-9 pl-9 pr-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary"
+            className="w-full h-9 pl-9 pr-3 bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary"
             placeholder={tx(
               "Search queue UID, game ID, order token...",
               "ค้นหา UID คิว, รหัสเกม, หรือรหัสคำสั่งซื้อ..."
@@ -43,14 +55,14 @@ export default function AdminHeader() {
         </form>
       </div>
 
-      <div className="flex items-center gap-space-md">
+      <div className="flex items-center gap-2 sm:gap-space-md shrink-0">
         <button
           type="button"
           onClick={toggleLang}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors border border-surface-container-high"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm transition-colors border border-surface-container-high whitespace-nowrap shrink-0"
           title={tx("Switch Language", "เปลี่ยนภาษา")}
         >
-          <span className="material-symbols-outlined text-[16px] text-primary">
+          <span className="material-symbols-outlined text-[16px] text-primary shrink-0">
             translate
           </span>
           <span className={lang === "en" ? "font-bold text-primary" : "text-on-surface-variant"}>
@@ -62,27 +74,27 @@ export default function AdminHeader() {
           </span>
         </button>
 
-        <div className="hidden lg:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-secondary-container/40 text-on-secondary-fixed">
-          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-          <span className="font-label-sm text-label-sm uppercase tracking-wide">
+        <div className="hidden xl:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-secondary-container/40 text-on-secondary-fixed whitespace-nowrap shrink-0">
+          <span className="w-2 h-2 rounded-full bg-secondary animate-pulse shrink-0"></span>
+          <span className="font-label-sm text-label-sm uppercase tracking-wide whitespace-nowrap">
             {tx("Live Sync", "ซิงค์สด")}
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-surface-container-low text-on-surface-variant">
-          <span className="material-symbols-outlined text-[16px]">schedule</span>
-          <span className="font-label-sm text-label-sm">UTC+7 14:32:09</span>
+        <div className="hidden md:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-surface-container-low text-on-surface-variant whitespace-nowrap shrink-0">
+          <span className="material-symbols-outlined text-[16px] shrink-0">schedule</span>
+          <span className="font-label-sm text-label-sm whitespace-nowrap">UTC+7 14:32:09</span>
         </div>
 
-        <div className="hidden sm:inline-flex items-center px-space-sm py-space-xs rounded-xl bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">
+        <div className="hidden sm:inline-flex items-center px-space-sm py-space-xs rounded-xl bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap shrink-0">
           {tx("admin_iq: ACTIVE", "แอดมิน_iq: ออนไลน์")}
         </div>
 
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => setShowNotifToast((prev) => !prev)}
-            className="relative w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
+            className="relative w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors shrink-0"
             title={tx("Gateway Alerts", "การแจ้งเตือนเกตเวย์")}
           >
             <span className="material-symbols-outlined text-[20px]">
@@ -94,13 +106,13 @@ export default function AdminHeader() {
           {showNotifToast && (
             <div className="absolute right-0 mt-2 w-72 rounded-xl bg-surface-container-lowest p-space-md shadow-xl border border-surface-container-high z-50">
               <div className="flex items-center justify-between pb-2 border-b border-surface-container">
-                <span className="font-label-sm text-label-sm uppercase text-primary font-semibold">
+                <span className="font-label-sm text-label-sm uppercase text-primary font-semibold whitespace-nowrap">
                   {tx("System Telemetry", "สถานะระบบ")}
                 </span>
                 <button
                   type="button"
                   onClick={() => setShowNotifToast(false)}
-                  className="text-outline hover:text-on-surface"
+                  className="text-outline hover:text-on-surface shrink-0"
                 >
                   <span className="material-symbols-outlined text-[16px]">
                     close
@@ -125,7 +137,7 @@ export default function AdminHeader() {
           )}
         </div>
 
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
           <span className="material-symbols-outlined text-on-primary text-[18px]">
             person
           </span>

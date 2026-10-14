@@ -87,21 +87,21 @@ export default function AdminTopUpPage() {
   };
 
   return (
-    <div className="flex flex-col w-full p-margin-desktop gap-space-2xl">
+    <div className="flex flex-col w-full px-4 sm:px-6 lg:px-margin-desktop py-space-xl gap-space-2xl">
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
         <div className="flex flex-col gap-space-xs">
-          <div className="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+          <div className="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider whitespace-nowrap">
             <span>{tx("Catalog Operations", "จัดการระบบสินค้า")}</span>
             <span className="material-symbols-outlined text-[14px]">chevron_right</span>
             <span className="text-primary font-medium">{tx("Automated Pipeline", "ท่อส่งข้อมูลอัตโนมัติ")}</span>
           </div>
-          <div className="flex items-center gap-space-md">
+          <div className="flex flex-wrap items-center gap-space-md">
             <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
               {tx("Top-Up Games & Packages", "เกมเติมเงิน & แพ็กเกจ")}
             </h1>
-            <span className="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-fixed font-label-sm text-label-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+            <span className="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-fixed font-label-sm text-label-sm whitespace-nowrap shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse shrink-0"></span>
               {tx("Gateway Online", "เกตเวย์ออนไลน์")}
             </span>
           </div>
@@ -113,12 +113,12 @@ export default function AdminTopUpPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-space-sm self-start md:self-auto">
-          <button type="button" onClick={() => setLatencyModalOpen(true)} className="flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm shadow-sm hover:bg-surface-container transition-all">
+        <div className="flex flex-wrap items-center gap-space-sm self-start md:self-auto shrink-0">
+          <button type="button" onClick={() => setLatencyModalOpen(true)} className="inline-flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm shadow-sm hover:bg-surface-container transition-all whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[18px] text-tertiary">hub</span>
             <span>{tx("Gateway Metrics", "ความหน่วงเกตเวย์")}</span>
           </button>
-          <button type="button" onClick={() => { setEditingPkg(null); setDrawerOpen(true); }} className="flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-primary text-on-primary font-body-sm text-body-sm shadow-sm hover:bg-primary-container transition-all">
+          <button type="button" onClick={() => { setEditingPkg(null); setDrawerOpen(true); }} className="inline-flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-primary text-on-primary font-body-sm text-body-sm shadow-sm hover:bg-primary-container transition-all whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[18px]">add_circle</span>
             <span>{tx("+ Add Top-Up Package", "+ เพิ่มแพ็กเกจเติมเกม")}</span>
           </button>
@@ -127,14 +127,14 @@ export default function AdminTopUpPage() {
 
       {/* Supported Providers (3 Active) */}
       <section className="flex flex-col gap-space-md">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-space-sm">
-            <span className="material-symbols-outlined text-primary text-[20px]">sports_esports</span>
+            <span className="material-symbols-outlined text-primary text-[20px] shrink-0">sports_esports</span>
             <h2 className="font-headline-sm text-headline-sm text-on-surface">
               {tx("Supported Providers (3 Active)", "ผู้ให้บริการเกมที่รองรับ (ออนไลน์ 3 ค่าย)")}
             </h2>
           </div>
-          <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+          <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider whitespace-nowrap">
             {tx("Queue Routing & Protocols", "เส้นทางคิวและโปรโตคอล")}
           </span>
         </div>
@@ -147,33 +147,33 @@ export default function AdminTopUpPage() {
               <div
                 key={prov.id}
                 onClick={() => setSelectedGame(prov.id)}
-                className={`group relative flex flex-col justify-between p-space-xl rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all cursor-pointer border-2 ${
+                className={`group relative flex flex-col justify-between p-5 sm:p-space-xl rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all cursor-pointer border-2 ${
                   isSelected ? "border-primary" : "border-transparent"
                 }`}
               >
                 <div className="flex flex-col gap-space-md">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-space-md">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-space-md min-w-0">
                       <div className="w-14 h-14 rounded-xl overflow-hidden bg-surface-container relative shrink-0 shadow-sm">
                         <img className="w-full h-full object-cover" src={prov.imageUrl} alt={prov.name} />
                       </div>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-space-xs">
-                          <h3 className="font-headline-sm text-headline-sm text-on-surface">{prov.name}</h3>
-                          <span className={`font-label-sm text-label-sm ${isSelected ? "text-primary font-medium" : "text-outline"}`}>
+                      <div className="flex flex-col min-w-0">
+                        <div className="flex flex-wrap items-center gap-space-xs">
+                          <h3 className="font-headline-sm text-headline-sm text-on-surface whitespace-nowrap">{prov.name}</h3>
+                          <span className={`font-label-sm text-label-sm whitespace-nowrap ${isSelected ? "text-primary font-medium" : "text-outline"}`}>
                             {isSelected ? tx("(Selected)", "(กำลังเลือก)") : prov.sub}
                           </span>
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
-                          <span className={`w-2 h-2 rounded-full ${prov.dotColor}`}></span>
-                          <span className="font-label-sm text-label-sm text-on-surface-variant">
+                          <span className={`w-2 h-2 rounded-full shrink-0 ${prov.dotColor}`}></span>
+                          <span className="font-label-sm text-label-sm text-on-surface-variant truncate">
                             {tx(prov.statusEn, prov.statusTh)}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    <label className="relative inline-flex items-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                    <label className="relative inline-flex items-center cursor-pointer shrink-0" onClick={(e) => e.stopPropagation()}>
                       <input
                         checked={isEnabled}
                         onChange={(e) => {
@@ -191,41 +191,41 @@ export default function AdminTopUpPage() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-space-xs">
-                    <span className="px-space-sm py-space-xs rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+                    <span className="px-space-sm py-space-xs rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap">
                       {tx("Input Mode", "ข้อมูลที่ใช้")}: <strong className="text-on-surface">{tx(prov.inputModeEn, prov.inputModeTh)}</strong>
                     </span>
-                    <span className="px-space-sm py-space-xs rounded-lg bg-primary-fixed/60 text-on-primary-fixed-variant font-label-sm text-label-sm">
+                    <span className="px-space-sm py-space-xs rounded-lg bg-primary-fixed/60 text-on-primary-fixed-variant font-label-sm text-label-sm whitespace-nowrap">
                       {tx(prov.activeBadgeEn, prov.activeBadgeTh)}
                     </span>
-                    <span className={`px-space-sm py-space-xs rounded-lg font-label-sm text-label-sm ${prov.slaClass}`}>{prov.slaBadge}</span>
+                    <span className={`px-space-sm py-space-xs rounded-lg font-label-sm text-label-sm whitespace-nowrap ${prov.slaClass}`}>{prov.slaBadge}</span>
                   </div>
 
-                  <div className="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
-                    <div className="flex flex-col">
+                  <div className="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between gap-2">
+                    <div className="flex flex-col whitespace-nowrap">
                       <span className="font-label-sm text-label-sm text-outline uppercase">{tx("24h Throughput", "ยอดเติม 24 ชม.")}</span>
                       <span className="font-label-lg text-label-lg text-on-surface font-semibold">{prov.throughput}</span>
                     </div>
-                    <div className="text-right flex flex-col items-end">
+                    <div className="text-right flex flex-col items-end whitespace-nowrap">
                       <span className="font-label-sm text-label-sm text-secondary font-medium">{tx(prov.successRateEn, prov.successRateTh)}</span>
                       <span className="font-label-sm text-label-sm text-outline">{prov.txns}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-space-lg pt-space-md flex items-center justify-between">
+                <div className="mt-space-lg pt-space-md flex items-center justify-between gap-2">
                   {isSelected ? (
-                    <span className="font-body-sm text-body-sm text-primary font-medium flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-primary"></span> {tx("Viewing Packages", "กำลังดูแพ็กเกจ")}
+                    <span className="font-body-sm text-body-sm text-primary font-medium flex items-center gap-1 whitespace-nowrap">
+                      <span className="w-2 h-2 rounded-full bg-primary shrink-0"></span> {tx("Viewing Packages", "กำลังดูแพ็กเกจ")}
                     </span>
                   ) : (
-                    <span className="font-body-sm text-body-sm text-on-surface-variant">{tx(prov.queueEn, prov.queueTh)}</span>
+                    <span className="font-body-sm text-body-sm text-on-surface-variant truncate">{tx(prov.queueEn, prov.queueTh)}</span>
                   )}
                   <button
                     type="button"
                     className={
                       isSelected
-                        ? "px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm transition-colors flex items-center gap-1"
-                        : "px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-primary hover:text-on-primary transition-colors flex items-center gap-1"
+                        ? "px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm transition-colors inline-flex items-center gap-1 whitespace-nowrap shrink-0"
+                        : "px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-1 whitespace-nowrap shrink-0"
                     }
                   >
                     <span>{isSelected ? tx("Configured", "ตั้งค่าอยู่") : tx("Manage Packages", "จัดการแพ็กเกจ")}</span>

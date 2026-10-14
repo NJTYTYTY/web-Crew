@@ -44,19 +44,19 @@ export function SimulatorView() {
           {/* Bank Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-emerald-800/80 gap-4">
             <div className="flex items-center space-x-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shadow-emerald-500/30">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shadow-emerald-500/30 shrink-0">
                 IQ
               </div>
               <div>
-                <div className="flex items-center space-x-2">
-                  <h2 className="text-xl font-black tracking-tight text-white">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-lg sm:text-xl font-black tracking-tight text-white">
                     {tx('IQ-Bank Web Payment Simulator', 'ระบบจำลองการโอนเงินธนาคาร IQ-Bank')}
                   </h2>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono whitespace-nowrap shrink-0">
                     SANDBOX v2.4
                   </span>
                 </div>
-                <p className="text-xs text-emerald-300/80">
+                <p className="text-xs text-emerald-300/80 mt-0.5">
                   {tx(
                     'Interactive webhook simulation engine for testing PromptPay QR settlement',
                     'ระบบจำลองการสแกน QR พร้อมเพย์และส่ง Webhook อัตโนมัติพร้อมลายเซ็น HMAC-SHA256'
@@ -65,9 +65,9 @@ export function SimulatorView() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-mono bg-emerald-950 px-3 py-1.5 rounded-lg border border-emerald-800 text-emerald-400">
-                Target: http://store.local/api/iqbank/webhook
+            <div className="flex items-center space-x-2 shrink-0">
+              <span className="text-xs font-mono bg-emerald-950 px-3 py-1.5 rounded-lg border border-emerald-800 text-emerald-400 whitespace-nowrap">
+                POST /api/webhooks/iqbank
               </span>
             </div>
           </div>
@@ -81,10 +81,10 @@ export function SimulatorView() {
           {/* Simulator Body */}
           <div className="py-6 space-y-6">
             {/* Step 1: Upload / Drop QR */}
-            <div className="bg-slate-800/70 rounded-2xl p-6 border border-emerald-800/40">
-              <div className="flex items-center justify-between mb-3">
+            <div className="bg-slate-800/70 rounded-2xl p-5 sm:p-6 border border-emerald-800/40">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5">
-                  <ScanLine className="w-4 h-4" />
+                  <ScanLine className="w-4 h-4 shrink-0" />
                   <span>{tx('1. QR Code Capture & Ingestion', '1. อัปโหลดหรือดึงข้อมูล QR Code พร้อมเพย์')}</span>
                 </span>
                 <span className="text-[11px] text-slate-400">
@@ -110,7 +110,7 @@ export function SimulatorView() {
                 </p>
                 <button
                   type="button"
-                  className="mt-3 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition"
+                  className="mt-3 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition whitespace-nowrap"
                 >
                   {tx('Load Active Pending QR Code', 'ดึงข้อมูล QR รายการล่าสุด')}
                 </button>
@@ -118,30 +118,30 @@ export function SimulatorView() {
             </div>
 
             {/* Step 2: Parsed Transaction Data */}
-            <div className="bg-slate-800/70 rounded-2xl p-6 border border-emerald-800/40">
+            <div className="bg-slate-800/70 rounded-2xl p-5 sm:p-6 border border-emerald-800/40">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5 mb-4">
-                <FileCheck className="w-4 h-4" />
+                <FileCheck className="w-4 h-4 shrink-0" />
                 <span>{tx('2. Parsed Merchant Transaction Metadata', '2. ข้อมูลธุรกรรมร้านค้าที่ถอดรหัสจาก QR')}</span>
               </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                 <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700">
                   <span className="text-slate-400 text-[10px] block font-semibold">{tx('MERCHANT NAME', 'ชื่อร้านค้า')}</span>
-                  <span className="font-bold text-white text-sm mt-0.5 block">NEXUS PLAY STORE</span>
+                  <span className="font-bold text-white text-sm mt-0.5 block truncate">NEXUS PLAY STORE</span>
                 </div>
                 <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700">
                   <span className="text-slate-400 text-[10px] block font-semibold">{tx('TRANSACTION REF', 'รหัสอ้างอิงธุรกรรม')}</span>
-                  <span className="font-bold text-emerald-400 font-mono text-sm mt-0.5 block" id="sim-ref">
+                  <span className="font-bold text-emerald-400 font-mono text-sm mt-0.5 block truncate" id="sim-ref">
                     {activeOrder.txRef}
                   </span>
                 </div>
                 <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700">
                   <span className="text-slate-400 text-[10px] block font-semibold">{tx('TARGET ACCOUNT', 'บัญชีปลายทาง')}</span>
-                  <span className="font-bold text-white text-sm mt-0.5 block font-mono">098-4-88192-1 (IQ-B)</span>
+                  <span className="font-bold text-white text-sm mt-0.5 block font-mono truncate">098-4-88192-1 (IQ-B)</span>
                 </div>
                 <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-700">
                   <span className="text-slate-400 text-[10px] block font-semibold">{tx('TOTAL CHARGE', 'ยอดโอนสุทธิ')}</span>
-                  <span className="font-black text-emerald-300 text-base mt-0.5 block" id="sim-amount">
+                  <span className="font-black text-emerald-300 text-base mt-0.5 block whitespace-nowrap" id="sim-amount">
                     ฿{activeOrder.price}.00 THB
                   </span>
                 </div>
@@ -149,10 +149,10 @@ export function SimulatorView() {
             </div>
 
             {/* Step 3: Webhook Actions */}
-            <div className="bg-slate-800/70 rounded-2xl p-6 border border-emerald-800/40 space-y-4">
+            <div className="bg-slate-800/70 rounded-2xl p-5 sm:p-6 border border-emerald-800/40 space-y-4">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5">
-                  <Radio className="w-4 h-4" />
+                  <Radio className="w-4 h-4 shrink-0" />
                   <span>{tx('3. Dispatch Webhook Event Simulation', '3. จำลองการยิง Webhook แจ้งผลไปยังระบบหลังบ้าน')}</span>
                 </span>
                 <p className="text-xs text-slate-300 mt-1">
@@ -166,18 +166,18 @@ export function SimulatorView() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <button
                   onClick={triggerWebhookSuccess}
-                  className="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg shadow-emerald-900/50 transition flex items-center justify-center space-x-2"
+                  className="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-900/50 transition flex items-center justify-center space-x-2 whitespace-nowrap"
                 >
-                  <CheckCircle className="w-5 h-5" />
-                  <span>{tx('Confirm Payment (Trigger Webhook to Backend)', 'ยืนยันการโอนเงินสำเร็จ (ยิง Webhook ไปยัง Backend)')}</span>
+                  <CheckCircle className="w-5 h-5 shrink-0" />
+                  <span>{tx('Confirm Payment (Trigger Webhook)', 'ยืนยันโอนเงินสำเร็จ (ยิง Webhook)')}</span>
                 </button>
 
                 <button
                   onClick={handleTriggerFail}
-                  className="p-4 rounded-xl bg-slate-900 hover:bg-red-950/50 text-red-400 border border-red-500/30 font-bold text-sm transition flex items-center justify-center space-x-2"
+                  className="p-4 rounded-xl bg-slate-900 hover:bg-red-950/50 text-red-400 border border-red-500/30 font-bold text-xs sm:text-sm transition flex items-center justify-center space-x-2 whitespace-nowrap"
                 >
-                  <XCircle className="w-5 h-5" />
-                  <span>{tx('Simulate Failed / Expired Payment', 'จำลองการโอนเงินล้มเหลว / QR หมดอายุ')}</span>
+                  <XCircle className="w-5 h-5 shrink-0" />
+                  <span>{tx('Simulate Failed / Expired Payment', 'จำลองโอนล้มเหลว / QR หมดอายุ')}</span>
                 </button>
               </div>
 
@@ -210,14 +210,14 @@ export function SimulatorView() {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-emerald-800/60 flex items-center justify-between text-xs text-slate-400">
+          <div className="pt-4 border-t border-emerald-800/60 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
             <span>{tx('Powered by IQ-Bank Thai QR Payment Infrastructure', 'ขับเคลื่อนด้วยโครงสร้างพื้นฐานการชำระเงิน IQ-Bank Thai QR')}</span>
             <button
               onClick={() => switchView('home')}
-              className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center space-x-1"
+              className="text-emerald-400 hover:text-emerald-300 font-bold flex items-center space-x-1 whitespace-nowrap shrink-0"
             >
               <span>{tx('Return to Storefront', 'กลับสู่หน้าร้านค้า')}</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 shrink-0" />
             </button>
           </div>
         </div>

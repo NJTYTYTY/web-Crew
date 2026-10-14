@@ -19,7 +19,7 @@ export function GameTopupView() {
   const pkgs = packagesData[activeTopupGame] || [];
 
   const gameTabClass = (g: TopupGameKey) =>
-    `topup-game-btn p-3.5 rounded-xl border-2 flex flex-col items-center justify-center text-center transition group ${
+    `topup-game-btn p-3 sm:p-3.5 rounded-xl border-2 flex flex-col items-center justify-center text-center transition group ${
       activeTopupGame === g ? 'border-indigo-600 bg-indigo-50/50' : 'border-slate-200 hover:border-slate-300 bg-white'
     }`;
 
@@ -35,9 +35,9 @@ export function GameTopupView() {
     <div id="view-topup" className="page-view">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-6">
-          <div className="flex items-center space-x-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">{tx('SECTION 1.2', 'หมวดหมู่ 1.2')}</span>
-            <h1 className="text-2xl font-black text-slate-900">{tx('Automated 24/7 Game Top-Up', 'ระบบเติมเกมอัตโนมัติ 24 ชั่วโมง')}</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 whitespace-nowrap shrink-0">{tx('SECTION 1.2', 'หมวดหมู่ 1.2')}</span>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900">{tx('Automated 24/7 Game Top-Up', 'ระบบเติมเกมอัตโนมัติ 24 ชั่วโมง')}</h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             {tx('Direct system injection via official UID or automated fast Robux bot delivery.', 'เติมเข้าเกมโดยตรงผ่านหมายเลข UID หรือระบบบอทเติม Robux อัตโนมัติความเร็วสูง')}
@@ -49,34 +49,34 @@ export function GameTopupView() {
           <div className="lg:col-span-8 space-y-6">
             <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">{tx('Select Game to Top Up', 'เลือกเกมที่ต้องการเติม')}</label>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
                 <button onClick={() => selectTopupGame('rov')} id="topup-tab-rov" className={gameTabClass('rov')}>
                   <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center font-black text-sm mb-2 shadow-sm group-hover:scale-105 transition-transform">RoV</div>
-                  <span className="text-xs font-bold text-slate-900">Arena of Valor</span>
-                  <span className="text-[10px] text-emerald-600 font-semibold mt-0.5">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
+                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Arena of Valor</span>
+                  <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
                 </button>
                 <button onClick={() => selectTopupGame('freefire')} id="topup-tab-freefire" className={gameTabClass('freefire')}>
                   <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-sm mb-2 shadow-sm group-hover:scale-105 transition-transform">FF</div>
-                  <span className="text-xs font-bold text-slate-900">Free Fire</span>
-                  <span className="text-[10px] text-emerald-600 font-semibold mt-0.5">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
+                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Free Fire</span>
+                  <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
                 </button>
                 <button onClick={() => selectTopupGame('roblox')} id="topup-tab-roblox" className={gameTabClass('roblox')}>
                   <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm mb-2 shadow-sm group-hover:scale-105 transition-transform">R$</div>
-                  <span className="text-xs font-bold text-slate-900">Roblox Robux</span>
-                  <span className="text-[10px] text-indigo-600 font-semibold mt-0.5">{tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว')}</span>
+                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Roblox Robux</span>
+                  <span className="text-[10px] text-indigo-600 font-semibold mt-0.5 whitespace-nowrap">{tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว')}</span>
                 </button>
               </div>
             </div>
 
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-6">
               <div>
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center">1</span>
+                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">1</span>
                     <span id="step-1-title">{stepOneTitle}</span>
                   </h3>
-                  <button type="button" onClick={() => setShowUidHelp((p) => !p)} className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold flex items-center space-x-1">
-                    <HelpCircle className="w-3.5 h-3.5" />
+                  <button type="button" onClick={() => setShowUidHelp((p) => !p)} className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold flex items-center space-x-1 whitespace-nowrap shrink-0">
+                    <HelpCircle className="w-3.5 h-3.5 shrink-0" />
                     <span>{tx('Where is my UID?', 'ดูเลข UID ตรงไหน?')}</span>
                   </button>
                 </div>
@@ -99,8 +99,8 @@ export function GameTopupView() {
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Hash className="w-4 h-4" /></div>
                       </div>
                     </div>
-                    <p className="text-[11px] text-slate-500 flex items-center space-x-1">
-                      <Info className="w-3.5 h-3.5 text-slate-400" />
+                    <p className="text-[11px] text-slate-500 flex items-center space-x-1.5">
+                      <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       <span>{tx('No password needed! Top-up is transferred instantly directly via server API.', 'ไม่ต้องใช้รหัสผ่าน! ระบบโอนคูปอง/เพชรเข้าบัญชีเกมโดยตรงผ่าน API ทันที')}</span>
                     </p>
                   </div>
@@ -145,12 +145,12 @@ export function GameTopupView() {
               </div>
 
               <div className="pt-4 border-t border-slate-100">
-                <div className="flex items-center justify-between mb-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
-                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center">2</span>
+                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0">2</span>
                     <span>{tx('Select Denomination Package', 'เลือกแพ็กเกจราคาที่ต้องการเติม')}</span>
                   </h3>
-                  <span className="text-xs text-slate-400">{tx('Tax Included 7%', 'รวมภาษีมูลค่าเพิ่ม 7%')}</span>
+                  <span className="text-xs text-slate-400 whitespace-nowrap">{tx('Tax Included 7%', 'รวมภาษีมูลค่าเพิ่ม 7%')}</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3" id="topup-packages-container">
@@ -164,7 +164,7 @@ export function GameTopupView() {
                         }`}
                       >
                         {pkg.hot && (
-                          <span className="absolute -top-2.5 right-2 px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-600 text-white uppercase tracking-wider">{tx('Popular', 'ขายดี')}</span>
+                          <span className="absolute -top-2.5 right-2 px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-600 text-white uppercase tracking-wider whitespace-nowrap">{tx('Popular', 'ขายดี')}</span>
                         )}
                         <div className="font-bold text-xs text-slate-900">{pkg.label}</div>
                         {pkg.bonus ? (
@@ -172,7 +172,7 @@ export function GameTopupView() {
                         ) : (
                           <div className="text-[10px] text-slate-400">{tx('Standard Delivery', 'จัดส่งมาตรฐาน')}</div>
                         )}
-                        <div className="mt-2 text-sm font-black text-slate-900">฿{pkg.price}</div>
+                        <div className="mt-2 text-sm font-black text-slate-900 whitespace-nowrap">฿{pkg.price}</div>
                       </button>
                     );
                   })}
@@ -182,69 +182,72 @@ export function GameTopupView() {
           </div>
 
           {/* Right: Order Summary Sticky Card (4 Cols) */}
-          <div className="lg:col-span-4 sticky top-28 space-y-4">
+          <div className="lg:col-span-4 sticky top-24 space-y-4">
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-md">
-              <h3 className="text-base font-extrabold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
-                <span>{tx('Order Summary', 'สรุปรายการสั่งซื้อ')}</span>
-                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">PromptPay QR</span>
+              <h3 className="text-base font-extrabold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between gap-2">
+                <span className="whitespace-nowrap">{tx('Order Summary', 'สรุปรายการสั่งซื้อ')}</span>
+                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded whitespace-nowrap shrink-0">PromptPay QR</span>
               </h3>
 
               <div className="py-4 space-y-3.5 text-xs">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500">{tx('Service:', 'บริการ:')}</span>
-                  <span className="font-bold text-slate-900" id="summary-game-name">{gameTitle}</span>
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-slate-500 whitespace-nowrap">{tx('Service:', 'บริการ:')}</span>
+                  <span className="font-bold text-slate-900 text-right" id="summary-game-name">{gameTitle}</span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500" id="summary-account-label">
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-slate-500 whitespace-nowrap" id="summary-account-label">
                     {activeTopupGame === 'roblox' ? tx('Roblox User:', 'ชื่อผู้ใช้ Roblox:') : tx('Player UID:', 'หมายเลข UID:')}
                   </span>
-                  <span className="font-mono font-bold text-slate-900" id="summary-account-val">
+                  <span className="font-mono font-bold text-slate-900 truncate max-w-[160px]" id="summary-account-val">
                     {activeTopupGame === 'roblox' ? robloxUser || 'Unspecified' : uidInput || 'Unspecified'}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500">{tx('Selected Package:', 'แพ็กเกจที่เลือก:')}</span>
-                  <span className="font-bold text-indigo-600" id="summary-package-name">
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-slate-500 whitespace-nowrap">{tx('Selected Package:', 'แพ็กเกจที่เลือก:')}</span>
+                  <span className="font-bold text-indigo-600 text-right" id="summary-package-name">
                     {selectedPackage ? `${selectedPackage.label}${selectedPackage.bonus ? ` (${selectedPackage.bonus})` : ''}` : 'None'}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500">{tx('Estimated Delivery:', 'ระยะเวลาจัดส่ง:')}</span>
-                  <span className="font-semibold text-emerald-600 flex items-center space-x-1"><Zap className="w-3 h-3" /><span>{tx('Instant (5-15 sec)', 'เข้าทันที (5-15 วินาที)')}</span></span>
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-slate-500 whitespace-nowrap">{tx('Estimated Delivery:', 'ระยะเวลาจัดส่ง:')}</span>
+                  <span className="font-semibold text-emerald-600 flex items-center space-x-1 whitespace-nowrap">
+                    <Zap className="w-3 h-3 shrink-0" />
+                    <span>{tx('Instant (5-15 sec)', 'เข้าทันที (5-15 วินาที)')}</span>
+                  </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-500">{tx('Processing Fee:', 'ค่าธรรมเนียม:')}</span>
-                  <span className="font-semibold text-slate-700">฿0.00</span>
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-slate-500 whitespace-nowrap">{tx('Processing Fee:', 'ค่าธรรมเนียม:')}</span>
+                  <span className="font-semibold text-slate-700 whitespace-nowrap">฿0.00</span>
                 </div>
-                <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline">
-                  <span className="text-sm font-bold text-slate-800">{tx('Total Price:', 'ยอดชำระสุทธิ:')}</span>
-                  <div className="text-right">
+                <div className="pt-3 border-t border-slate-100 flex justify-between items-baseline gap-2">
+                  <span className="text-sm font-bold text-slate-800 whitespace-nowrap">{tx('Total Price:', 'ยอดชำระสุทธิ:')}</span>
+                  <div className="text-right whitespace-nowrap">
                     <span className="text-2xl font-black text-slate-900" id="summary-total-price">฿{selectedPackage ? selectedPackage.price : 0}</span>
                     <span className="text-[10px] text-slate-400 font-bold block">{tx('THB Net', 'บาท (สุทธิ)')}</span>
                   </div>
                 </div>
               </div>
 
-              <button onClick={handleTopupCheckout} className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition flex items-center justify-center space-x-2">
-                <QrCode className="w-4 h-4" />
+              <button onClick={handleTopupCheckout} className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition flex items-center justify-center space-x-2 whitespace-nowrap">
+                <QrCode className="w-4 h-4 shrink-0" />
                 <span>{tx('Confirm & Pay via IQ-Bank', 'ยืนยันและสแกนจ่ายผ่าน IQ-Bank')}</span>
               </button>
 
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-center space-x-2 text-[11px] text-slate-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{tx('Automated IQ-Bank Webhook Detection', 'ตรวจจับยอดโอนอัตโนมัติผ่าน IQ-Bank Webhook')}</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="truncate">{tx('Automated IQ-Bank Webhook Detection', 'ตรวจจับยอดโอนอัตโนมัติผ่าน IQ-Bank Webhook')}</span>
               </div>
             </div>
 
             <div className="bg-indigo-50/70 border border-indigo-100 rounded-xl p-4 text-xs text-indigo-900">
-              <div className="font-bold flex items-center space-x-1 mb-1">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+              <div className="font-bold flex items-center space-x-1.5 mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
                 <span>{tx('Need test payment without money?', 'ต้องการทดสอบการชำระเงินแบบไม่เสียเงินจริง?')}</span>
               </div>
               <p className="text-indigo-700 text-[11px] leading-relaxed">
                 {tx(
-                  'Use the top bar "Open QR Modal" and click the IQ-Bank Webhook Simulator button to trigger a live payment confirmation!',
-                  'กดปุ่มเปิด QR หรือคลิกปุ่ม จำลองธนาคาร IQ-Bank ด้านบนเพื่อจำลองการยิง Webhook ยืนยันยอดชำระเงินได้ทันที!'
+                  'Click Confirm & Pay to open the Dynamic QR modal, then launch the IQ-Bank Simulator to trigger instant payment confirmation!',
+                  'กดยืนยันการสั่งซื้อเพื่อเปิด QR พร้อมเพย์ จากนั้นกดปุ่มจำลองธนาคาร IQ-Bank เพื่อทดสอบการยิง Webhook ยืนยันยอดได้ทันที!'
                 )}
               </p>
             </div>

@@ -31,12 +31,12 @@ export default function RecentTransactionsTable({
 
   const renderBadgeClass = (badge: OverviewTransaction["gameBadge"]) => {
     if (badge === "V") {
-      return "w-6 h-6 rounded-md bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-label-sm text-label-sm font-bold";
+      return "w-6 h-6 rounded-md bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center font-label-sm text-label-sm font-bold shrink-0";
     }
     if (badge === "A") {
-      return "w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-label-sm text-label-sm font-bold";
+      return "w-6 h-6 rounded-md bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-label-sm text-label-sm font-bold shrink-0";
     }
-    return "w-6 h-6 rounded-md bg-primary-fixed text-primary flex items-center justify-center font-label-sm text-label-sm font-bold";
+    return "w-6 h-6 rounded-md bg-primary-fixed text-primary flex items-center justify-center font-label-sm text-label-sm font-bold shrink-0";
   };
 
   return (
@@ -53,11 +53,11 @@ export default function RecentTransactionsTable({
             )}
           </p>
         </div>
-        <div className="flex items-center gap-space-sm">
+        <div className="flex items-center gap-space-sm shrink-0">
           <button
             type="button"
             onClick={cycleStatusFilter}
-            className="h-9 px-space-md bg-surface-container-low text-on-surface rounded-xl font-label-sm text-label-sm flex items-center gap-1 hover:bg-surface-container transition-colors"
+            className="h-9 px-space-md bg-surface-container-low text-on-surface rounded-xl font-label-sm text-label-sm inline-flex items-center gap-1 hover:bg-surface-container transition-colors whitespace-nowrap shrink-0"
           >
             <span className="material-symbols-outlined text-[16px]">
               filter_list
@@ -71,7 +71,7 @@ export default function RecentTransactionsTable({
           <button
             type="button"
             onClick={onExportCsv}
-            className="h-9 px-space-md bg-surface-container-low text-on-surface rounded-xl font-label-sm text-label-sm flex items-center gap-1 hover:bg-surface-container transition-colors"
+            className="h-9 px-space-md bg-surface-container-low text-on-surface rounded-xl font-label-sm text-label-sm inline-flex items-center gap-1 hover:bg-surface-container transition-colors whitespace-nowrap shrink-0"
           >
             <span className="material-symbols-outlined text-[16px]">
               download
@@ -86,14 +86,14 @@ export default function RecentTransactionsTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
-              <th className="py-space-md px-space-lg">{tx("Order ID", "รหัสคำสั่งซื้อ")}</th>
-              <th className="py-space-md px-space-md">{tx("Customer / UID", "ลูกค้า / UID")}</th>
-              <th className="py-space-md px-space-md">{tx("Game & SKU", "เกม & แพ็กเกจ")}</th>
-              <th className="py-space-md px-space-md text-right">{tx("Amount", "ยอดเงิน")}</th>
-              <th className="py-space-md px-space-md">{tx("IQ-Bank Ref", "อ้างอิง IQ-Bank")}</th>
-              <th className="py-space-md px-space-md">{tx("Status", "สถานะ")}</th>
-              <th className="py-space-md px-space-md text-right">{tx("Timestamp", "เวลา")}</th>
-              <th className="py-space-md px-space-lg text-right">{tx("Action", "จัดการ")}</th>
+              <th className="py-space-md px-space-lg whitespace-nowrap">{tx("Order ID", "รหัสคำสั่งซื้อ")}</th>
+              <th className="py-space-md px-space-md whitespace-nowrap">{tx("Customer / UID", "ลูกค้า / UID")}</th>
+              <th className="py-space-md px-space-md whitespace-nowrap">{tx("Game & SKU", "เกม & แพ็กเกจ")}</th>
+              <th className="py-space-md px-space-md text-right whitespace-nowrap">{tx("Amount", "ยอดเงิน")}</th>
+              <th className="py-space-md px-space-md whitespace-nowrap">{tx("IQ-Bank Ref", "อ้างอิง IQ-Bank")}</th>
+              <th className="py-space-md px-space-md whitespace-nowrap">{tx("Status", "สถานะ")}</th>
+              <th className="py-space-md px-space-md text-right whitespace-nowrap">{tx("Timestamp", "เวลา")}</th>
+              <th className="py-space-md px-space-lg text-right whitespace-nowrap">{tx("Action", "จัดการ")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-surface-container font-body-sm text-body-sm">
@@ -104,10 +104,10 @@ export default function RecentTransactionsTable({
                   txn.status === "WAITING OTP" ? "bg-surface-container-low/20" : ""
                 }`}
               >
-                <td className="py-space-md px-space-lg font-label-md text-label-md text-primary font-medium">
+                <td className="py-space-md px-space-lg font-label-md text-label-md text-primary font-medium whitespace-nowrap">
                   {txn.id}
                 </td>
-                <td className="py-space-md px-space-md">
+                <td className="py-space-md px-space-md whitespace-nowrap">
                   <div className="flex flex-col">
                     <span className="font-body-md text-body-md text-on-surface font-medium">
                       {txn.customerName}
@@ -117,53 +117,53 @@ export default function RecentTransactionsTable({
                     </span>
                   </div>
                 </td>
-                <td className="py-space-md px-space-md">
+                <td className="py-space-md px-space-md whitespace-nowrap">
                   <div className="flex items-center gap-space-xs">
                     <span className={renderBadgeClass(txn.gameBadge)}>
                       {txn.gameBadge}
                     </span>
-                    <span className="text-on-surface">{txn.gameSku}</span>
+                    <span className="text-on-surface whitespace-nowrap">{txn.gameSku}</span>
                   </div>
                 </td>
-                <td className="py-space-md px-space-md text-right font-label-md text-label-md text-on-surface font-semibold">
+                <td className="py-space-md px-space-md text-right font-label-md text-label-md text-on-surface font-semibold whitespace-nowrap">
                   {txn.amount}
                 </td>
-                <td className="py-space-md px-space-md font-label-sm text-label-sm text-on-surface-variant">
+                <td className="py-space-md px-space-md font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
                   {txn.iqBankRef}
                 </td>
-                <td className="py-space-md px-space-md">
+                <td className="py-space-md px-space-md whitespace-nowrap">
                   {txn.status === "SUCCESS" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>{" "}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm font-medium whitespace-nowrap">
+                      <span className="w-1.5 h-1.5 rounded-full bg-secondary shrink-0"></span>{" "}
                       {tx("SUCCESS", "สำเร็จ")}
                     </span>
                   )}
                   {txn.status === "WAITING OTP" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-label-sm text-label-sm font-medium animate-pulse">
-                      <span className="material-symbols-outlined text-[12px]">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 font-label-sm text-label-sm font-medium animate-pulse whitespace-nowrap">
+                      <span className="material-symbols-outlined text-[12px] shrink-0">
                         security
                       </span>{" "}
                       {tx("WAITING OTP", "รอรหัส OTP")}
                     </span>
                   )}
                   {txn.status === "FAILED (TIMEOUT)" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-error"></span>{" "}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm font-medium whitespace-nowrap">
+                      <span className="w-1.5 h-1.5 rounded-full bg-error shrink-0"></span>{" "}
                       {tx("FAILED (TIMEOUT)", "ล้มเหลว (หมดเวลา)")}
                     </span>
                   )}
                 </td>
-                <td className="py-space-md px-space-md text-right font-label-sm text-label-sm text-on-surface-variant">
+                <td className="py-space-md px-space-md text-right font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
                   {txn.timestamp}
                 </td>
-                <td className="py-space-md px-space-lg text-right">
+                <td className="py-space-md px-space-lg text-right whitespace-nowrap">
                   <button
                     type="button"
                     onClick={() => onInspect(txn)}
                     className={
                       txn.actionLabel === "Resolve"
-                        ? "h-8 px-space-sm bg-primary text-on-primary hover:bg-primary-container rounded-lg font-label-sm text-label-sm transition-colors shadow-xs"
-                        : "h-8 px-space-sm bg-surface-container text-on-surface hover:bg-surface-container-high rounded-lg font-label-sm text-label-sm transition-colors"
+                        ? "h-8 px-space-sm bg-primary text-on-primary hover:bg-primary-container rounded-lg font-label-sm text-label-sm transition-colors shadow-xs whitespace-nowrap shrink-0"
+                        : "h-8 px-space-sm bg-surface-container text-on-surface hover:bg-surface-container-high rounded-lg font-label-sm text-label-sm transition-colors whitespace-nowrap shrink-0"
                     }
                   >
                     {txn.actionLabel === "Resolve"
@@ -180,18 +180,18 @@ export default function RecentTransactionsTable({
       </div>
 
       {/* Table Pagination */}
-      <div className="p-space-md bg-surface-container-low/40 flex items-center justify-between border-t border-surface-container font-label-sm text-label-sm">
-        <span className="text-on-surface-variant">
+      <div className="p-space-md bg-surface-container-low/40 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-surface-container font-label-sm text-label-sm">
+        <span className="text-on-surface-variant whitespace-nowrap">
           {tx(
             `Showing ${filtered.length} of 3,842 queued orders`,
             `แสดง ${filtered.length} จาก 3,842 รายการในคิว`
           )}
         </span>
-        <div className="flex items-center gap-space-xs">
+        <div className="flex items-center gap-space-xs shrink-0">
           <button
             type="button"
             disabled
-            className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors disabled:opacity-40"
+            className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors disabled:opacity-40 whitespace-nowrap"
           >
             {tx("Previous", "ก่อนหน้า")}
           </button>
@@ -201,7 +201,7 @@ export default function RecentTransactionsTable({
           <span className="px-1 text-outline">...</span>
           <button
             type="button"
-            className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors"
+            className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors whitespace-nowrap"
           >
             {tx("Next", "ถัดไป")}
           </button>

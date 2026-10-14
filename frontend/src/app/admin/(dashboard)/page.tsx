@@ -36,19 +36,19 @@ export default function AdminOverviewPage() {
   };
 
   return (
-    <div className="flex flex-col w-full px-gutter-desktop py-space-xl gap-space-xl">
+    <div className="flex flex-col w-full px-4 sm:px-6 lg:px-gutter-desktop py-space-xl gap-space-xl">
       {/* Top Welcome Banner & System Health */}
-      <div className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-xl shadow-sm">
+      <div className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-5 sm:p-space-xl shadow-sm">
         <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div>
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-space-lg relative z-10">
           <div className="flex flex-col gap-space-xs">
-            <div className="flex items-center gap-space-sm">
-              <span className="font-label-sm text-label-sm uppercase tracking-wider text-primary bg-primary-fixed px-space-sm py-0.5 rounded-full">
+            <div className="flex flex-wrap items-center gap-space-sm">
+              <span className="font-label-sm text-label-sm uppercase tracking-wider text-primary bg-primary-fixed px-space-sm py-0.5 rounded-full whitespace-nowrap shrink-0">
                 {tx("Operator Console v3.4", "คอนโซลผู้ดูแลระบบ v3.4")}
               </span>
-              <span className="text-outline-variant">•</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
-                <span className="inline-block w-2 h-2 rounded-full bg-secondary"></span>{" "}
+              <span className="text-outline-variant hidden sm:inline">•</span>
+              <span className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 whitespace-nowrap shrink-0">
+                <span className="inline-block w-2 h-2 rounded-full bg-secondary shrink-0"></span>{" "}
                 {tx("Cluster: ap-southeast-1b", "คลัสเตอร์: ap-southeast-1b")}
               </span>
             </div>
@@ -64,16 +64,16 @@ export default function AdminOverviewPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-space-md">
-            <div className="flex items-center gap-space-md bg-surface-container-low px-space-lg py-space-sm rounded-xl">
-              <div className="w-9 h-9 rounded-xl bg-secondary-container/60 flex items-center justify-center text-on-secondary-container">
+            <div className="flex items-center gap-space-md bg-surface-container-low px-space-lg py-space-sm rounded-xl shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-secondary-container/60 flex items-center justify-center text-on-secondary-container shrink-0">
                 <span className="material-symbols-outlined text-[20px]">verified</span>
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col whitespace-nowrap">
                 <div className="flex items-center gap-space-xs">
                   <span className="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant">
                     {tx("IQ-Bank Webhook", "เว็บฮุค IQ-Bank")}
                   </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse shrink-0"></span>
                 </div>
                 <div className="flex items-baseline gap-space-xs">
                   <span className="font-headline-sm text-headline-sm text-on-surface">
@@ -84,11 +84,11 @@ export default function AdminOverviewPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-space-md bg-surface-container-low px-space-lg py-space-sm rounded-xl">
-              <div className="w-9 h-9 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
+            <div className="flex items-center gap-space-md bg-surface-container-low px-space-lg py-space-sm rounded-xl shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-primary-fixed flex items-center justify-center text-primary shrink-0">
                 <span className="material-symbols-outlined text-[20px]">bolt</span>
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col whitespace-nowrap">
                 <span className="font-label-sm text-label-sm uppercase tracking-wide text-on-surface-variant">
                   {tx("Auto-Fulfill Engine", "ระบบเติมเงินอัตโนมัติ")}
                 </span>
@@ -106,9 +106,9 @@ export default function AdminOverviewPage() {
                   tx("Real-time metrics synchronized with ap-southeast-1b.", "ซิงค์ข้อมูลเรียลไทม์กับ ap-southeast-1b สำเร็จ")
                 )
               }
-              className="h-10 px-space-md bg-on-surface text-surface rounded-xl font-label-md text-label-md flex items-center gap-space-xs hover:bg-on-surface-variant transition-colors shadow-sm"
+              className="h-10 px-space-md bg-on-surface text-surface rounded-xl font-label-md text-label-md inline-flex items-center gap-space-xs hover:bg-on-surface-variant transition-colors shadow-sm whitespace-nowrap shrink-0"
             >
-              <span className="material-symbols-outlined text-[18px]">refresh</span>
+              <span className="material-symbols-outlined text-[18px] shrink-0">refresh</span>
               <span>{tx("Refresh Feeds", "รีเฟรชข้อมูล")}</span>
             </button>
           </div>
@@ -116,19 +116,19 @@ export default function AdminOverviewPage() {
       </div>
 
       {/* 4 KPI Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-gutter-desktop">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-gutter-desktop">
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">
               {tx("Gross Platform Revenue", "รายได้รวมแพลตฟอร์ม")}
             </span>
-            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary"><span className="material-symbols-outlined text-[18px]">payments</span></span>
+            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary shrink-0"><span className="material-symbols-outlined text-[18px]">payments</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">฿1,428,950</span><span className="font-label-sm text-label-sm text-on-surface-variant">THB</span></div>
-            <div className="mt-space-xs flex items-center justify-between">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm"><span className="material-symbols-outlined text-[14px]">trending_up</span><span>+18.4%</span></div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant">{tx("vs. prev 7 days", "เทียบกับ 7 วันก่อน")}</span>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight whitespace-nowrap">฿1,428,950</span><span className="font-label-sm text-label-sm text-on-surface-variant">THB</span></div>
+            <div className="mt-space-xs flex items-center justify-between gap-2">
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">trending_up</span><span>+18.4%</span></div>
+              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{tx("vs. prev 7 days", "เทียบกับ 7 วันก่อน")}</span>
             </div>
           </div>
           <div className="mt-space-md pt-space-sm border-t border-surface-container-low">
@@ -140,34 +140,34 @@ export default function AdminOverviewPage() {
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">
               {tx("Game Accounts Sold", "ไอดีเกมที่ขายแล้ว")}
             </span>
-            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-tertiary"><span className="material-symbols-outlined text-[18px]">sports_esports</span></span>
+            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-tertiary shrink-0"><span className="material-symbols-outlined text-[18px]">sports_esports</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">342</span><span className="font-label-sm text-label-sm text-on-surface-variant">{tx("verified listings", "รายการที่ยืนยันแล้ว")}</span></div>
-            <div className="mt-space-xs flex items-center justify-between">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm"><span className="material-symbols-outlined text-[14px]">arrow_upward</span><span>+12.5%</span></div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant">{tx("MTD Escrow Release", "ยอดโอนสำเร็จเดือนนี้")}</span>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">342</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("verified listings", "รายการที่ยืนยันแล้ว")}</span></div>
+            <div className="mt-space-xs flex items-center justify-between gap-2">
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">arrow_upward</span><span>+12.5%</span></div>
+              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{tx("MTD Escrow Release", "ยอดโอนสำเร็จเดือนนี้")}</span>
             </div>
           </div>
-          <div className="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><span>RoV: 184</span><span>Valorant: 96</span><span>Genshin: 62</span></div>
+          <div className="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap"><span>RoV: 184</span><span>Valorant: 96</span><span>Genshin: 62</span></div>
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">
               {tx("Active Queue Length", "คิวที่กำลังดำเนินการ")}
             </span>
-            <span className="w-8 h-8 rounded-lg bg-error-container/50 flex items-center justify-center text-error"><span className="material-symbols-outlined text-[18px]">hourglass_top</span></span>
+            <span className="w-8 h-8 rounded-lg bg-error-container/50 flex items-center justify-center text-error shrink-0"><span className="material-symbols-outlined text-[18px]">hourglass_top</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">14</span><span className="font-label-sm text-label-sm text-on-surface-variant">{tx("Orders in Buffer", "ออเดอร์ในคิว")}</span></div>
-            <div className="mt-space-xs flex items-center justify-between">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm"><span className="material-symbols-outlined text-[14px]">priority_high</span><span>{tx("3 Need Manual OTP", "3 รายการรอ OTP")}</span></div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant">{tx("11 Automated", "อัตโนมัติ 11 รายการ")}</span>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">14</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("Orders in Buffer", "ออเดอร์ในคิว")}</span></div>
+            <div className="mt-space-xs flex items-center justify-between gap-2">
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error-container text-on-error-container font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">priority_high</span><span>{tx("3 Need Manual OTP", "3 รายการรอ OTP")}</span></div>
+              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">{tx("11 Automated", "อัตโนมัติ 11 รายการ")}</span>
             </div>
           </div>
           <div className="mt-space-md pt-space-sm flex items-center gap-2">
@@ -176,22 +176,22 @@ export default function AdminOverviewPage() {
         </div>
 
         <div className="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between group hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-2">
             <span className="font-body-sm text-body-sm text-on-surface-variant uppercase tracking-wider">
               {tx("Campaign Slot Engagements", "แคมเปญแบนเนอร์ที่เปิดใช้งาน")}
             </span>
-            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary"><span className="material-symbols-outlined text-[18px]">view_carousel</span></span>
+            <span className="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-secondary shrink-0"><span className="material-symbols-outlined text-[18px]">view_carousel</span></span>
           </div>
           <div className="mt-space-md flex flex-col">
-            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight">{tx("5 Live", "5 แสดงผล")}</span><span className="font-label-sm text-label-sm text-on-surface-variant">{tx("/ 8 Maximum", "/ สูงสุด 8")}</span></div>
-            <div className="mt-space-xs flex items-center justify-between">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm"><span className="material-symbols-outlined text-[14px]">event</span><span>{tx("2 Scheduled", "ตั้งเวลา 2 รายการ")}</span></div>
-              <span className="font-body-sm text-body-sm text-on-surface-variant">CTR: 8.74%</span>
+            <div className="flex items-baseline gap-space-xs"><span className="font-headline-xl text-headline-xl text-on-surface font-semibold tracking-tight whitespace-nowrap">{tx("5 Live", "5 แสดงผล")}</span><span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">{tx("/ 8 Maximum", "/ สูงสุด 8")}</span></div>
+            <div className="mt-space-xs flex items-center justify-between gap-2">
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm whitespace-nowrap shrink-0"><span className="material-symbols-outlined text-[14px]">event</span><span>{tx("2 Scheduled", "ตั้งเวลา 2 รายการ")}</span></div>
+              <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">CTR: 8.74%</span>
             </div>
           </div>
-          <div className="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
-            <span className="text-secondary font-medium">{tx('Hero: "PayDay 15% Bonus"', 'ฮีโร่: "PayDay โบนัส 15%"')}</span>
-            <Link className="text-primary hover:underline" href="/admin/banners">{tx("Manage", "จัดการ")}</Link>
+          <div className="mt-space-md pt-space-sm flex items-center justify-between gap-2 text-on-surface-variant font-label-sm text-label-sm">
+            <span className="text-secondary font-medium truncate">{tx('Hero: "PayDay 15% Bonus"', 'ฮีโร่: "PayDay โบนัส 15%"')}</span>
+            <Link className="text-primary hover:underline whitespace-nowrap shrink-0" href="/admin/banners">{tx("Manage", "จัดการ")}</Link>
           </div>
         </div>
       </div>
@@ -211,15 +211,15 @@ export default function AdminOverviewPage() {
 
       {/* Sticky Quick Actions Toolbar */}
       <div className="sticky bottom-4 z-30 flex justify-center w-full">
-        <div className="bg-surface-container-lowest/95 backdrop-blur-md p-space-xs px-space-md rounded-2xl shadow-xl flex flex-wrap items-center gap-space-xs border border-surface-container-high">
-          <button type="button" onClick={() => router.push("/admin/accounts")} className="h-9 px-space-md bg-on-surface text-surface rounded-xl font-label-sm text-label-sm flex items-center gap-1.5 hover:bg-on-surface-variant transition-colors">
+        <div className="bg-surface-container-lowest/95 backdrop-blur-md p-space-xs px-space-md rounded-2xl shadow-xl flex flex-wrap items-center justify-center gap-space-xs border border-surface-container-high">
+          <button type="button" onClick={() => router.push("/admin/accounts")} className="h-9 px-space-md bg-on-surface text-surface rounded-xl font-label-sm text-label-sm inline-flex items-center gap-1.5 hover:bg-on-surface-variant transition-colors whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[16px]">add_box</span><span>{tx("+ Add Account", "+ เพิ่มไอดีเกม")}</span>
           </button>
-          <button type="button" onClick={() => router.push("/admin/topup")} className="h-9 px-space-md bg-surface-container text-on-surface rounded-xl font-label-sm text-label-sm flex items-center gap-1.5 hover:bg-surface-container-high transition-colors">
+          <button type="button" onClick={() => router.push("/admin/topup")} className="h-9 px-space-md bg-surface-container text-on-surface rounded-xl font-label-sm text-label-sm inline-flex items-center gap-1.5 hover:bg-surface-container-high transition-colors whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[16px]">inventory</span><span>{tx("+ Add Package", "+ เพิ่มแพ็กเกจ")}</span>
           </button>
-          <div className="h-4 w-px bg-surface-container-high mx-space-xs"></div>
-          <button type="button" onClick={handleIqBankSync} className="h-9 px-space-md bg-secondary text-on-secondary rounded-xl font-label-sm text-label-sm flex items-center gap-1.5 hover:opacity-90 transition-opacity">
+          <div className="h-4 w-px bg-surface-container-high mx-space-xs hidden sm:block"></div>
+          <button type="button" onClick={handleIqBankSync} className="h-9 px-space-md bg-secondary text-on-secondary rounded-xl font-label-sm text-label-sm inline-flex items-center gap-1.5 hover:opacity-90 transition-opacity whitespace-nowrap shrink-0">
             <span className={`material-symbols-outlined text-[16px] ${syncState === "syncing" ? "animate-spin" : ""}`}>
               {syncState === "done" ? "done" : syncState === "syncing" ? "refresh" : "sync"}
             </span>
@@ -231,7 +231,7 @@ export default function AdminOverviewPage() {
                 : tx("Trigger IQ-Bank Sync", "ซิงค์ข้อมูล IQ-Bank")}
             </span>
           </button>
-          <Link className="h-9 px-space-md bg-surface-container-low text-primary rounded-xl font-label-sm text-label-sm flex items-center gap-1.5 hover:bg-surface-container transition-colors" href="/">
+          <Link className="h-9 px-space-md bg-surface-container-low text-primary rounded-xl font-label-sm text-label-sm inline-flex items-center gap-1.5 hover:bg-surface-container transition-colors whitespace-nowrap shrink-0" href="/">
             <span className="material-symbols-outlined text-[16px]">open_in_new</span><span>{tx("View Live Storefront", "ดูหน้าร้านค้าจริง")}</span>
           </Link>
         </div>

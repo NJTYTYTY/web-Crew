@@ -34,23 +34,25 @@ export function PaymentCheckoutModal() {
   };
 
   const tabClass = (st: ModalStateName) =>
-    `px-2 py-0.5 rounded font-bold transition ${modalState === st ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:text-white'}`;
+    `px-2.5 py-1 rounded-md font-bold transition whitespace-nowrap shrink-0 ${
+      modalState === st ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-300 hover:text-white'
+    }`;
 
   return (
     <div id="payment-modal-backdrop" className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl overflow-hidden relative animate-in fade-in zoom-in-95 duration-200">
-        {/* Modal Prototype State Bar */}
-        <div className="bg-slate-900 text-slate-300 px-4 py-2 flex items-center justify-between text-[11px] border-b border-slate-800">
-          <span className="font-bold flex items-center space-x-1.5 text-white">
-            <Layers className="w-3.5 h-3.5 text-indigo-400" />
-            <span>{tx('TEST PREVIEW MODAL STATES:', 'สลับสถานะป๊อปอัปเพื่อทดสอบ:')}</span>
+      <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-200 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+        {/* Clean Production-Grade Checkout Step Bar */}
+        <div className="bg-slate-900 text-slate-300 px-4 py-2.5 flex items-center justify-between gap-2 text-[11px] border-b border-slate-800 sticky top-0 z-20">
+          <span className="font-bold flex items-center space-x-1.5 text-white whitespace-nowrap shrink-0">
+            <Layers className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+            <span>{tx('Checkout Step:', 'ขั้นตอนการสั่งซื้อ:')}</span>
           </span>
-          <div className="flex items-center space-x-1">
+          <div className="flex items-center space-x-1 overflow-x-auto hide-scrollbar">
             <button onClick={() => setModalState('waiting')} id="modal-tab-waiting" className={tabClass('waiting')}>
-              {tx('1. QR Waiting', '1. รอสแกน QR')}
+              {tx('1. Scan QR', '1. สแกน QR')}
             </button>
             <button onClick={() => setModalState('success')} id="modal-tab-success" className={tabClass('success')}>
-              {tx('2. Verified', '2. โอนสำเร็จ')}
+              {tx('2. Verified', '2. ยืนยันยอด')}
             </button>
             <button onClick={() => setModalState('fulfillment')} id="modal-tab-fulfillment" className={tabClass('fulfillment')}>
               {tx('3. Delivery', '3. รับสินค้า')}
@@ -58,7 +60,10 @@ export function PaymentCheckoutModal() {
           </div>
         </div>
 
-        <button onClick={closeModal} className="absolute top-10 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition z-10">
+        <button
+          onClick={closeModal}
+          className="absolute top-12 right-4 p-1.5 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition z-10"
+        >
           <X className="w-5 h-5" />
         </button>
 
@@ -67,24 +72,24 @@ export function PaymentCheckoutModal() {
           <div id="modal-state-waiting" className="p-6">
             <div className="text-center pb-4 border-b border-slate-100">
               <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-bold border border-emerald-200 mb-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-ring" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-ring shrink-0" />
                 <span>{tx('IQ-Bank Official Payment — Dynamic QR PromptPay', 'ระบบชำระเงินทางการ IQ-Bank — พร้อมเพย์ Dynamic QR')}</span>
               </div>
-              <h3 className="text-xl font-extrabold text-slate-900" id="modal-item-title">{activeOrder.title}</h3>
-              <div className="flex items-center justify-center space-x-3 text-xs text-slate-500 mt-1 font-mono">
-                <span>{tx('Ref:', 'อ้างอิง:')} <b className="text-slate-700" id="modal-tx-ref">{activeOrder.txRef}</b></span>
+              <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 px-4" id="modal-item-title">{activeOrder.title}</h3>
+              <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-1 font-mono">
+                <span className="whitespace-nowrap">{tx('Ref:', 'อ้างอิง:')} <b className="text-slate-700" id="modal-tx-ref">{activeOrder.txRef}</b></span>
                 <span>•</span>
-                <span>{tx('Amount:', 'ยอดชำระ:')} <b className="text-indigo-600 text-sm font-black" id="modal-tx-price">฿{activeOrder.price}.00</b></span>
+                <span className="whitespace-nowrap">{tx('Amount:', 'ยอดชำระ:')} <b className="text-indigo-600 text-sm font-black" id="modal-tx-price">฿{activeOrder.price}.00</b></span>
               </div>
             </div>
 
             <div className="py-5 flex flex-col items-center">
               <div className="bg-white p-4 rounded-2xl border-2 border-indigo-600/30 shadow-lg flex flex-col items-center relative group">
-                <div className="w-full bg-[#003d6b] text-white py-1 px-3 rounded-t-lg text-center text-[10px] font-bold tracking-wider mb-2 flex items-center justify-center space-x-1">
+                <div className="w-full bg-[#003d6b] text-white py-1 px-3 rounded-t-lg text-center text-[10px] font-bold tracking-wider mb-2 flex items-center justify-center space-x-1 whitespace-nowrap">
                   <span>PROMPTPAY THAI QR PAYMENT</span>
                 </div>
 
-                <div className="w-52 h-52 bg-white flex items-center justify-center relative p-2 border border-slate-200 rounded-lg">
+                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-white flex items-center justify-center relative p-2 border border-slate-200 rounded-lg">
                   <svg viewBox="0 0 100 100" className="w-full h-full text-slate-900" fill="currentColor">
                     <rect x="0" y="0" width="30" height="30" rx="3" fill="#0f172a" />
                     <rect x="4" y="4" width="22" height="22" rx="2" fill="#ffffff" />
@@ -122,13 +127,17 @@ export function PaymentCheckoutModal() {
                   </div>
                 </div>
 
-                <div className="w-full mt-3 flex items-center justify-between text-xs text-slate-500">
-                  <span className="flex items-center space-x-1 font-mono">
-                    <Clock className="w-3.5 h-3.5 text-amber-500" />
+                <div className="w-full mt-3 flex items-center justify-between gap-2 text-xs text-slate-500">
+                  <span className="flex items-center space-x-1 font-mono whitespace-nowrap">
+                    <Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     <span id="qr-countdown" className="font-bold text-slate-800">{formattedTime}</span>
                   </span>
-                  <button type="button" onClick={() => copyToClipboard(activeOrder.txRef, 'qr')} className="text-indigo-600 hover:text-indigo-800 font-bold flex items-center space-x-1 text-[11px]">
-                    <Download className="w-3 h-3" />
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(activeOrder.txRef, 'qr')}
+                    className="text-indigo-600 hover:text-indigo-800 font-bold flex items-center space-x-1 text-[11px] whitespace-nowrap shrink-0"
+                  >
+                    <Download className="w-3 h-3 shrink-0" />
                     <span>{copiedLabel === 'qr' ? tx('QR Captured!', 'บันทึก QR แล้ว!') : tx('Download / Capture QR', 'ดาวน์โหลด / แคปภาพ QR')}</span>
                   </button>
                 </div>
@@ -136,15 +145,18 @@ export function PaymentCheckoutModal() {
 
               <div className="w-full mt-4 bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center space-x-3">
                 <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin shrink-0" />
-                <div className="text-xs">
+                <div className="text-xs min-w-0">
                   <div className="font-bold text-slate-800">{tx('Waiting for payment...', 'กำลังรอการชำระเงิน...')}</div>
-                  <div className="text-[11px] text-slate-500">{tx('Auto-detecting transaction from IQ-Bank Webhook', 'ระบบกำลังตรวจจับยอดโอนอัตโนมัติจาก IQ-Bank Webhook')}</div>
+                  <div className="text-[11px] text-slate-500 truncate">{tx('Auto-detecting transaction from IQ-Bank Webhook', 'ระบบกำลังตรวจจับยอดโอนอัตโนมัติจาก IQ-Bank Webhook')}</div>
                 </div>
               </div>
 
               <div className="w-full mt-4 pt-3 border-t border-slate-100">
-                <button onClick={openSimulatorDirectly} className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5">
-                  <ExternalLink className="w-4 h-4 text-emerald-600" />
+                <button
+                  onClick={openSimulatorDirectly}
+                  className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 whitespace-nowrap"
+                >
+                  <ExternalLink className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>{tx('Open IQ-Bank Demo Payment Simulator ↗', 'เปิดระบบจำลองการโอนเงิน IQ-Bank ↗')}</span>
                 </button>
               </div>
@@ -162,15 +174,18 @@ export function PaymentCheckoutModal() {
             <p className="text-xs text-slate-500 mt-1">{tx('Confirmed via IQ-Bank Dynamic PromptPay webhook', 'ยืนยันยอดโอนผ่านระบบ IQ-Bank Dynamic PromptPay Webhook เรียบร้อยแล้ว')}</p>
 
             <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 my-5 text-left text-xs space-y-2">
-              <div className="flex justify-between"><span className="text-slate-500">{tx('Transaction Ref:', 'รหัสอ้างอิงธุรกรรม:')}</span><span className="font-mono font-bold text-slate-800" id="success-tx-ref">{activeOrder.txRef}</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">{tx('Settled Amount:', 'ยอดชำระสุทธิ:')}</span><span className="font-bold text-emerald-600" id="success-tx-amount">฿{activeOrder.price}.00 THB</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">{tx('Payment Channel:', 'ช่องทางชำระเงิน:')}</span><span className="font-semibold text-slate-700">PromptPay QR (IQ-Bank Gateway)</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">{tx('Timestamp:', 'เวลาทำรายการ:')}</span><span className="font-mono text-slate-600" id="success-timestamp">{tx('Just now', 'เมื่อสักครู่')}</span></div>
+              <div className="flex justify-between gap-2"><span className="text-slate-500 whitespace-nowrap">{tx('Transaction Ref:', 'รหัสอ้างอิงธุรกรรม:')}</span><span className="font-mono font-bold text-slate-800" id="success-tx-ref">{activeOrder.txRef}</span></div>
+              <div className="flex justify-between gap-2"><span className="text-slate-500 whitespace-nowrap">{tx('Settled Amount:', 'ยอดชำระสุทธิ:')}</span><span className="font-bold text-emerald-600 whitespace-nowrap" id="success-tx-amount">฿{activeOrder.price}.00 THB</span></div>
+              <div className="flex justify-between gap-2"><span className="text-slate-500 whitespace-nowrap">{tx('Payment Channel:', 'ช่องทางชำระเงิน:')}</span><span className="font-semibold text-slate-700 text-right">PromptPay QR (IQ-Bank Gateway)</span></div>
+              <div className="flex justify-between gap-2"><span className="text-slate-500 whitespace-nowrap">{tx('Timestamp:', 'เวลาทำรายการ:')}</span><span className="font-mono text-slate-600 whitespace-nowrap" id="success-timestamp">{tx('Just now', 'เมื่อสักครู่')}</span></div>
             </div>
 
-            <button onClick={() => setModalState('fulfillment')} className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-1.5">
+            <button
+              onClick={() => setModalState('fulfillment')}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs shadow-md transition flex items-center justify-center space-x-1.5 whitespace-nowrap"
+            >
               <span>{tx('Proceed to Instant Fulfillment', 'ดำเนินการรับสินค้า / ไอดีเกมทันที')}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-4 h-4 shrink-0" />
             </button>
           </div>
         )}
@@ -179,7 +194,7 @@ export function PaymentCheckoutModal() {
         {modalState === 'fulfillment' && (
           <div id="modal-state-fulfillment" className="p-6">
             <div className="text-center pb-4 border-b border-slate-100">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 uppercase">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 uppercase whitespace-nowrap">
                 {tx('Order Complete', 'คำสั่งซื้อสำเร็จ')}
               </span>
               <h3 className="text-xl font-extrabold text-slate-900 mt-1">{tx('Instant Order Delivery', 'ส่งมอบสินค้าอัตโนมัติเรียบร้อย')}</h3>
@@ -194,20 +209,26 @@ export function PaymentCheckoutModal() {
                 </div>
 
                 <div className="bg-slate-900 text-white p-4 rounded-2xl border border-slate-800 space-y-3 font-mono text-xs">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                    <span className="text-slate-400">{tx('Account Username:', 'ชื่อผู้ใช้ไอดีเกม:')}</span>
+                  <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                    <span className="text-slate-400 whitespace-nowrap">{tx('Account Username:', 'ชื่อผู้ใช้ไอดีเกม:')}</span>
                     <div className="flex items-center space-x-2">
                       <span className="font-bold text-amber-300" id="revealed-user">{activeOrder.username || 'blox_kitsune_99'}</span>
-                      <button onClick={() => copyToClipboard(activeOrder.username || 'blox_kitsune_99', 'user')} className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300">
+                      <button
+                        onClick={() => copyToClipboard(activeOrder.username || 'blox_kitsune_99', 'user')}
+                        className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300 whitespace-nowrap shrink-0"
+                      >
                         {copiedLabel === 'user' ? tx('Copied!', 'คัดลอกแล้ว!') : tx('Copy', 'คัดลอก')}
                       </button>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">{tx('Account Password:', 'รหัสผ่านไอดีเกม:')}</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-400 whitespace-nowrap">{tx('Account Password:', 'รหัสผ่านไอดีเกม:')}</span>
                     <div className="flex items-center space-x-2">
                       <span className="font-bold text-emerald-400" id="revealed-pass">{activeOrder.password || 'NexPass#7741'}</span>
-                      <button onClick={() => copyToClipboard(activeOrder.password || 'NexPass#7741', 'pass')} className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300">
+                      <button
+                        onClick={() => copyToClipboard(activeOrder.password || 'NexPass#7741', 'pass')}
+                        className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300 whitespace-nowrap shrink-0"
+                      >
                         {copiedLabel === 'pass' ? tx('Copied!', 'คัดลอกแล้ว!') : tx('Copy', 'คัดลอก')}
                       </button>
                     </div>
@@ -219,19 +240,25 @@ export function PaymentCheckoutModal() {
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
                   <div className="font-bold text-slate-900">{tx('Live Top-Up Delivery Progress:', 'สถานะการจัดส่งเติมเกมอัตโนมัติ:')}</div>
                   <div className="space-y-2">
-                    <div className="flex items-center space-x-2 text-emerald-600 font-semibold"><CheckCircle2 className="w-4 h-4" /><span>{tx('1. Payment Confirmed by IQ-Bank', '1. ยืนยันยอดชำระเงินจาก IQ-Bank สำเร็จ')}</span></div>
-                    <div className="flex items-center space-x-2 text-emerald-600 font-semibold"><CheckCircle2 className="w-4 h-4" /><span>{tx('2. Injected to UID / In-Game Server', '2. ส่งคำสั่งเติมเข้า UID / เซิร์ฟเวอร์เกมเรียบร้อย')}</span></div>
-                    <div className="flex items-center space-x-2 text-emerald-600 font-semibold"><CheckCircle2 className="w-4 h-4" /><span>{tx('3. Balance Credited Successfully (100%)', '3. เติมคูปอง/เพชร/Robux เข้าบัญชีสำเร็จ (100%)')}</span></div>
+                    <div className="flex items-center space-x-2 text-emerald-600 font-semibold"><CheckCircle2 className="w-4 h-4 shrink-0" /><span>{tx('1. Payment Confirmed by IQ-Bank', '1. ยืนยันยอดชำระเงินจาก IQ-Bank สำเร็จ')}</span></div>
+                    <div className="flex items-center space-x-2 text-emerald-600 font-semibold"><CheckCircle2 className="w-4 h-4 shrink-0" /><span>{tx('2. Injected to UID / In-Game Server', '2. ส่งคำสั่งเติมเข้า UID / เซิร์ฟเวอร์เกมเรียบร้อย')}</span></div>
+                    <div className="flex items-center space-x-2 text-emerald-600 font-semibold"><CheckCircle2 className="w-4 h-4 shrink-0" /><span>{tx('3. Balance Credited Successfully (100%)', '3. เติมคูปอง/เพชร/Robux เข้าบัญชีสำเร็จ (100%)')}</span></div>
                   </div>
                 </div>
               </div>
             )}
 
             <div className="pt-3 border-t border-slate-100 flex items-center space-x-3">
-              <button onClick={() => { switchView('orders'); closeModal(); }} className="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition text-center">
+              <button
+                onClick={() => { switchView('orders'); closeModal(); }}
+                className="flex-1 py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition text-center whitespace-nowrap"
+              >
                 {tx('View in My Orders', 'ดูในประวัติการสั่งซื้อ')}
               </button>
-              <button onClick={closeModal} className="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition text-center">
+              <button
+                onClick={closeModal}
+                className="flex-1 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition text-center whitespace-nowrap"
+              >
                 {tx('Done / Close', 'เสร็จสิ้น / ปิดหน้าต่าง')}
               </button>
             </div>
