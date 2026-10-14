@@ -50,17 +50,17 @@ export function GameTopupView() {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">{tx('Select Game to Top Up', 'เลือกเกมที่ต้องการเติม')}</label>
               <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
                 <button onClick={() => selectTopupGame('rov')} id="topup-tab-rov" className={gameTabClass('rov')}>
-                  <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center font-black text-sm mb-2 shadow-sm group-hover:scale-105 transition-transform">RoV</div>
+                  <img src="/game-logos/rov/rov-icon.png" alt="RoV" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
                   <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Arena of Valor</span>
                   <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
                 </button>
                 <button onClick={() => selectTopupGame('freefire')} id="topup-tab-freefire" className={gameTabClass('freefire')}>
-                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-sm mb-2 shadow-sm group-hover:scale-105 transition-transform">FF</div>
+                  <img src="/game-logos/freefire/freefire-icon.png" alt="Free Fire" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
                   <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Free Fire</span>
                   <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
                 </button>
                 <button onClick={() => selectTopupGame('roblox')} id="topup-tab-roblox" className={gameTabClass('roblox')}>
-                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-sm mb-2 shadow-sm group-hover:scale-105 transition-transform">R$</div>
+                  <img src="/game-logos/roblox/roblox-icon.png" alt="Roblox" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
                   <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Roblox Robux</span>
                   <span className="text-[10px] text-indigo-600 font-semibold mt-0.5 whitespace-nowrap">{tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว')}</span>
                 </button>

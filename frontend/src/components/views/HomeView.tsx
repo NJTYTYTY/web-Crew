@@ -181,25 +181,16 @@ export function HomeView() {
             {/* 3 Stacked Playing-Card Game Logos (RoV, Roblox, Free Fire) */}
             <div className="relative w-20 h-16 flex items-center justify-center shrink-0 select-none pt-1">
               {/* Left Card: RoV */}
-              <div className="absolute w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 -rotate-12 -translate-x-3 translate-y-1 group-hover:-rotate-16 group-hover:-translate-x-4 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-red-400 z-10">
-                <img src="/pic-banner-slide/rov.jpeg" alt="RoV" className="w-full h-full object-cover opacity-85" />
-                <div className="absolute inset-0 bg-gradient-to-t from-red-950/90 via-transparent to-transparent flex items-end justify-center pb-1">
-                  <span className="text-[9px] font-black text-white tracking-tighter drop-shadow">RoV</span>
-                </div>
+              <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 -rotate-12 -translate-x-3.5 translate-y-1 group-hover:-rotate-16 group-hover:-translate-x-4.5 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-red-400 z-10">
+                <img src="/game-logos/rov/rov-icon.png" alt="RoV" className="w-full h-full object-cover" />
               </div>
               {/* Center Card (Pops up on card hover): Roblox */}
-              <div className="absolute w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-lg bg-slate-900 rotate-0 -translate-y-0.5 group-hover:-translate-y-2.5 group-hover:scale-110 group-hover:ring-2 group-hover:ring-emerald-400 transition-all duration-300 ease-out hover:!-translate-y-3 hover:!scale-115 hover:!z-30 z-20">
-                <img src="/pic-banner-slide/roblox.webp" alt="Roblox" className="w-full h-full object-cover opacity-90" />
-                <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-transparent to-transparent flex items-end justify-center pb-1">
-                  <span className="text-[9px] font-black text-sky-300 tracking-tighter drop-shadow">R$</span>
-                </div>
+              <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-lg bg-slate-900 rotate-0 -translate-y-0.5 group-hover:-translate-y-2.5 group-hover:scale-110 group-hover:ring-2 group-hover:ring-emerald-400 transition-all duration-300 ease-out hover:!-translate-y-3 hover:!scale-115 hover:!z-30 z-20">
+                <img src="/game-logos/roblox/roblox-icon.png" alt="Roblox" className="w-full h-full object-cover" />
               </div>
               {/* Right Card: Free Fire */}
-              <div className="absolute w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 rotate-12 translate-x-3 translate-y-1 group-hover:rotate-16 group-hover:translate-x-4 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-amber-400 z-10">
-                <img src="/pic-banner-slide/freefire.jpeg" alt="Free Fire" className="w-full h-full object-cover opacity-85" />
-                <div className="absolute inset-0 bg-gradient-to-t from-amber-950/90 via-transparent to-transparent flex items-end justify-center pb-1">
-                  <span className="text-[9px] font-black text-amber-300 tracking-tighter drop-shadow">FF</span>
-                </div>
+              <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 rotate-12 translate-x-3.5 translate-y-1 group-hover:rotate-16 group-hover:translate-x-4.5 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-amber-400 z-10">
+                <img src="/game-logos/freefire/freefire-icon.png" alt="Free Fire" className="w-full h-full object-cover" />
               </div>
             </div>
             <div className="flex-1 min-w-0">
