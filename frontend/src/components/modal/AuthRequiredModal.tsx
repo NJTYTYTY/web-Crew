@@ -41,8 +41,6 @@ export function AuthRequiredModal() {
         className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 border border-slate-200 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-500 rounded-t-3xl" />
-
         <button
           type="button"
           onClick={closeAuthPrompt}

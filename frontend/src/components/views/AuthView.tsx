@@ -39,8 +39,6 @@ export function AuthView({ initialMode }: { initialMode?: AuthMode }) {
     <div id="view-auth" className="page-view">
       <div className="max-w-md mx-auto px-4 py-10 sm:py-12">
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-500" />
-
           <div className="text-center mb-6">
             <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white mx-auto flex items-center justify-center shadow-md shadow-indigo-500/30 mb-3">
               <Gamepad2 className="w-6 h-6" />
