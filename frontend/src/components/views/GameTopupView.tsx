@@ -36,7 +36,6 @@ export function GameTopupView() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="mb-6">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 whitespace-nowrap shrink-0">{tx('SECTION 1.2', 'หมวดหมู่ 1.2')}</span>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900">{tx('Automated 24/7 Game Top-Up', 'ระบบเติมเกมอัตโนมัติ 24 ชั่วโมง')}</h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">

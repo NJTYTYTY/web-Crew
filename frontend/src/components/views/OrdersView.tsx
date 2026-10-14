@@ -16,9 +16,6 @@ export function OrdersView() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-slate-200 gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 whitespace-nowrap shrink-0">
-                {tx('SECTION 1.3', 'หมวดหมู่ 1.3')}
-              </span>
               <h1 className="text-xl sm:text-2xl font-black text-slate-900">
                 {tx('Customer Purchase History', 'ประวัติการสั่งซื้อและรับสินค้า')}
               </h1>

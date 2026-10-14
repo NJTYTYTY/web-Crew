@@ -35,9 +35,6 @@ export function AccountMarketplaceView() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 whitespace-nowrap shrink-0">
-                  {tx('SECTION 1.1', 'หมวดหมู่ 1.1')}
-                </span>
                 <h1 className="text-xl sm:text-2xl font-black text-slate-900">
                   {tx('Game Account Marketplace', 'ตลาดซื้อขายไอดีเกมพร้อมเล่น')}
                 </h1>
