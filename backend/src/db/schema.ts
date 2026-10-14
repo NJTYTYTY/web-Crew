@@ -46,6 +46,13 @@ export const gameAccounts = pgTable('game_accounts', {
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   highlightTags: jsonb('highlight_tags').$type<string[]>().default([]).notNull(),
+  specs: jsonb('specs').$type<{
+    levelOrRank?: string;
+    heroesOrFruitsCount?: string;
+    skinsOrWeaponsCount?: string;
+    serverRegion?: string;
+    emailStatus?: string;
+  }>(),
   price: integer('price').notNull(), // Stored in THB
   imageUrl: text('image_url').notNull(),
   // Secret credentials delivered ONLY after order is PAID
@@ -60,6 +67,7 @@ export const topupGames = pgTable('topup_games', {
   id: serial('id').primaryKey(),
   slug: varchar('slug', { length: 50 }).unique().notNull(), // 'rov', 'freefire', 'roblox'
   name: varchar('name', { length: 100 }).notNull(),
+  iconUrl: text('icon_url').default('/game-logos/rov/rov-icon.png').notNull(),
   inputMode: topupInputModeEnum('input_mode').notNull(), // 'UID' or 'ID_PASS'
   isActive: boolean('is_active').default(true).notNull(),
 });

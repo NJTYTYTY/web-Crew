@@ -10,7 +10,7 @@ import { TopupGameKey } from '@/types/store';
 
 export function GameTopupView() {
   const {
-    activeTopupGame, selectTopupGame, packagesData, selectedPackage, selectPackage,
+    activeTopupGame, selectTopupGame, packagesData, topupGamesMeta, selectedPackage, selectPackage,
     uidInput, setUidInput, robloxUser, setRobloxUser, robloxPass, setRobloxPass, handleTopupCheckout,
   } = useStore();
   const { tx } = useLanguage();
@@ -23,7 +23,7 @@ export function GameTopupView() {
       activeTopupGame === g ? 'border-indigo-600 bg-indigo-50/50' : 'border-slate-200 hover:border-slate-300 bg-white'
     }`;
 
-  const gameTitle = activeTopupGame === 'freefire' ? 'Free Fire' : activeTopupGame === 'roblox' ? 'Roblox Robux' : 'Arena of Valor (RoV)';
+  const gameTitle = topupGamesMeta[activeTopupGame]?.name || (activeTopupGame === 'freefire' ? 'Free Fire' : activeTopupGame === 'roblox' ? 'Roblox Robux' : 'Arena of Valor (RoV)');
   const stepOneTitle =
     activeTopupGame === 'roblox'
       ? tx('Enter Roblox Credentials (ID-Pass)', 'กรอกข้อมูลไอดี Roblox (ID-Pass)')
@@ -50,18 +50,18 @@ export function GameTopupView() {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">{tx('Select Game to Top Up', 'เลือกเกมที่ต้องการเติม')}</label>
               <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
                 <button onClick={() => selectTopupGame('rov')} id="topup-tab-rov" className={gameTabClass('rov')}>
-                  <img src="/game-logos/rov/rov-icon.png" alt="RoV" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
-                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Arena of Valor</span>
+                  <img src={topupGamesMeta.rov?.iconUrl || '/game-logos/rov/rov-icon.png'} alt="RoV" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
+                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">{topupGamesMeta.rov?.name || 'Arena of Valor'}</span>
                   <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
                 </button>
                 <button onClick={() => selectTopupGame('freefire')} id="topup-tab-freefire" className={gameTabClass('freefire')}>
-                  <img src="/game-logos/freefire/freefire-icon.png" alt="Free Fire" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
-                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Free Fire</span>
+                  <img src={topupGamesMeta.freefire?.iconUrl || '/game-logos/freefire/freefire-icon.png'} alt="Free Fire" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
+                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">{topupGamesMeta.freefire?.name || 'Free Fire'}</span>
                   <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">{tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}</span>
                 </button>
                 <button onClick={() => selectTopupGame('roblox')} id="topup-tab-roblox" className={gameTabClass('roblox')}>
-                  <img src="/game-logos/roblox/roblox-icon.png" alt="Roblox" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
-                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">Roblox Robux</span>
+                  <img src={topupGamesMeta.roblox?.iconUrl || '/game-logos/roblox/roblox-icon.png'} alt="Roblox" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
+                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">{topupGamesMeta.roblox?.name || 'Roblox Robux'}</span>
                   <span className="text-[10px] text-indigo-600 font-semibold mt-0.5 whitespace-nowrap">{tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว')}</span>
                 </button>
               </div>

@@ -1,5 +1,5 @@
-import { AccountProduct, BannerItem, PackagesByGame, TopupGameKey } from '@/types/store';
-import { initialAccountProducts, initialBanners, initialPackagesData } from '@/data/mockStoreData';
+import { AccountProduct, BannerItem, PackagesByGame, TopupGameKey, TopupGamesMetaByKey } from '@/types/store';
+import { initialAccountProducts, initialBanners, initialPackagesData, initialTopupGamesMeta } from '@/data/mockStoreData';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -28,6 +28,7 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
     ...options,
     headers,
     credentials: 'include',
+    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -98,17 +99,18 @@ export function normalizeAccounts(res: any): AccountProduct[] | null {
   return list.map((a: any, idx: number) => {
     const fallback = initialAccountProducts[idx % initialAccountProducts.length];
     const isRov = a.gameCategory === 'ROV' || a.game === 'RoV';
+    const specs = a.specs || {};
     return {
       id: `acc-${a.id ?? idx + 1}`,
       dbId: a.id,
       game: isRov ? 'RoV' : 'Roblox',
       title: a.title || fallback.title,
       description: a.description || fallback.description,
-      levelOrRank: a.levelOrRank || fallback.levelOrRank || (isRov ? 'Conqueror / Master Rank' : 'Max Level 2550'),
-      serverRegion: a.serverRegion || fallback.serverRegion || (isRov ? 'Garena Thailand (TH)' : 'Global / SEA'),
-      emailStatus: a.emailStatus || fallback.emailStatus || '100% Clean Unlinked',
-      heroesOrFruitsCount: a.heroesOrFruitsCount || fallback.heroesOrFruitsCount,
-      skinsOrWeaponsCount: a.skinsOrWeaponsCount || fallback.skinsOrWeaponsCount,
+      levelOrRank: specs.levelOrRank || a.levelOrRank || fallback.levelOrRank || (isRov ? 'Conqueror / Master Rank' : 'Max Level 2550'),
+      serverRegion: specs.serverRegion || a.serverRegion || fallback.serverRegion || (isRov ? 'Garena Thailand (TH)' : 'Global / SEA'),
+      emailStatus: specs.emailStatus || a.emailStatus || fallback.emailStatus || '100% Clean Unlinked',
+      heroesOrFruitsCount: specs.heroesOrFruitsCount || a.heroesOrFruitsCount || fallback.heroesOrFruitsCount,
+      skinsOrWeaponsCount: specs.skinsOrWeaponsCount || a.skinsOrWeaponsCount || fallback.skinsOrWeaponsCount,
       price: Number(a.price),
       tags: Array.isArray(a.highlightTags) ? a.highlightTags : a.tags || fallback.tags,
       stock: a.status === 'SOLD' || a.stock === 'sold_out' ? 'sold_out' : 'in_stock',
@@ -134,6 +136,25 @@ export function normalizeTopupGames(res: any): PackagesByGame | null {
         price: Number(p.price),
         hot: Boolean(p.isPopular ?? (i === 1 || i === 2)),
       }));
+    }
+  });
+  return mapped;
+}
+
+export function normalizeTopupGamesMeta(res: any): TopupGamesMetaByKey | null {
+  const list = Array.isArray(res) ? res : res?.games;
+  if (!Array.isArray(list) || list.length === 0) return null;
+  const mapped: TopupGamesMetaByKey = { ...initialTopupGamesMeta };
+  list.forEach((g: any) => {
+    const slug = (g.slug || '').toLowerCase() as TopupGameKey;
+    if (slug === 'rov' || slug === 'freefire' || slug === 'roblox') {
+      mapped[slug] = {
+        slug,
+        name: g.name || initialTopupGamesMeta[slug].name,
+        iconUrl: g.iconUrl || initialTopupGamesMeta[slug].iconUrl,
+        inputMode: g.inputMode === 'ID_PASS' ? 'ID_PASS' : 'UID',
+        isActive: g.isActive !== false,
+      };
     }
   });
   return mapped;

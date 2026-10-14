@@ -11,23 +11,33 @@ interface AccountFormDrawerProps {
   onSave: (data: Omit<AdminGameAccount, "id" | "code">, isDraft?: boolean) => void;
 }
 
+const ACCOUNT_IMG_PRESETS = [
+  { label: "Roblox #1", url: "/game-account_sale/roblox01.png" },
+  { label: "Roblox #2", url: "/game-account_sale/roblox02.png" },
+  { label: "Roblox #3", url: "/game-account_sale/roblox03.png" },
+  { label: "RoV #1", url: "/game-account_sale/rov1.png" },
+  { label: "RoV #2", url: "/game-account_sale/rov2.png" },
+  { label: "RoV #3", url: "/game-account_sale/rov3.png" },
+];
+
 export default function AccountFormDrawer({ open, editingAccount, onClose, onSave }: AccountFormDrawerProps) {
   const { tx } = useLanguage();
   const [platform, setPlatform] = useState<"roblox" | "rov">("roblox");
   const [title, setTitle] = useState("");
-  const [priceThb, setPriceThb] = useState("2500");
+  const [priceThb, setPriceThb] = useState("450");
   const [spec1, setSpec1] = useState("");
   const [spec2, setSpec2] = useState("");
   const [spec3, setSpec3] = useState("");
-  const [serverRegion, setServerRegion] = useState("Global Server");
+  const [serverRegion, setServerRegion] = useState("Global / SEA Optimized");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [tags, setTags] = useState<string[]>(["Godhuman Max", "Dough V2", "Unverified Email"]);
+  const [imageUrl, setImageUrl] = useState("/game-account_sale/roblox01.png");
+  const [tags, setTags] = useState<string[]>(["Human V4 T10", "CDK + 6 Melee", "Clean ID"]);
   const [tagInput, setTagInput] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [pin, setPin] = useState("");
-  const [emailStatus, setEmailStatus] = useState("unverified");
+  const [emailStatus, setEmailStatus] = useState("100% Clean ID (No Phone / No Email Linked)");
+  const [status, setStatus] = useState<"available" | "sold">("available");
   const [showPwd, setShowPwd] = useState(false);
 
   useEffect(() => {
@@ -38,17 +48,20 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
       setSpec1(editingAccount.spec1);
       setSpec2(editingAccount.spec2);
       setSpec3(editingAccount.spec3);
-      setServerRegion(editingAccount.serverRegion || (editingAccount.platform === "rov" ? "TH / Garena Server" : "Global Server"));
+      setServerRegion(editingAccount.serverRegion || (editingAccount.platform === "rov" ? "Garena Thailand (TH)" : "Global / SEA Optimized"));
       setDescription(editingAccount.description || "");
-      setImageUrl(editingAccount.imageUrl || "");
+      setImageUrl(editingAccount.imageUrl || "/game-account_sale/roblox01.png");
       setTags(editingAccount.tags);
       setUsername(editingAccount.username);
       setPassword(editingAccount.password);
       setPin(editingAccount.pin === "None" ? "" : editingAccount.pin);
+      setEmailStatus(editingAccount.subtitle || "100% Clean ID (No Phone / No Email Linked)");
+      setStatus(editingAccount.status);
     } else {
-      setPlatform("roblox"); setTitle(""); setPriceThb(""); setSpec1(""); setSpec2(""); setSpec3("");
-      setServerRegion("Global Server"); setDescription(""); setImageUrl("");
-      setTags(["Godhuman Max", "Dough V2", "Unverified Email"]); setUsername(""); setPassword(""); setPin("");
+      setPlatform("roblox"); setTitle(""); setPriceThb("450"); setSpec1(""); setSpec2(""); setSpec3("");
+      setServerRegion("Global / SEA Optimized"); setDescription(""); setImageUrl("/game-account_sale/roblox01.png");
+      setTags(["Human V4 T10", "CDK + 6 Melee", "Clean ID"]); setUsername(""); setPassword(""); setPin("");
+      setEmailStatus("100% Clean ID (No Phone / No Email Linked)"); setStatus("available");
     }
   }, [editingAccount, open]);
 
@@ -63,24 +76,24 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
   };
 
   const handleSubmit = (isDraft = false) => {
-    const numPrice = Number(priceThb) || 1990;
+    const numPrice = Number(priceThb) || 450;
     const defaultImg = INITIAL_GAME_ACCOUNTS[platform === "roblox" ? 0 : 1].imageUrl;
     onSave(
       {
         title: title.trim() || "Roblox Blox Fruits Max Lvl + Godhuman Vault",
-        subtitle: emailStatus === "unverified" ? "Unverified Email • Instant Ownership" : "Auto-Transfer Ready • Just Added",
+        subtitle: emailStatus.trim() || "100% Clean ID • Instant Ownership",
         subIcon: "vpn_key",
         platform,
         platformLabel: platform === "roblox" ? "Roblox" : "RoV (Garena)",
-        spec1: spec1.trim() || (platform === "roblox" ? "Level 2550 (Max)" : "Supreme Conqueror"),
+        spec1: spec1.trim() || (platform === "roblox" ? "Lv. 2550 (MAX)" : "Ex-Supreme Rank"),
         spec2: spec2.trim() || tags.slice(0, 2).join(" • ") || "Verified Full Access",
         spec3: spec3.trim() || tags[2] || "Instant Escrow Delivery",
-        serverRegion: serverRegion.trim() || (platform === "roblox" ? "Global Server" : "TH / Garena Server"),
-        description: description.trim() || "Full access verified game account stored in ApexPay AES-256 escrow vault. Instant automated credential delivery after payment.",
+        serverRegion: serverRegion.trim() || (platform === "roblox" ? "Global / SEA Optimized" : "Garena Thailand (TH)"),
+        description: description.trim() || "Full access verified game account stored in AES-256 escrow vault. Instant automated credential delivery after payment.",
         imageUrl: imageUrl.trim() || defaultImg,
         priceThb: numPrice,
         priceUsd: `~ $${(numPrice / 35).toFixed(2)} USD`,
-        status: "available",
+        status,
         username: username.trim() || "apex_vault_user99",
         password: password.trim() || "ApexSecret#2025",
         pin: pin.trim() || "None",
@@ -100,7 +113,7 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
           <div className="flex flex-col">
             <div className="flex items-center gap-space-xs font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">
               <span className="material-symbols-outlined text-[16px]">add_moderator</span>
-              <span>{tx("Listing Wizard", "ตัวช่วยสร้างรายการไอดี")}</span>
+              <span>{tx("Listing Wizard", "ตัวช่วยจัดการไอดีเกม")}</span>
             </div>
             <h2 className="font-headline-md text-headline-md text-on-surface font-semibold">
               {editingAccount ? tx(`Edit Account (${editingAccount.code})`, `แก้ไขไอดี (${editingAccount.code})`) : tx("Add New Game Account", "เพิ่มไอดีเกมใหม่")}
@@ -112,24 +125,76 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
         </div>
 
         <div className="p-space-xl flex flex-col gap-space-lg flex-grow overflow-y-auto">
-          <div className="flex flex-col gap-space-xs">
-            <label className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">{tx("Platform Category", "หมวดหมู่แพลตฟอร์มเกม")}</label>
-            <div className="grid grid-cols-2 gap-space-md p-1 bg-surface-container-low rounded-xl">
-              <button type="button" onClick={() => { setPlatform("roblox"); setServerRegion("Global Server"); }} className={`flex items-center justify-center gap-space-sm py-space-sm px-space-md rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${platform === "roblox" ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"}`}>
-                <span className="material-symbols-outlined text-[18px]">smart_toy</span>
-                <span>{tx("Roblox Platform", "แพลตฟอร์ม Roblox")}</span>
-              </button>
-              <button type="button" onClick={() => { setPlatform("rov"); setServerRegion("TH / Garena Server"); }} className={`flex items-center justify-center gap-space-sm py-space-sm px-space-md rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${platform === "rov" ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"}`}>
-                <span className="material-symbols-outlined text-[18px]">sports_esports</span>
-                <span>RoV (Arena of Valor)</span>
-              </button>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
+            <div className="sm:col-span-2 flex flex-col gap-space-xs">
+              <label className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">{tx("Platform Category", "หมวดหมู่แพลตฟอร์มเกม")}</label>
+              <div className="grid grid-cols-2 gap-space-sm p-1 bg-surface-container-low rounded-xl">
+                <button type="button" onClick={() => { setPlatform("roblox"); setServerRegion("Global / SEA Optimized"); }} className={`flex items-center justify-center gap-space-xs py-space-sm px-space-sm rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${platform === "roblox" ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"}`}>
+                  <span className="material-symbols-outlined text-[18px]">smart_toy</span>
+                  <span>Roblox</span>
+                </button>
+                <button type="button" onClick={() => { setPlatform("rov"); setServerRegion("Garena Thailand (TH)"); }} className={`flex items-center justify-center gap-space-xs py-space-sm px-space-sm rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${platform === "rov" ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"}`}>
+                  <span className="material-symbols-outlined text-[18px]">sports_esports</span>
+                  <span>RoV (Garena)</span>
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-space-xs">
+              <label className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">{tx("Stock Status", "สถานะสินค้า")}</label>
+              <select value={status} onChange={(e) => setStatus(e.target.value as "available" | "sold")} className={inputCls}>
+                <option value="available">{tx("Available (In Stock)", "พร้อมขาย (มีสินค้า)")}</option>
+                <option value="sold">{tx("Sold Out", "ขายแล้ว")}</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Account Screenshot Image Upload + URL + Presets + Preview */}
+          <div className="p-space-md rounded-xl bg-surface-container-low border border-surface-container space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="font-label-sm text-label-sm text-on-surface font-semibold uppercase tracking-wide">
+                {tx("Account Screenshot / Cover Image *", "รูปภาพสกรีนช็อตไอดี (อัปโหลดไฟล์หรือใส่ URL) *")}
+              </label>
+              <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-semibold hover:bg-primary-container transition-colors shadow-xs">
+                <span className="material-symbols-outlined text-[15px]">upload_file</span>
+                <span>{tx("Upload Image File", "อัปโหลดรูปจากเครื่อง")}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      if (typeof reader.result === "string") setImageUrl(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+              <div className="sm:col-span-4 h-24 rounded-lg overflow-hidden bg-slate-900 border border-surface-container-high relative">
+                <img src={imageUrl || "/game-account_sale/roblox01.png"} alt="Account preview" className="w-full h-full object-cover" />
+              </div>
+              <div className="sm:col-span-8 space-y-2">
+                <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={`w-full ${vaultInputCls}`} placeholder="/game-account_sale/roblox01.png or https://..." type="text" />
+                <div className="flex flex-wrap items-center gap-1">
+                  <span className="font-label-sm text-[11px] text-outline mr-1">{tx("Presets:", "เลือกรูป:")}</span>
+                  {ACCOUNT_IMG_PRESETS.map((p) => (
+                    <button key={p.url} type="button" onClick={() => setImageUrl(p.url)} className={`px-2 py-0.5 rounded font-label-sm text-[11px] transition-colors ${imageUrl === p.url ? "bg-primary text-on-primary font-bold" : "bg-surface-container-lowest text-on-surface-variant hover:bg-primary-fixed hover:text-primary"}`}>
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="flex flex-col gap-space-md">
             <div className="flex flex-col gap-1">
               <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Listing Title *", "ชื่อรายการไอดี *")}</label>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="e.g. Roblox Blox Fruits Max Lvl + Godhuman + Dough V2" type="text" />
+              <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="e.g. Blox Fruits [Lv.2550 MAX + Human V4 T10 + CDK]" type="text" />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
@@ -137,38 +202,38 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
                 <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Price in THB (฿) *", "ราคาขาย (บาท ฿) *")}</label>
                 <div className="relative flex items-center">
                   <span className="absolute left-space-md font-label-md text-label-md text-outline">฿</span>
-                  <input value={priceThb} onChange={(e) => setPriceThb(e.target.value)} className={`w-full pl-8 pr-space-md ${inputCls}`} placeholder="2,500" type="number" />
+                  <input value={priceThb} onChange={(e) => setPriceThb(e.target.value)} className={`w-full pl-8 pr-space-md ${inputCls}`} placeholder="450" type="number" />
                 </div>
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Tier / Level / Rank", "ระดับเลเวล / แรงค์")}</label>
-                <input value={spec1} onChange={(e) => setSpec1(e.target.value)} className={inputCls} placeholder="e.g. Level 2550 or Conqueror" type="text" />
+                <input value={spec1} onChange={(e) => setSpec1(e.target.value)} className={inputCls} placeholder="e.g. Lv. 2550 (MAX) or Ex-Supreme" type="text" />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Server / Region", "เซิร์ฟเวอร์ / ภูมิภาค")}</label>
-                <input value={serverRegion} onChange={(e) => setServerRegion(e.target.value)} className={inputCls} placeholder="e.g. TH / Garena or Global" type="text" />
+                <input value={serverRegion} onChange={(e) => setServerRegion(e.target.value)} className={inputCls} placeholder="e.g. Garena Thailand (TH)" type="text" />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
               <div className="flex flex-col gap-1">
                 <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Heroes / Fruits / Characters Summary", "สรุปฮีโร่ / ผลปีศาจ / ตัวละคร")}</label>
-                <input value={spec2} onChange={(e) => setSpec2(e.target.value)} className={inputCls} placeholder={tx("e.g. 95 Heroes or Perm Kitsune + Godhuman", "เช่น 95 ฮีโร่ หรือ ผลคิตสึเนะถาวร + หมัดพระเจ้า")} type="text" />
+                <input value={spec2} onChange={(e) => setSpec2(e.target.value)} className={inputCls} placeholder="e.g. 108 Heroes or Awakened Ice & Dark" type="text" />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Skins / Rare Weapons Summary", "สรุปสกินแรร์ / อาวุธพิเศษ")}</label>
-                <input value={spec3} onChange={(e) => setSpec3(e.target.value)} className={inputCls} placeholder={tx("e.g. 140 Skins or CDK + Soul Guitar", "เช่น 140 สกิน หรือ ดาบคู่ CDK + กีตาร์บรู๊ค")} type="text" />
+                <input value={spec3} onChange={(e) => setSpec3(e.target.value)} className={inputCls} placeholder="e.g. 194 Skins or CDK + 6 Melee" type="text" />
               </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Email / Security Bind Status", "สถานะการผูกอีเมล / เบอร์โทร")}</label>
+              <input value={emailStatus} onChange={(e) => setEmailStatus(e.target.value)} className={inputCls} placeholder="e.g. 100% Clean ID (No Phone / No Email Linked)" type="text" />
             </div>
 
             <div className="flex flex-col gap-1">
               <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Detailed Account Description (Shown in Storefront Popup)", "รายละเอียดไอดีแบบเต็ม (แสดงในป๊อปอัปหน้าร้าน)")}</label>
-              <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="p-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all resize-y" placeholder={tx("Describe full inventory, rare skins, awakened fruits, arcana level, bind status, and warranty...", "ระบุรายละเอียดไอเทมในคลัง สกินแรร์ ผลปีศาจตื่น รูน สถานะการผูกเมล/เบอร์ และการรับประกัน...")} />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="font-label-sm text-label-sm text-on-surface-variant font-semibold">{tx("Cover Image URL (Optional — uses default game cover if blank)", "ลิงก์รูปภาพปกไอดี (เว้นว่างเพื่อใช้รูปมาตรฐานได้)")}</label>
-              <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className={inputCls} placeholder="https://..." type="url" />
+              <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="p-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all resize-y" placeholder={tx("Describe full inventory, rare skins, awakened fruits, bind status, and warranty...", "ระบุรายละเอียดไอเทมในคลัง สกินแรร์ ผลปีศาจตื่น สถานะการผูกเมล/เบอร์ และการรับประกัน...")} />
             </div>
           </div>
 
@@ -186,25 +251,10 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
           </div>
 
           <div className="bg-surface-container-low rounded-xl p-space-lg flex flex-col gap-space-md shadow-sm">
-            <div className="flex items-start gap-space-md">
-              <div className="w-9 h-9 rounded-xl bg-tertiary text-on-tertiary flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-[20px]">lock</span>
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-space-xs">
-                  <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold text-tertiary">{tx("Automated Customer Vault Delivery", "ระบบจัดส่งรหัสผ่านอัตโนมัติ")}</span>
-                  <span className="px-1.5 py-0.2 rounded font-label-sm text-[10px] bg-secondary text-on-secondary font-bold">AES-256</span>
-                </div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">
-                  {tx("Encrypted in ApexPay escrow vault and dispensed immediately upon IQ-Bank QR payment verification.", "เข้ารหัสในคลังนิรภัย ApexPay และส่งให้ลูกค้าทันทีเมื่อยืนยันการชำระเงินผ่าน IQ-Bank QR สำเร็จ")}
-                </p>
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
               <div className="flex flex-col gap-1">
                 <label className="font-label-sm text-label-sm text-on-surface font-semibold">{tx("Game Username / Login ID *", "ชื่อผู้ใช้ / ไอดีเข้าเกม *")}</label>
-                <input value={username} onChange={(e) => setUsername(e.target.value)} className={vaultInputCls} placeholder="e.g. apex_player_99" type="text" />
+                <input value={username} onChange={(e) => setUsername(e.target.value)} className={vaultInputCls} placeholder="e.g. blox_id6214_v4" type="text" />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-label-sm text-label-sm text-on-surface font-semibold flex items-center justify-between">
@@ -217,28 +267,13 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
                 <input value={password} onChange={(e) => setPassword(e.target.value)} className={`w-full ${vaultInputCls}`} placeholder="••••••••••••" type={showPwd ? "text" : "password"} />
               </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-              <div className="flex flex-col gap-1">
-                <label className="font-label-sm text-label-sm text-on-surface-variant font-medium">{tx("Recovery PIN / 2FA Backup", "รหัส PIN กู้คืน / 2FA")}</label>
-                <input value={pin} onChange={(e) => setPin(e.target.value)} className={vaultInputCls} placeholder="e.g. 6-digit PIN" type="text" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="font-label-sm text-label-sm text-on-surface-variant font-medium">{tx("Original Email Status", "สถานะอีเมลของไอดี")}</label>
-                <select value={emailStatus} onChange={(e) => setEmailStatus(e.target.value)} className={vaultInputCls}>
-                  <option value="unverified">{tx("Clean Unverified (Instant Bind)", "ไอดีสะอาดไม่ติดเมล (พร้อมผูกทันที)")}</option>
-                  <option value="included">{tx("First Email Included (OGE Included)", "แถมอีเมลแรกให้พร้อมไอดี")}</option>
-                  <option value="changeable">{tx("Email Changeable Instantly", "เปลี่ยนอีเมลได้ทันที")}</option>
-                </select>
-              </div>
-            </div>
           </div>
         </div>
 
         <div className="px-space-xl py-space-lg bg-surface-container-low flex items-center justify-between shrink-0">
           <button type="button" onClick={onClose} className="px-space-lg py-space-sm rounded-xl font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container transition-colors whitespace-nowrap">{tx("Cancel", "ยกเลิก")}</button>
           <div className="flex items-center gap-space-md">
-            <button type="button" onClick={() => handleSubmit(true)} className="px-space-lg py-space-sm rounded-xl bg-surface-container-lowest hover:bg-surface-container font-label-lg text-label-lg text-on-surface shadow-sm transition-colors whitespace-nowrap">{tx("Save as Draft", "บันทึกฉบับร่าง")}</button>
+            <button type="button" onClick={() => handleSubmit(true)} className="px-space-lg py-space-sm rounded-xl bg-surface-container-lowest hover:bg-surface-container font-label-lg text-label-lg text-on-surface shadow-sm transition-colors whitespace-nowrap">{tx("Save Draft", "บันทึกร่าง")}</button>
             <button type="button" onClick={() => handleSubmit(false)} className="inline-flex items-center gap-space-sm bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg px-space-xl py-space-sm rounded-xl shadow-sm transition-all active:scale-95 whitespace-nowrap">
               <span className="material-symbols-outlined text-[18px]">verified</span>
               <span>{tx("Save & List Account", "บันทึกและวางขายไอดี")}</span>

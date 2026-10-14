@@ -129,9 +129,9 @@ async function seed() {
     const insertedGames = await db
       .insert(topupGames)
       .values([
-        { slug: 'rov', name: 'Arena of Valor (RoV)', inputMode: 'UID', isActive: true },
-        { slug: 'freefire', name: 'Free Fire', inputMode: 'UID', isActive: true },
-        { slug: 'roblox', name: 'Roblox Robux', inputMode: 'ID_PASS', isActive: true },
+        { slug: 'rov', name: 'Arena of Valor (RoV)', iconUrl: '/game-logos/rov/rov-icon.png', inputMode: 'UID', isActive: true },
+        { slug: 'freefire', name: 'Free Fire', iconUrl: '/game-logos/freefire/freefire-icon.png', inputMode: 'UID', isActive: true },
+        { slug: 'roblox', name: 'Roblox Robux', iconUrl: '/game-logos/roblox/roblox-icon.png', inputMode: 'ID_PASS', isActive: true },
       ])
       .returning();
 

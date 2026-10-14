@@ -19,7 +19,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({ limit: '15mb' }));
 
 // Health Check Endpoint
 app.get('/api/health', (_req: Request, res: Response) => {

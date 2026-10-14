@@ -116,11 +116,28 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <label className="block font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wide">
-                {tx("Banner Image URL / Slide Asset *", "ลิงก์รูปภาพแบนเนอร์ / รูปในโฟลเดอร์ pic-banner-slide *")}
+                {tx("Banner Image (Upload File or URL) *", "รูปภาพแบนเนอร์ (อัปโหลดไฟล์หรือใส่ URL) *")}
               </label>
-              <span className="font-label-sm text-label-sm text-outline">{tx("Auto-Slide Hero Background", "ภาพพื้นหลังสไลด์หน้าแรก")}</span>
+              <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-semibold hover:bg-primary-container transition-colors shadow-xs">
+                <span className="material-symbols-outlined text-[15px]">upload_file</span>
+                <span>{tx("Upload Image File", "อัปโหลดรูปจากเครื่อง")}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                      if (typeof reader.result === "string") setImageUrl(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                  }}
+                />
+              </label>
             </div>
             <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" placeholder="/pic-banner-slide/roblox.webp or https://..." type="text" />
 
@@ -140,8 +157,8 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
 
             <div className="relative rounded-xl bg-surface-container-low overflow-hidden h-40 border border-surface-container mt-2">
               <img className="w-full h-full object-cover" src={imageUrl || "/pic-banner-slide/roblox.webp"} alt="Banner preview" />
-              <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded bg-inverse-surface/80 backdrop-blur-md text-inverse-on-surface font-label-sm text-[11px]">
-                {imageUrl}
+              <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded bg-inverse-surface/80 backdrop-blur-md text-inverse-on-surface font-label-sm text-[11px] max-w-[90%] truncate">
+                {imageUrl.startsWith("data:") ? tx("Uploaded Custom Image File", "ไฟล์รูปภาพที่อัปโหลดจากเครื่อง") : imageUrl}
               </div>
             </div>
           </div>

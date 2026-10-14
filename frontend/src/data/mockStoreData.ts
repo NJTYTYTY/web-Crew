@@ -1,23 +1,17 @@
-import { AccountProduct, ActiveOrder, BannerItem, CustomerOrder, PackagesByGame } from '@/types/store';
+import { AccountProduct, ActiveOrder, BannerItem, CustomerOrder, PackagesByGame, TopupGamesMetaByKey } from '@/types/store';
 
 export const initialBanners: BannerItem[] = [
-  {
-    id: 1,
-    title: 'Supercharge Your Gaming in Seconds.',
-    imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80',
-    linkUrl: '/topup',
-    sortOrder: 1,
-    isActive: true,
-  },
-  {
-    id: 2,
-    title: 'Verified Blox Fruits & RoV Accounts — Instant Delivery',
-    imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80',
-    linkUrl: '/accounts',
-    sortOrder: 2,
-    isActive: true,
-  },
+  { id: 1, title: 'Roblox Blox Fruits Special Deal — Instant Robux & Godhuman IDs', imageUrl: '/pic-banner-slide/roblox.webp', linkUrl: '/topup', sortOrder: 1, isActive: true },
+  { id: 2, title: 'RoV Champion League 2025 Top-Up Bonus (+25% Extra Coupons)', imageUrl: '/pic-banner-slide/rov.jpeg', linkUrl: '/accounts', sortOrder: 2, isActive: true },
+  { id: 3, title: 'Free Fire Instant UID Diamonds — 5-Second Auto Delivery', imageUrl: '/pic-banner-slide/freefire.jpeg', linkUrl: '/topup', sortOrder: 3, isActive: true },
+  { id: 4, title: 'Verified Roblox & RoV Accounts — 100% Clean Handover', imageUrl: '/pic-banner-slide/roblox.jpeg', linkUrl: '/accounts', sortOrder: 4, isActive: true },
 ];
+
+export const initialTopupGamesMeta: TopupGamesMetaByKey = {
+  rov: { slug: 'rov', name: 'Arena of Valor', iconUrl: '/game-logos/rov/rov-icon.png', inputMode: 'UID', isActive: true },
+  freefire: { slug: 'freefire', name: 'Free Fire', iconUrl: '/game-logos/freefire/freefire-icon.png', inputMode: 'UID', isActive: true },
+  roblox: { slug: 'roblox', name: 'Roblox Robux', iconUrl: '/game-logos/roblox/roblox-icon.png', inputMode: 'ID_PASS', isActive: true },
+};
 
 export const initialAccountProducts: AccountProduct[] = [
   {

@@ -14,6 +14,16 @@ const accountSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional().nullable(),
   highlightTags: z.array(z.string()).default([]),
+  specs: z
+    .object({
+      levelOrRank: z.string().optional(),
+      heroesOrFruitsCount: z.string().optional(),
+      skinsOrWeaponsCount: z.string().optional(),
+      serverRegion: z.string().optional(),
+      emailStatus: z.string().optional(),
+    })
+    .optional()
+    .nullable(),
   price: z.coerce.number().int().nonnegative(),
   imageUrl: z.string().min(1),
   accountUsername: z.string().min(1),
@@ -27,6 +37,13 @@ const packageSchema = z.object({
   bonusTag: z.string().optional().nullable(),
   price: z.coerce.number().int().nonnegative(),
   isActive: z.boolean().default(true),
+});
+
+const gameUpdateSchema = z.object({
+  name: z.string().min(1).optional(),
+  iconUrl: z.string().min(1).optional(),
+  inputMode: z.enum(['UID', 'ID_PASS']).optional(),
+  isActive: z.boolean().optional(),
 });
 
 const bannerSchema = z.object({
@@ -141,7 +158,24 @@ router.post('/topup', async (req: Request, res: Response) => {
   res.status(201).json({ package: created });
 });
 
-router.patch('/topup/:id', async (req: Request, res: Response) => {
+const updateGameHandler = async (req: Request, res: Response) => {
+  const slug = String(req.params.slug || '').toLowerCase();
+  const parsed = gameUpdateSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid game update' });
+    return;
+  }
+  const [updated] = await db
+    .update(topupGames)
+    .set(parsed.data)
+    .where(eq(topupGames.slug, slug))
+    .returning();
+  res.json({ game: updated });
+};
+router.patch('/topup/games/:slug', updateGameHandler);
+router.put('/topup/games/:slug', updateGameHandler);
+
+const updatePackageHandler = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const parsed = packageSchema.partial().safeParse(req.body);
   if (!parsed.success) {
@@ -154,7 +188,9 @@ router.patch('/topup/:id', async (req: Request, res: Response) => {
     .where(eq(topupPackages.id, id))
     .returning();
   res.json({ package: updated });
-});
+};
+router.patch('/topup/:id', updatePackageHandler);
+router.put('/topup/:id', updatePackageHandler);
 
 router.delete('/topup/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);

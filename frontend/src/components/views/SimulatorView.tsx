@@ -26,6 +26,16 @@ export function SimulatorView() {
     setTimeout(() => setBannerNotice(null), 3000);
   };
 
+  const handleTriggerSuccess = async () => {
+    await triggerWebhookSuccess();
+    setBannerNotice(
+      tx(
+        `✅ Payment Confirmed for ${activeOrder.txRef} (฿${activeOrder.price}.00)! Switch back to your previous Storefront tab — the QR popup has automatically moved to the next step!`,
+        `✅ ยืนยันโอนเงินสำเร็จสำหรับ ${activeOrder.txRef} (฿${activeOrder.price}.00)! สลับกลับไปที่แท็บหน้าร้านเดิมได้เลย — หน้าต่างป๊อปอัปได้เข้าสู่ขั้นตอนถัดไปให้อัตโนมัติแล้ว!`
+      )
+    );
+  };
+
   const handleTriggerFail = async () => {
     await triggerWebhookFailed();
     setBannerNotice(
@@ -165,7 +175,7 @@ export function SimulatorView() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <button
-                  onClick={triggerWebhookSuccess}
+                  onClick={handleTriggerSuccess}
                   className="p-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-900/50 transition flex items-center justify-center space-x-2 whitespace-nowrap"
                 >
                   <CheckCircle className="w-5 h-5 shrink-0" />

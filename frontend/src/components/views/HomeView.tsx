@@ -25,12 +25,26 @@ const DEFAULT_HERO_SLIDES: HeroSlideItem[] = [
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export function HomeView() {
-  const { switchView, accountProducts, buyAccount, openAccountDetail } = useStore();
+  const { switchView, banners, accountProducts, topupGamesMeta, buyAccount, openAccountDetail } = useStore();
   const { tx } = useLanguage();
   const [slides, setSlides] = useState<HeroSlideItem[]>(DEFAULT_HERO_SLIDES);
   const [activeSlideIdx, setActiveSlideIdx] = useState(0);
 
   useEffect(() => {
+    const activeFromStore = (banners || [])
+      .filter((b) => b.isActive !== false && b.imageUrl)
+      .sort((a, b) => (Number(a.sortOrder) || 1) - (Number(b.sortOrder) || 1))
+      .map((b, idx) => ({
+        id: String(b.id || idx),
+        title: String(b.title || ''),
+        imageUrl: String(b.imageUrl),
+        linkUrl: String(b.linkUrl || '/topup'),
+        sortOrder: Number(b.sortOrder) || idx + 1,
+      }));
+    if (activeFromStore.length > 0) {
+      setSlides(activeFromStore);
+      return;
+    }
     try {
       const cached = localStorage.getItem('nexusplay_banners_sync');
       if (cached) {
@@ -47,23 +61,7 @@ export function HomeView() {
         }
       }
     } catch { /* ignore */ }
-
-    fetch(`${API_BASE}/api/banners`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        const list = Array.isArray(data?.banners) ? data.banners : [];
-        if (list.length > 0) {
-          setSlides(list.map((b: Record<string, unknown>, idx: number) => ({
-            id: String(b.id || idx),
-            title: String(b.title || ''),
-            imageUrl: String(b.imageUrl || DEFAULT_HERO_SLIDES[idx % DEFAULT_HERO_SLIDES.length].imageUrl),
-            linkUrl: String(b.linkUrl || '/topup'),
-            sortOrder: Number(b.sortOrder) || idx + 1,
-          })));
-        }
-      })
-      .catch(() => {});
-  }, []);
+  }, [banners]);
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -71,7 +69,7 @@ export function HomeView() {
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const currentSlide = slides[activeSlideIdx] || DEFAULT_HERO_SLIDES[0];
+  const currentSlide = slides[activeSlideIdx % Math.max(slides.length, 1)] || DEFAULT_HERO_SLIDES[0];
 
   return (
     <div id="view-home" className="page-view">
@@ -193,15 +191,15 @@ export function HomeView() {
             <div className="relative w-20 h-16 flex items-center justify-center shrink-0 select-none pt-1">
               {/* Left Card: RoV */}
               <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 -rotate-12 -translate-x-3.5 translate-y-1 group-hover:-rotate-16 group-hover:-translate-x-4.5 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-red-400 z-10">
-                <img src="/game-logos/rov/rov-icon.png" alt="RoV" className="w-full h-full object-cover" />
+                <img src={topupGamesMeta.rov?.iconUrl || '/game-logos/rov/rov-icon.png'} alt={topupGamesMeta.rov?.name || 'RoV'} className="w-full h-full object-cover" />
               </div>
               {/* Center Card (Pops up on card hover): Roblox */}
               <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-lg bg-slate-900 rotate-0 -translate-y-0.5 group-hover:-translate-y-2.5 group-hover:scale-110 group-hover:ring-2 group-hover:ring-emerald-400 transition-all duration-300 ease-out hover:!-translate-y-3 hover:!scale-115 hover:!z-30 z-20">
-                <img src="/game-logos/roblox/roblox-icon.png" alt="Roblox" className="w-full h-full object-cover" />
+                <img src={topupGamesMeta.roblox?.iconUrl || '/game-logos/roblox/roblox-icon.png'} alt={topupGamesMeta.roblox?.name || 'Roblox'} className="w-full h-full object-cover" />
               </div>
               {/* Right Card: Free Fire */}
               <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 rotate-12 translate-x-3.5 translate-y-1 group-hover:rotate-16 group-hover:translate-x-4.5 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-amber-400 z-10">
-                <img src="/game-logos/freefire/freefire-icon.png" alt="Free Fire" className="w-full h-full object-cover" />
+                <img src={topupGamesMeta.freefire?.iconUrl || '/game-logos/freefire/freefire-icon.png'} alt={topupGamesMeta.freefire?.name || 'Free Fire'} className="w-full h-full object-cover" />
               </div>
             </div>
             <div className="flex-1 min-w-0">

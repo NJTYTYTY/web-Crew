@@ -43,6 +43,16 @@ export interface TopupPackage {
   hot: boolean;
 }
 
+export interface TopupGameMeta {
+  slug: TopupGameKey;
+  name: string;
+  iconUrl: string;
+  inputMode: 'UID' | 'ID_PASS';
+  isActive: boolean;
+}
+
+export type TopupGamesMetaByKey = Record<TopupGameKey, TopupGameMeta>;
+
 export type PackagesByGame = Record<TopupGameKey, TopupPackage[]>;
 
 export interface CustomerOrder {
@@ -90,6 +100,8 @@ export interface StoreContextValue {
   banners: BannerItem[];
   accountProducts: AccountProduct[];
   packagesData: PackagesByGame;
+  topupGamesMeta: TopupGamesMetaByKey;
+  refreshStoreCatalog: () => void;
   activeTopupGame: TopupGameKey;
   selectedPackage: TopupPackage;
   uidInput: string;

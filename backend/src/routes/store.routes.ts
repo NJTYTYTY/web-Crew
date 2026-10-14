@@ -61,6 +61,7 @@ router.get('/accounts', async (req: Request, res: Response) => {
         title: gameAccounts.title,
         description: gameAccounts.description,
         highlightTags: gameAccounts.highlightTags,
+        specs: gameAccounts.specs,
         price: gameAccounts.price,
         imageUrl: gameAccounts.imageUrl,
         status: gameAccounts.status,
