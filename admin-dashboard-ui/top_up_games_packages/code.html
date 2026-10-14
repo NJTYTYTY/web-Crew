@@ -1,0 +1,896 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={"darkMode":"class","theme":{"extend":{"colors":{"tertiary-container":"#8455ef","inverse-on-surface":"#eaf1ff","on-error-container":"#93000a","tertiary":"#6b38d4","on-secondary-container":"#00714d","error":"#ba1a1a","surface-variant":"#d3e4fe","on-secondary-fixed":"#002113","secondary-fixed":"#6ffbbe","tertiary-fixed":"#e9ddff","on-tertiary":"#ffffff","tertiary-fixed-dim":"#d0bcff","primary-fixed":"#e1e0ff","on-primary-fixed-variant":"#2f2ebe","on-error":"#ffffff","surface":"#f8f9ff","outline":"#767586","secondary":"#006c49","surface-container-low":"#eff4ff","surface-dim":"#cbdbf5","secondary-container":"#6cf8bb","secondary-fixed-dim":"#4edea3","inverse-surface":"#213145","primary-container":"#6063ee","surface-container-high":"#dce9ff","on-primary-fixed":"#07006c","on-secondary":"#ffffff","outline-variant":"#c7c4d7","background":"#f8f9ff","on-surface-variant":"#464554","surface-bright":"#f8f9ff","primary-fixed-dim":"#c0c1ff","surface-container-lowest":"#ffffff","on-primary-container":"#fffbff","on-tertiary-container":"#fffbff","surface-container":"#e5eeff","on-surface":"#0b1c30","on-secondary-fixed-variant":"#005236","on-tertiary-fixed":"#23005c","on-background":"#0b1c30","error-container":"#ffdad6","inverse-primary":"#c0c1ff","surface-container-highest":"#d3e4fe","surface-tint":"#494bd6","primary":"#4648d4","on-primary":"#ffffff","on-tertiary-fixed-variant":"#5516be"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"gutter":"1rem","space-sm":"0.5rem","space-xl":"1.5rem","space-2xl":"2rem","margin-desktop":"2rem","space-lg":"1rem","space-xs":"0.25rem","margin-tablet":"1.5rem","space-md":"0.75rem","margin":"1rem","gutter-desktop":"1.5rem"},"fontFamily":{"body-md":["Geist"],"body-lg":["Geist"],"label-md":["JetBrains Mono"],"body-sm":["Geist"],"headline-lg":["Geist"],"headline-xl-mobile":["Geist"],"label-lg":["JetBrains Mono"],"headline-sm":["Geist"],"headline-lg-mobile":["Geist"],"headline-md":["Geist"],"label-sm":["JetBrains Mono"],"headline-xl":["Geist"]},"fontSize":{"body-md":["14px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}],"body-lg":["16px",{"lineHeight":"24px","letterSpacing":"-0.005em","fontWeight":"400"}],"label-md":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"500"}],"body-sm":["12px",{"lineHeight":"16px","letterSpacing":"0em","fontWeight":"400"}],"headline-lg":["28px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"600"}],"headline-xl-mobile":["28px",{"lineHeight":"36px","letterSpacing":"-0.02em","fontWeight":"600"}],"label-lg":["14px",{"lineHeight":"20px","letterSpacing":"-0.01em","fontWeight":"500"}],"headline-sm":["16px",{"lineHeight":"24px","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-lg-mobile":["22px",{"lineHeight":"30px","letterSpacing":"-0.015em","fontWeight":"600"}],"headline-md":["20px",{"lineHeight":"28px","letterSpacing":"-0.015em","fontWeight":"600"}],"label-sm":["11px",{"lineHeight":"14px","letterSpacing":"0.02em","fontWeight":"500"}],"headline-xl":["36px",{"lineHeight":"44px","letterSpacing":"-0.025em","fontWeight":"600"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface" data-mode="connect"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between"><div class="flex flex-col"><div class="h-16 px-space-lg flex items-center gap-space-sm bg-surface-container-lowest"><img alt="ApexPay Admin Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XQkmaHs5f5F7m2A4e5llAtAuYyPHXMYN7SR5DWday6TJvrD9o5MQoWyRRHFCV47iT3LNZCSSW0yXPQaBowbhLw87JQ1bW4J783Eznq33rg7s52munazr7XZT3xythaPnsGC-rZ-J7xrFBBvmXMUU1-BtMNtddl7IyEAlwfgIlvknsMWmQ2NviauiFbS8e8YVeVDtretKV3jvkr3wwIreChYEdoJvoblnxX156horXtf-qdTRuLeEJMbw"><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight">ApexPay</span><span class="font-label-sm text-label-sm text-primary uppercase tracking-wider">Backoffice</span></div></div><div class="px-space-md py-space-sm"><div class="px-space-sm py-space-xs font-label-sm text-label-sm uppercase text-outline tracking-wider">Navigation</div><nav class="mt-space-xs flex flex-col gap-space-xs" data-active-classes="bg-primary-container text-on-primary-container font-medium shadow-[0_1px_4px_rgba(0,0,0,0.06)]"><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="dashboard-overview" href="#"><span class="material-symbols-outlined text-[20px]">grid_view</span><span>Dashboard Overview</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="game-accounts" href="#"><span class="material-symbols-outlined text-[20px]">sports_esports</span><span>Game Accounts</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="top-up-games-packages" href="#"><span class="material-symbols-outlined text-[20px]">inventory_2</span><span>Top-Up Games &amp; Packages</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="orders-top-up-queue" href="#"><span class="material-symbols-outlined text-[20px]">sync_alt</span><span>Orders &amp; Top-Up Queue</span></a><a class="flex items-center gap-space-md px-space-md py-space-sm rounded-xl font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors" data-path="homepage-banners" href="#"><span class="material-symbols-outlined text-[20px]">view_carousel</span><span>Homepage Banners</span></a></nav></div></div><div class="p-space-md bg-surface-container-lowest"><a class="flex items-center justify-between px-space-md py-space-sm rounded-xl bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors font-body-sm text-body-sm" data-path="restricted-login" href="#"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-[18px] text-tertiary">lock</span><span>Switch to Login</span></div><span class="material-symbols-outlined text-[16px]">logout</span></a></div></aside><div class="pl-64"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter-desktop"><div class="flex items-center gap-space-lg"><img alt="ApexPay Admin Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1XQkmaHs5f5F7m2A4e5llAtAuYyPHXMYN7SR5DWday6TJvrD9o5MQoWyRRHFCV47iT3LNZCSSW0yXPQaBowbhLw87JQ1bW4J783Eznq33rg7s52munazr7XZT3xythaPnsGC-rZ-J7xrFBBvmXMUU1-BtMNtddl7IyEAlwfgIlvknsMWmQ2NviauiFbS8e8YVeVDtretKV3jvkr3wwIreChYEdoJvoblnxX156horXtf-qdTRuLeEJMbw"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-space-md text-[18px] text-outline">search</span><input class="w-80 h-9 pl-9 pr-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary" placeholder="Search queue UID, game ID, order token..." type="text"></div></div><div class="flex items-center gap-space-md"><div class="hidden lg:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-secondary-container/40 text-on-secondary-fixed"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-label-sm uppercase tracking-wide">Live Sync</span></div><div class="hidden md:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-surface-container-low text-on-surface-variant"><span class="material-symbols-outlined text-[16px]">schedule</span><span class="font-label-sm text-label-sm">UTC+0 14:32:09</span></div><div class="hidden sm:inline-flex items-center px-space-sm py-space-xs rounded-xl bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm">admin_iq: ACTIVE</div><button class="relative w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-error"></span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-16 bg-surface min-h-screen"><div class="flex flex-col w-full p-margin-desktop gap-space-2xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
+<span>Catalog Operations</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-medium">Automated Pipeline</span>
+</div>
+<div class="flex items-center gap-space-md">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Top-Up Games &amp; Packages</h1>
+<span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-fixed font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+          Gateway Online
+        </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+        Manage automated credit dispatchers, vendor wholesale exchange margins, and game provider API webhooks in real-time.
+      </p>
+</div>
+<div class="flex items-center gap-space-sm self-start md:self-auto">
+<button class="flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container-low text-on-surface font-body-sm text-body-sm shadow-sm hover:bg-surface-container transition-all" onclick="openApiHealthModal()">
+<span class="material-symbols-outlined text-[18px] text-tertiary">hub</span>
+<span>Gateway Metrics</span>
+</button>
+<button class="flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-primary text-on-primary font-body-sm text-body-sm shadow-sm hover:bg-primary-container transition-all" onclick="openPackageDrawer()">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+<span>+ Add Top-Up Package</span>
+</button>
+</div>
+</div>
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">sports_esports</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Supported Providers (3 Active)</h2>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Queue Routing &amp; Protocols</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-space-lg">
+<div class="group relative flex flex-col justify-between p-space-xl rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-transparent transition-colors" id="game-card-rov" onclick="selectGameTab('rov')">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-md">
+<div class="w-14 h-14 rounded-xl overflow-hidden bg-surface-container relative shrink-0 shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Close up dramatic cinematic portrait of a fantasy warrior hero from Arena of Valor with glowing golden armor, neon teal particle lighting, high detail esports promo aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh9coHoZg4P5b5OeEIRFJCBq1DBC3HLVDHJQYjy9iHimvgWTaKBirLnGmp6fNpll1sE34X_K1BjRMrycJZHS3w-Rtd5C-1v_OnaybShb0-7HWYIiOxgEVHhiLGbhpgNxsrnzKAf0r8xf6QsiAlPzLSana2e2dlSZB8UGW68UgNwcN3hmySZmZF0DS5DDOK_cY4r6fD8IXZXGSFnVts6HY68o04xf2TZev6ciH_0SBeusxjW5kLLSYU">
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Arena of Valor</h3>
+<span class="font-label-sm text-label-sm text-outline">(RoV)</span>
+</div>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Automated IQ-Bank API Connected</span>
+</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer" onclick="event.stopPropagation()">
+<input checked="" class="sr-only peer" onchange="toggleGameStatus('rov', this.checked)" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:border-surface-container-high after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="px-space-sm py-space-xs rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+              Input Mode: <strong class="text-on-surface">Player UID</strong>
+</span>
+<span class="px-space-sm py-space-xs rounded-lg bg-primary-fixed/60 text-on-primary-fixed-variant font-label-sm text-label-sm">
+              14 Packages Active
+            </span>
+<span class="px-space-sm py-space-xs rounded-lg bg-tertiary-fixed/60 text-on-tertiary-fixed-variant font-label-sm text-label-sm">
+              0.8s SLA
+            </span>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">24h Throughput</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">฿142,890.00</span>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-secondary font-medium">99.8% Success</span>
+<span class="font-label-sm text-label-sm text-outline">1,402 Txns</span>
+</div>
+</div>
+</div>
+<div class="mt-space-lg pt-space-md flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Default Queue: Direct IQ-Direct</span>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-primary hover:text-on-primary transition-colors flex items-center gap-1">
+<span>Manage Packages</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="group relative flex flex-col justify-between p-space-xl rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-transparent transition-colors" id="game-card-freefire" onclick="selectGameTab('freefire')">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-md">
+<div class="w-14 h-14 rounded-xl overflow-hidden bg-surface-container relative shrink-0 shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Tactical survival shooter battle royale character portrait with orange cybernetic visor, gritty urban battlefield backdrop, intense action dynamic angle." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQoZTZrRbhil6XYYWzAIuH57fobVsRhR-dYlaMEXU0QkZsqT8Fd9QHQPssaOdhHwzENrCCoBKY5DPKqF_lMS7t6h5E_OTLIpRDvBo7GgJB28dUvgzTivhts7o38rbjNySIAeSpHOCCxleW2F5MgUv7mX-D_pVVrIOpXibbguwj-T2ULGtadV0jAkRo1CwcEeEdwjA03JxKJvWroc2yRGAq75Tj4hRh2s8rYfsvhJALMHOlSgk7xe3A">
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Free Fire</h3>
+<span class="font-label-sm text-label-sm text-outline">(Garena)</span>
+</div>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Instant Server Inject</span>
+</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer" onclick="event.stopPropagation()">
+<input checked="" class="sr-only peer" onchange="toggleGameStatus('freefire', this.checked)" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:border-surface-container-high after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="px-space-sm py-space-xs rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+              Input Mode: <strong class="text-on-surface">Player UID</strong>
+</span>
+<span class="px-space-sm py-space-xs rounded-lg bg-primary-fixed/60 text-on-primary-fixed-variant font-label-sm text-label-sm">
+              18 Packages Active
+            </span>
+<span class="px-space-sm py-space-xs rounded-lg bg-secondary-container/50 text-on-secondary-fixed font-label-sm text-label-sm">
+              Flash Inject
+            </span>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">24h Throughput</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">฿98,420.00</span>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-secondary font-medium">99.1% Success</span>
+<span class="font-label-sm text-label-sm text-outline">2,310 Txns</span>
+</div>
+</div>
+</div>
+<div class="mt-space-lg pt-space-md flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Default Queue: Direct WebSocket</span>
+<button class="px-space-md py-1.5 rounded-lg bg-surface-container-high text-on-surface font-body-sm text-body-sm hover:bg-primary hover:text-on-primary transition-colors flex items-center gap-1">
+<span>Manage Packages</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="group relative flex flex-col justify-between p-space-xl rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md transition-all cursor-pointer border-2 border-primary" id="game-card-roblox" onclick="selectGameTab('roblox')">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-md">
+<div class="w-14 h-14 rounded-xl overflow-hidden bg-surface-container relative shrink-0 shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Vibrant 3D avatar block character in futuristic cyberpunk city street with neon signs, floating holographic UI elements, digital metaverse aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkqdxzxK_BV54TD1yH5sKBV3zJG_rqGd5cgyq6rEX0fZW8xHHeCqq37Ee0IQPfEK5ns1PPD_2Z0vmEng5OpuES90qTRo3wx9u0rGpwiiqq3THfs4mLtQ7oQpBYHp07s2emsxJ8ED_eBgADHkVbleg_OXZqK2HxU2Wigw7D71dvynKl-8Hh5aW7bcycb8QYF0UgQ4O8X6EnV2y4D6h3tgfGMzM8N4bJwZRQDDkvffRagsCAAXztSX7K">
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Roblox</h3>
+<span class="font-label-sm text-label-sm text-primary font-medium">(Selected)</span>
+</div>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bot Queue Managed</span>
+</div>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer" onclick="event.stopPropagation()">
+<input checked="" class="sr-only peer" onchange="toggleGameStatus('roblox', this.checked)" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:border-surface-container-high after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="px-space-sm py-space-xs rounded-lg bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+              Input Mode: <strong class="text-on-surface">User &amp; Pass</strong>
+</span>
+<span class="px-space-sm py-space-xs rounded-lg bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm">
+              10 Packages Active
+            </span>
+<span class="px-space-sm py-space-xs rounded-lg bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-sm text-label-sm">
+              Worker Pool: 8 Bots
+            </span>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">24h Throughput</span>
+<span class="font-label-lg text-label-lg text-on-surface font-semibold">฿214,150.00</span>
+</div>
+<div class="text-right flex flex-col items-end">
+<span class="font-label-sm text-label-sm text-secondary font-medium">97.6% Success</span>
+<span class="font-label-sm text-label-sm text-outline">890 Txns</span>
+</div>
+</div>
+</div>
+<div class="mt-space-lg pt-space-md flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-primary font-medium flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Viewing Packages
+          </span>
+<button class="px-space-md py-1.5 rounded-lg bg-primary text-on-primary font-body-sm text-body-sm transition-colors flex items-center gap-1">
+<span>Configured</span>
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<section class="flex flex-col gap-space-lg rounded-xl bg-surface-container-lowest p-space-xl shadow-sm">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]" id="current-game-icon">token</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-space-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface" id="current-game-title">Roblox Top-Up Packages</h2>
+<span class="px-space-sm py-0.5 rounded-md bg-surface-container-high font-label-sm text-label-sm text-on-surface-variant" id="current-game-badge">10 Active SKU</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Settlement currency: Thai Baht (THB ฿) • Auto-synced with Garena IQ-Bank wholesale cost API</span>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-space-sm">
+<div class="flex items-center p-1 rounded-xl bg-surface-container-low">
+<button class="filter-btn px-space-md py-1 rounded-lg bg-surface-container-lowest text-on-surface font-body-sm text-body-sm shadow-sm transition-all" onclick="setFilter('all', this)">All SKUs</button>
+<button class="filter-btn px-space-md py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all" onclick="setFilter('popular', this)">Promotional</button>
+<button class="filter-btn px-space-md py-1 rounded-lg text-on-surface-variant hover:text-on-surface font-body-sm text-body-sm transition-all" onclick="setFilter('high-margin', this)">High Margin (&gt;18%)</button>
+</div>
+<button class="flex items-center gap-1.5 px-space-md py-space-sm rounded-xl bg-primary text-on-primary font-body-sm text-body-sm hover:bg-primary-container transition-all" onclick="openPackageDrawer()">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>New SKU</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">Active Catalog Value</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">฿12,840 <span class="font-body-sm text-body-sm text-on-surface-variant font-normal">/ cart capacity</span></span>
+</div>
+<span class="material-symbols-outlined text-outline text-[22px]">account_balance_wallet</span>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">Avg. Gross Margin</span>
+<span class="font-headline-sm text-headline-sm text-secondary">21.84%</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[22px]">trending_up</span>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">Fast Delivery Rate</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">99.4%</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[22px]">bolt</span>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">Worker Bots Connected</span>
+<span class="font-headline-sm text-headline-sm text-tertiary">8 / 8 Online</span>
+</div>
+<span class="material-symbols-outlined text-tertiary text-[22px]">smart_toy</span>
+</div>
+</div>
+<div class="overflow-x-auto -mx-space-xl px-space-xl">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-outline font-label-sm text-label-sm uppercase">
+<th class="py-space-sm px-space-md rounded-l-lg">Package &amp; Denomination</th>
+<th class="py-space-sm px-space-md">Promotion Tag</th>
+<th class="py-space-sm px-space-md text-right">Wholesale Cost</th>
+<th class="py-space-sm px-space-md text-right">Storefront Price</th>
+<th class="py-space-sm px-space-md text-right">Net Profit (Margin)</th>
+<th class="py-space-sm px-space-md text-center">Auto-Dispatch</th>
+<th class="py-space-sm px-space-md text-center">Active Status</th>
+<th class="py-space-sm px-space-md text-right rounded-r-lg">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-low font-body-sm text-body-sm text-on-surface" id="package-rows">
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">diamond</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">800 Robux</span>
+<span class="font-label-sm text-label-sm text-outline">SKU: RBX-0800-STD • In-Game Value: R$ 800</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center px-space-sm py-0.5 rounded-md bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Standard</span>
+</td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md text-outline">
+              ฿240.00
+            </td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md font-semibold text-on-surface">
+              ฿290.00
+            </td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex flex-col items-end">
+<span class="font-label-md text-label-md text-secondary font-semibold">+฿50.00</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim/90 bg-secondary/10 px-1 rounded">+17.2%</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-center">
+<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-medium">
+<span class="material-symbols-outlined text-[16px]">bolt</span> Instant
+              </span>
+</td>
+<td class="py-space-md px-space-md text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" onclick="editPackage('RBX-0800-STD', '800 Robux', 290, 240, 'Standard', '800')" title="Edit Package">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 rounded-lg text-error hover:bg-error-container/40 transition-colors" onclick="deletePackageRow(this)" title="Delete SKU">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">stars</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">1,700 Robux</span>
+<span class="font-label-sm text-label-sm text-outline">SKU: RBX-1700-POP • In-Game Value: R$ 1,700</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center px-space-sm py-0.5 rounded-md bg-secondary-container/50 text-on-secondary-fixed font-label-sm text-label-sm font-medium">
+                Hot Deal
+              </span>
+</td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md text-outline">
+              ฿480.00
+            </td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md font-semibold text-on-surface">
+              ฿590.00
+            </td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex flex-col items-end">
+<span class="font-label-md text-label-md text-secondary font-semibold">+฿110.00</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim/90 bg-secondary/10 px-1 rounded">+18.6%</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-center">
+<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-medium">
+<span class="material-symbols-outlined text-[16px]">bolt</span> Instant
+              </span>
+</td>
+<td class="py-space-md px-space-md text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" onclick="editPackage('RBX-1700-POP', '1,700 Robux', 590, 480, 'Hot Deal', '1700')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 rounded-lg text-error hover:bg-error-container/40 transition-colors" onclick="deletePackageRow(this)">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-lg bg-tertiary-fixed flex items-center justify-center text-tertiary shrink-0">
+<span class="material-symbols-outlined text-[20px]">military_tech</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">4,500 Robux + Bonus</span>
+<span class="font-label-sm text-label-sm text-outline">SKU: RBX-4500-VIP • In-Game Value: R$ 4,500 + 400</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center px-space-sm py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm font-medium">
+                +400 Extra (20% OFF)
+              </span>
+</td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md text-outline">
+              ฿1,180.00
+            </td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md font-semibold text-on-surface">
+              ฿1,490.00
+            </td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex flex-col items-end">
+<span class="font-label-md text-label-md text-secondary font-semibold">+฿310.00</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim/90 bg-secondary/10 px-1 rounded">+20.8%</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-center">
+<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-medium">
+<span class="material-symbols-outlined text-[16px]">bolt</span> Instant
+              </span>
+</td>
+<td class="py-space-md px-space-md text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" onclick="editPackage('RBX-4500-VIP', '4,500 Robux + Bonus', 1490, 1180, '+400 Extra (20% OFF)', '4500')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 rounded-lg text-error hover:bg-error-container/40 transition-colors" onclick="deletePackageRow(this)">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">stars</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">350 RoV Coupons</span>
+<span class="font-label-sm text-label-sm text-outline">SKU: ROV-0350-BUN • In-Game Value: 350 Coupons</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center px-space-sm py-0.5 rounded-md bg-secondary-container/50 text-on-secondary-fixed font-label-sm text-label-sm font-medium">
+                +25 Bonus
+              </span>
+</td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md text-outline">
+              ฿115.00
+            </td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md font-semibold text-on-surface">
+              ฿149.00
+            </td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex flex-col items-end">
+<span class="font-label-md text-label-md text-secondary font-semibold">+฿34.00</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim/90 bg-secondary/10 px-1 rounded">+22.8%</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-center">
+<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-medium">
+<span class="material-symbols-outlined text-[16px]">bolt</span> Instant
+              </span>
+</td>
+<td class="py-space-md px-space-md text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" onclick="editPackage('ROV-0350-BUN', '350 RoV Coupons', 149, 115, '+25 Bonus', '350')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 rounded-lg text-error hover:bg-error-container/40 transition-colors" onclick="deletePackageRow(this)">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="py-space-md px-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">1,200 RoV Coupons</span>
+<span class="font-label-sm text-label-sm text-outline">SKU: ROV-1200-MAX • In-Game Value: 1,200 Coupons</span>
+</div>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center px-space-sm py-0.5 rounded-md bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm font-medium">
+                Best Seller
+              </span>
+</td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md text-outline">
+              ฿395.00
+            </td>
+<td class="py-space-md px-space-md text-right font-label-md text-label-md font-semibold text-on-surface">
+              ฿490.00
+            </td>
+<td class="py-space-md px-space-md text-right">
+<div class="flex flex-col items-end">
+<span class="font-label-md text-label-md text-secondary font-semibold">+฿95.00</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed-dim/90 bg-secondary/10 px-1 rounded">+19.3%</span>
+</div>
+</td>
+<td class="py-space-md px-space-md text-center">
+<span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-medium">
+<span class="material-symbols-outlined text-[16px]">bolt</span> Instant
+              </span>
+</td>
+<td class="py-space-md px-space-md text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</td>
+<td class="py-space-md px-space-md text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" onclick="editPackage('ROV-1200-MAX', '1,200 RoV Coupons', 490, 395, 'Best Seller', '1200')">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+</button>
+<button class="p-1.5 rounded-lg text-error hover:bg-error-container/40 transition-colors" onclick="deletePackageRow(this)">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-space-sm pt-space-sm">
+<span class="font-label-sm text-label-sm text-outline">
+        Showing 5 of 10 configured game packages • Auto-sync interval: 60s
+      </span>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-md py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container transition-colors" disabled="">Previous</button>
+<span class="px-space-sm font-label-sm text-label-sm text-on-surface">Page 1 / 2</span>
+<button class="px-space-md py-1 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">Next</button>
+</div>
+</div>
+</section>
+<div class="fixed inset-0 z-50 overflow-hidden pointer-events-none transition-all duration-300 opacity-0" id="package-drawer">
+<div class="absolute inset-0 bg-inverse-surface/40 backdrop-blur-sm transition-opacity" id="drawer-backdrop" onclick="closePackageDrawer()"></div>
+<div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+<div class="w-screen max-w-lg bg-surface-container-lowest shadow-xl p-margin-desktop flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto overflow-y-auto" id="drawer-panel">
+<div class="flex flex-col gap-space-xl">
+<div class="flex items-center justify-between pb-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">add_box</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface" id="drawer-title">Add Top-Up Package</h3>
+<span class="font-label-sm text-label-sm text-outline">Direct Injection SKU Provisioning</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors" onclick="closePackageDrawer()">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<form class="flex flex-col gap-space-lg" id="package-form" onsubmit="handleFormSubmit(event)">
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wider">Target Game Protocol</label>
+<div class="relative">
+<select class="w-full h-10 px-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer" id="form-game-select">
+<option value="Roblox">Roblox (Bot Queue Dispatch)</option>
+<option value="RoV">Arena of Valor / RoV (IQ-Bank API)</option>
+<option value="FreeFire">Free Fire (Garena Webhook)</option>
+</select>
+<span class="material-symbols-outlined absolute right-space-md top-2.5 text-outline pointer-events-none text-[20px]">expand_more</span>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wider">Package Title</label>
+<input class="h-10 px-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="form-title" placeholder="e.g. 2,000 Robux" required="" type="text">
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wider">Denomination Value</label>
+<input class="h-10 px-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="form-denomination" placeholder="e.g. 2000" required="" type="number">
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wider">Wholesale Cost (฿)</label>
+<div class="relative flex items-center">
+<span class="absolute left-space-md text-outline font-label-md text-label-md">฿</span>
+<input class="w-full h-10 pl-8 pr-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="form-cost" oninput="calculateDrawerMargin()" placeholder="250.00" required="" step="0.5" type="number">
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wider">Storefront Price (฿)</label>
+<div class="relative flex items-center">
+<span class="absolute left-space-md text-outline font-label-md text-label-md">฿</span>
+<input class="w-full h-10 pl-8 pr-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="form-price" oninput="calculateDrawerMargin()" placeholder="320.00" required="" step="0.5" type="number">
+</div>
+</div>
+</div>
+<div class="p-space-md rounded-xl bg-surface-container flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase">Projected Net Margin</span>
+<span class="font-label-lg text-label-lg font-bold text-on-surface" id="calc-net-profit">฿0.00 (0.0%)</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[24px]">price_check</span>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wider">Promotional Tag / Badge</label>
+<input class="h-10 px-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary" id="form-badge" placeholder="e.g. +100 Bonus, 20% OFF, Hot Deal" type="text">
+</div>
+<div class="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between">
+<div class="flex flex-col max-w-[80%]">
+<span class="font-headline-sm text-headline-sm text-on-surface">Automated IQ-Bank Trigger</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">
+                  Instantly execute via API without manual backoffice order approval.
+                </span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="form-instant" type="checkbox">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:border-surface-container-high after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<div class="flex items-center gap-space-xs p-space-sm rounded-lg bg-tertiary-fixed/40 text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="font-label-sm text-label-sm">Automatic inventory lock will engage once published to storefront.</span>
+</div>
+</form>
+</div>
+<div class="pt-space-xl flex items-center gap-space-sm justify-end">
+<button class="px-space-lg py-space-sm rounded-xl bg-surface-container text-on-surface font-body-sm text-body-sm hover:bg-surface-container-high transition-colors" onclick="closePackageDrawer()" type="button">
+            Cancel
+          </button>
+<button class="px-space-xl py-space-sm rounded-xl bg-primary text-on-primary font-body-sm text-body-sm hover:bg-primary-container transition-all flex items-center gap-1 shadow-sm" form="package-form" type="submit">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span id="drawer-save-label">Publish SKU</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed inset-0 z-50 hidden flex items-center justify-center p-gutter" id="api-modal">
+<div class="absolute inset-0 bg-inverse-surface/40 backdrop-blur-sm" onclick="closeApiHealthModal()"></div>
+<div class="relative w-full max-w-xl bg-surface-container-lowest rounded-xl shadow-xl p-space-xl flex flex-col gap-space-lg z-10">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/50 text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[24px]">terminal</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Provider Gateway Live Latency</h3>
+<span class="font-label-sm text-label-sm text-outline">Real-time health telemetry across providers</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container" onclick="closeApiHealthModal()">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Arena of Valor (IQ-Bank Core)</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="font-label-sm text-label-sm text-outline">Ping: 34ms</span>
+<span class="px-space-sm py-0.5 rounded-md bg-secondary-container/40 text-on-secondary-fixed font-label-sm text-label-sm font-medium">99.99% UP</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Free Fire (Server Inject Node #4)</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="font-label-sm text-label-sm text-outline">Ping: 52ms</span>
+<span class="px-space-sm py-0.5 rounded-md bg-secondary-container/40 text-on-secondary-fixed font-label-sm text-label-sm font-medium">100.0% UP</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-space-md rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary"></span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Roblox Worker Pool (8 Active Daemons)</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="font-label-sm text-label-sm text-outline">Avg Q: 1.2s</span>
+<span class="px-space-sm py-0.5 rounded-md bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm font-medium">ACTIVE</span>
+</div>
+</div>
+</div>
+<div class="flex justify-end pt-space-xs">
+<button class="px-space-lg py-space-sm rounded-xl bg-surface-container text-on-surface font-body-sm text-body-sm hover:bg-surface-container-high transition-colors" onclick="closeApiHealthModal()">
+          Close Window
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  let currentGame = 'roblox';
+
+  function selectGameTab(gameKey) {
+    currentGame = gameKey;
+    const rovCard = document.getElementById('game-card-rov');
+    const ffCard = document.getElementById('game-card-freefire');
+    const robloxCard = document.getElementById('game-card-roblox');
+
+    [rovCard, ffCard, robloxCard].forEach(card => {
+      card.classList.remove('border-primary');
+      card.classList.add('border-transparent');
+    });
+
+    const activeCard = document.getElementById(`game-card-${gameKey}`);
+    if (activeCard) {
+      activeCard.classList.remove('border-transparent');
+      activeCard.classList.add('border-primary');
+    }
+
+    const titleEl = document.getElementById('current-game-title');
+    const badgeEl = document.getElementById('current-game-badge');
+    const iconEl = document.getElementById('current-game-icon');
+
+    if (gameKey === 'roblox') {
+      titleEl.innerText = 'Roblox Top-Up Packages';
+      badgeEl.innerText = '10 Active SKU';
+      iconEl.innerText = 'token';
+    } else if (gameKey === 'rov') {
+      titleEl.innerText = 'Arena of Valor (RoV) Top-Up Packages';
+      badgeEl.innerText = '14 Active SKU';
+      iconEl.innerText = 'sports_esports';
+    } else if (gameKey === 'freefire') {
+      titleEl.innerText = 'Free Fire Top-Up Packages';
+      badgeEl.innerText = '18 Active SKU';
+      iconEl.innerText = 'local_fire_department';
+    }
+  }
+
+  function toggleGameStatus(gameKey, isChecked) {
+    const statusText = isChecked ? 'Active' : 'Maintenance Mode';
+    console.log(`Provider [${gameKey}] changed to: ${statusText}`);
+  }
+
+  function openPackageDrawer() {
+    const drawer = document.getElementById('package-drawer');
+    const panel = document.getElementById('drawer-panel');
+    drawer.classList.remove('pointer-events-none', 'opacity-0');
+    drawer.classList.add('pointer-events-auto', 'opacity-100');
+    panel.classList.remove('translate-x-full');
+    panel.classList.add('translate-x-0');
+    document.getElementById('drawer-title').innerText = 'Add Top-Up Package';
+    document.getElementById('drawer-save-label').innerText = 'Publish SKU';
+    document.getElementById('package-form').reset();
+    calculateDrawerMargin();
+  }
+
+  function closePackageDrawer() {
+    const drawer = document.getElementById('package-drawer');
+    const panel = document.getElementById('drawer-panel');
+    drawer.classList.add('opacity-0');
+    drawer.classList.remove('opacity-100');
+    panel.classList.add('translate-x-full');
+    panel.classList.remove('translate-x-0');
+    setTimeout(() => {
+      drawer.classList.add('pointer-events-none');
+      drawer.classList.remove('pointer-events-auto');
+    }, 300);
+  }
+
+  function calculateDrawerMargin() {
+    const cost = parseFloat(document.getElementById('form-cost').value) || 0;
+    const price = parseFloat(document.getElementById('form-price').value) || 0;
+    const profitEl = document.getElementById('calc-net-profit');
+
+    if (price <= 0) {
+      profitEl.innerText = '฿0.00 (0.0%)';
+      profitEl.className = 'font-label-lg text-label-lg font-bold text-on-surface';
+      return;
+    }
+
+    const diff = price - cost;
+    const pct = ((diff / price) * 100).toFixed(1);
+
+    if (diff >= 0) {
+      profitEl.innerText = `+฿${diff.toFixed(2)} (+${pct}%)`;
+      profitEl.className = 'font-label-lg text-label-lg font-bold text-secondary';
+    } else {
+      profitEl.innerText = `-฿${Math.abs(diff).toFixed(2)} (${pct}%)`;
+      profitEl.className = 'font-label-lg text-label-lg font-bold text-error';
+    }
+  }
+
+  function editPackage(sku, name, price, cost, tag, denom) {
+    openPackageDrawer();
+    document.getElementById('drawer-title').innerText = `Edit Package (${sku})`;
+    document.getElementById('drawer-save-label').innerText = 'Update SKU';
+    document.getElementById('form-title').value = name;
+    document.getElementById('form-price').value = price;
+    document.getElementById('form-cost').value = cost;
+    document.getElementById('form-badge').value = tag;
+    document.getElementById('form-denomination').value = denom;
+    calculateDrawerMargin();
+  }
+
+  function deletePackageRow(btn) {
+    if (confirm('Are you sure you want to remove this top-up package from storefront?')) {
+      const row = btn.closest('tr');
+      row.style.opacity = '0';
+      row.style.transform = 'scale(0.98)';
+      row.style.transition = 'all 0.2s ease-out';
+      setTimeout(() => row.remove(), 200);
+    }
+  }
+
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const title = document.getElementById('form-title').value;
+    const price = parseFloat(document.getElementById('form-price').value) || 0;
+    const cost = parseFloat(document.getElementById('form-cost').value) || 0;
+    const badge = document.getElementById('form-badge').value || 'Standard';
+    const profit = (price - cost).toFixed(2);
+    const margin = price > 0 ? ((profit / price) * 100).toFixed(1) : 0;
+
+    const tbody = document.getElementById('package-rows');
+    const newTr = document.createElement('tr');
+    newTr.className = 'hover:bg-surface-container-low/50 transition-colors group animate-fadeIn';
+    newTr.innerHTML = `
+      <td class="py-space-md px-space-md">
+        <div class="flex items-center gap-space-md">
+          <div class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-primary shrink-0">
+            <span class="material-symbols-outlined text-[20px]">diamond</span>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-headline-sm text-headline-sm text-on-surface">${title}</span>
+            <span class="font-label-sm text-label-sm text-outline">SKU: AUTO-GEN-${Math.floor(Math.random() * 9000 + 1000)} • Ready</span>
+          </div>
+        </div>
+      </td>
+      <td class="py-space-md px-space-md">
+        <span class="inline-flex items-center px-space-sm py-0.5 rounded-md bg-secondary-container/50 text-on-secondary-fixed font-label-sm text-label-sm font-medium">
+          ${badge}
+        </span>
+      </td>
+      <td class="py-space-md px-space-md text-right font-label-md text-label-md text-outline">
+        ฿${cost.toFixed(2)}
+      </td>
+      <td class="py-space-md px-space-md text-right font-label-md text-label-md font-semibold text-on-surface">
+        ฿${price.toFixed(2)}
+      </td>
+      <td class="py-space-md px-space-md text-right">
+        <div class="flex flex-col items-end">
+          <span class="font-label-md text-label-md text-secondary font-semibold">+฿${profit}</span>
+          <span class="font-label-sm text-label-sm text-secondary-fixed-dim/90 bg-secondary/10 px-1 rounded">+${margin}%</span>
+        </div>
+      </td>
+      <td class="py-space-md px-space-md text-center">
+        <span class="inline-flex items-center gap-1 text-secondary font-label-sm text-label-sm font-medium">
+          <span class="material-symbols-outlined text-[16px]">bolt</span> Instant
+        </span>
+      </td>
+      <td class="py-space-md px-space-md text-center">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" checked class="sr-only peer">
+          <div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-secondary"></div>
+        </label>
+      </td>
+      <td class="py-space-md px-space-md text-right">
+        <div class="inline-flex items-center gap-1">
+          <button onclick="editPackage('AUTO', '${title}', ${price}, ${cost}, '${badge}', '100')" class="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
+            <span class="material-symbols-outlined text-[18px]">edit</span>
+          </button>
+          <button onclick="deletePackageRow(this)" class="p-1.5 rounded-lg text-error hover:bg-error-container/40 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">delete</span>
+          </button>
+        </div>
+      </td>
+    `;
+    tbody.prepend(newTr);
+    closePackageDrawer();
+  }
+
+  function setFilter(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm');
+      b.classList.add('text-on-surface-variant');
+    });
+    btn.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-sm');
+    btn.classList.remove('text-on-surface-variant');
+  }
+
+  function openApiHealthModal() {
+    document.getElementById('api-modal').classList.remove('hidden');
+  }
+
+  function closeApiHealthModal() {
+    document.getElementById('api-modal').classList.add('hidden');
+  }
+</script></main></div></body></html>
