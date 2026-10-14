@@ -94,12 +94,6 @@ export function Navbar() {
             <span>{lang === 'en' ? 'EN | ไทย' : 'ไทย | EN'}</span>
           </button>
 
-          {/* Live Exchange Currency Pill */}
-          <div className="hidden xl:inline-flex whitespace-nowrap shrink-0 items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-lg border border-slate-200/80 text-xs font-semibold text-slate-600">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-            <span>{tx('THB (฿) PromptPay', 'บาท (฿) พร้อมเพย์')}</span>
-          </div>
-
           {/* Auth State Button */}
           <div id="nav-user-area" className="shrink-0">
             {user ? (
