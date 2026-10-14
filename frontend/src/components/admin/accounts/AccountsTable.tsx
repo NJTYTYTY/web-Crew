@@ -39,8 +39,8 @@ export default function AccountsTable({
           <thead>
             <tr className="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
               <th className="py-space-md px-space-lg font-semibold whitespace-nowrap">{tx("Item & Title", "รายการ & ชื่อไอดี")}</th>
-              <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Platform", "แพลตฟอร์ม")}</th>
-              <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Specs Summary", "รายละเอียดสเปค")}</th>
+              <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Platform & Server", "แพลตฟอร์ม & เซิร์ฟเวอร์")}</th>
+              <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Specs & Description", "สเปค & รายละเอียด")}</th>
               <th className="py-space-md px-space-md font-semibold text-right whitespace-nowrap">{tx("Price (THB)", "ราคา (บาท)")}</th>
               <th className="py-space-md px-space-md font-semibold text-center whitespace-nowrap">{tx("Status", "สถานะ")}</th>
               <th className="py-space-md px-space-md font-semibold whitespace-nowrap">{tx("Instant Vault Credentials", "ข้อมูลรหัสผ่านในคลังนิรภัย")}</th>
@@ -78,24 +78,33 @@ export default function AccountsTable({
                   </td>
 
                   <td className="py-space-md px-space-md whitespace-nowrap">
-                    {acc.platform === "roblox" ? (
-                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-inverse-surface text-inverse-on-surface font-medium whitespace-nowrap">
-                        <span className="material-symbols-outlined text-[13px] text-tertiary-fixed shrink-0">smart_toy</span>
-                        {acc.platformLabel}
+                    <div className="flex flex-col items-start gap-1">
+                      {acc.platform === "roblox" ? (
+                        <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-inverse-surface text-inverse-on-surface font-medium whitespace-nowrap">
+                          <span className="material-symbols-outlined text-[13px] text-tertiary-fixed shrink-0">smart_toy</span>
+                          {acc.platformLabel}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-surface-container-high text-on-primary-container font-medium whitespace-nowrap">
+                          <span className="material-symbols-outlined text-[13px] text-primary shrink-0">sports_esports</span>
+                          {acc.platformLabel}
+                        </span>
+                      )}
+                      <span className="font-label-sm text-[11px] text-outline whitespace-nowrap">
+                        {acc.serverRegion || (acc.platform === "rov" ? "TH / Garena Server" : "Global Server")}
                       </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-lg font-label-sm text-label-sm bg-surface-container-high text-on-primary-container font-medium whitespace-nowrap">
-                        <span className="material-symbols-outlined text-[13px] text-primary shrink-0">sports_esports</span>
-                        {acc.platformLabel}
-                      </span>
-                    )}
+                    </div>
                   </td>
 
-                  <td className="py-space-md px-space-md whitespace-nowrap">
+                  <td className="py-space-md px-space-md max-w-[280px]">
                     <div className="flex flex-col gap-0.5 font-label-sm text-label-sm">
-                      <span className="text-on-surface font-medium">{acc.spec1}</span>
-                      <span className="text-on-surface-variant font-normal">{acc.spec2}</span>
-                      <span className="text-outline text-[10px]">{acc.spec3}</span>
+                      <span className="text-on-surface font-medium whitespace-nowrap">{acc.spec1}</span>
+                      <span className="text-on-surface-variant font-normal whitespace-nowrap">{acc.spec2} • {acc.spec3}</span>
+                      {acc.description && (
+                        <span className="text-outline text-[11px] truncate" title={acc.description}>
+                          {acc.description}
+                        </span>
+                      )}
                     </div>
                   </td>
 
@@ -156,24 +165,14 @@ export default function AccountsTable({
 
                   <td className="py-space-md px-space-lg text-right whitespace-nowrap">
                     <div className="inline-flex items-center gap-1">
-                      {isSold ? (
-                        <button
-                          type="button"
-                          className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors opacity-50 cursor-not-allowed"
-                          title={tx("Account Settled", "ปิดการขายแล้ว")}
-                        >
-                          <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => onEdit(acc)}
-                          className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
-                          title={tx("Edit Account", "แก้ไขไอดี")}
-                        >
-                          <span className="material-symbols-outlined text-[18px]">edit</span>
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => onEdit(acc)}
+                        className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
+                        title={tx("Edit Account & Description", "แก้ไขไอดีและรายละเอียด")}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
                       <button
                         type="button"
                         onClick={() =>

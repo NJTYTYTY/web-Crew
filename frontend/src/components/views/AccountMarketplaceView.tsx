@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { Eye, ShoppingCart } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function AccountMarketplaceView() {
-  const { accountProducts, buyAccount } = useStore();
+  const { accountProducts, buyAccount, openAccountDetail } = useStore();
   const { tx } = useLanguage();
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'Roblox' | 'RoV'>('all');
   const [sortOption, setSortOption] = useState<'featured' | 'price-asc' | 'price-desc'>('featured');
@@ -44,8 +44,8 @@ export function AccountMarketplaceView() {
               </div>
               <p className="text-xs sm:text-sm text-slate-500 mt-1">
                 {tx(
-                  '100% Guaranteed unlinked clean credentials for Roblox & RoV with immediate reveal upon PromptPay scan.',
-                  'รับประกันไอดีสะอาด 100% สำหรับ Roblox และ RoV รับรหัสผ่านทันทีหลังสแกนจ่ายผ่าน PromptPay'
+                  'Click any account card to inspect full specs, level, and warranty. Instant credential reveal upon PromptPay scan.',
+                  'คลิกที่การ์ดไอดีเกมเพื่อดูรายละเอียด เลเวล สกิน และข้อมูลรับประกัน รับรหัสผ่านทันทีหลังสแกนจ่ายผ่าน PromptPay'
                 )}
               </p>
             </div>
@@ -90,7 +90,8 @@ export function AccountMarketplaceView() {
             return (
               <div
                 key={acc.id}
-                className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-md hover:border-indigo-300 transition-all flex flex-col group"
+                onClick={() => openAccountDetail(acc)}
+                className="cursor-pointer bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs hover:shadow-md hover:border-indigo-300 transition-all flex flex-col group"
               >
                 <div className="relative h-44 bg-slate-900 overflow-hidden">
                   <img
@@ -127,6 +128,12 @@ export function AccountMarketplaceView() {
                       {acc.title}
                     </h3>
 
+                    {acc.levelOrRank && (
+                      <p className="text-[11px] font-semibold text-indigo-600 mt-1 truncate">
+                        {acc.levelOrRank}
+                      </p>
+                    )}
+
                     <div className="flex flex-wrap gap-1.5 mt-2.5">
                       {acc.tags.map((t) => (
                         <span
@@ -139,12 +146,17 @@ export function AccountMarketplaceView() {
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <span className="text-[11px] text-slate-400 font-medium whitespace-nowrap truncate">
-                      {tx('Instant ID Handover', 'รับไอดีทันทีหลังโอน')}
+                  <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span className="text-[11px] text-indigo-600 hover:text-indigo-800 font-bold inline-flex items-center gap-1 whitespace-nowrap">
+                      <Eye className="w-3.5 h-3.5 shrink-0" />
+                      <span>{tx('View Details', 'ดูรายละเอียด')}</span>
                     </span>
                     <button
-                      onClick={() => buyAccount(acc.id)}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        buyAccount(acc.id);
+                      }}
                       disabled={!isInStock}
                       className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 whitespace-nowrap shrink-0 ${
                         isInStock

@@ -98,7 +98,7 @@ router.post('/accounts', async (req: Request, res: Response) => {
   res.status(201).json({ account: created });
 });
 
-router.patch('/accounts/:id', async (req: Request, res: Response) => {
+const updateAccountHandler = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const parsed = accountSchema.partial().safeParse(req.body);
   if (!parsed.success) {
@@ -111,7 +111,9 @@ router.patch('/accounts/:id', async (req: Request, res: Response) => {
     .where(eq(gameAccounts.id, id))
     .returning();
   res.json({ account: updated });
-});
+};
+router.patch('/accounts/:id', updateAccountHandler);
+router.put('/accounts/:id', updateAccountHandler);
 
 router.delete('/accounts/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);

@@ -2,13 +2,13 @@
 
 import React from 'react';
 import {
-  ArrowRight, CheckCircle2, ChevronRight, Clock, Shield, ShieldCheck, ShoppingBag, Sparkles, Zap,
+  ArrowRight, CheckCircle2, ChevronRight, Clock, Eye, PlayCircle, Shield, ShieldCheck, ShoppingBag, Sparkles, Zap,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function HomeView() {
-  const { switchView, accountProducts, buyAccount } = useStore();
+  const { switchView, accountProducts, buyAccount, openAccountDetail } = useStore();
   const { tx } = useLanguage();
 
   return (
@@ -35,8 +35,8 @@ export function HomeView() {
               </h1>
               <p className="text-slate-300 text-sm sm:text-base max-w-xl leading-relaxed">
                 {tx(
-                  'Instant Robux, RoV Coupons, and Free Fire Diamonds with automated 24/7 delivery. Buy verified ready-to-play Roblox & RoV accounts with instant PromptPay QR verification.',
-                  'เติม Robux, คูปอง RoV และเพชร Free Fire เข้าทันทีตลอด 24 ชม. พร้อมเลือกซื้อไอดีเกม Roblox และ RoV คัดเกรด เช็คยอดอัตโนมัติผ่านพร้อมเพย์ QR'
+                  'Instant Robux, RoV Coupons, and Free Fire Diamonds with automated 24/7 delivery. Buy verified ready-to-play Roblox & RoV accounts with IQ-Bank QR verification.',
+                  'เติม Robux, คูปอง RoV และเพชร Free Fire เข้าทันทีตลอด 24 ชม. พร้อมเลือกซื้อไอดีเกม Roblox และ RoV คัดเกรด เช็คยอดอัตโนมัติผ่าน IQ-Bank QR'
                 )}
               </p>
 
@@ -78,9 +78,9 @@ export function HomeView() {
                 <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-800">
                   <div className="flex items-center space-x-2 min-w-0">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-ring shrink-0" />
-                    <span className="text-xs font-bold text-slate-200 truncate">{tx('LIVE TOP-UP FEED', 'รายการเติมเกมล่าสุด')}</span>
+                    <span className="text-xs font-bold text-slate-200 truncate">{tx('LIVE PROMPTPAY GATEWAY', 'เกตเวย์พร้อมเพย์เรียลไทม์')}</span>
                   </div>
-                  <span className="text-[10px] mono bg-indigo-900/60 text-indigo-300 px-2 py-0.5 rounded font-bold whitespace-nowrap shrink-0">24/7 AUTO</span>
+                  <span className="text-[10px] mono bg-indigo-900/60 text-indigo-300 px-2 py-0.5 rounded font-bold whitespace-nowrap shrink-0">IQ-BANK V2</span>
                 </div>
                 <div className="py-4 space-y-3">
                   <div className="flex justify-between items-center gap-2 bg-slate-800/70 p-3 rounded-lg border border-slate-700">
@@ -174,7 +174,7 @@ export function HomeView() {
         <div className="flex items-center justify-between gap-4 mb-6">
           <div>
             <h2 className="text-xl font-black text-slate-900">{tx('Featured Game Accounts', 'ไอดีเกมแนะนำยอดนิยม')}</h2>
-            <p className="text-xs text-slate-500">{tx('Hand-verified accounts ready with instant password delivery', 'ไอดีคัดพิเศษพร้อมส่งมอบ Username / Password ทันทีหลังชำระเงิน')}</p>
+            <p className="text-xs text-slate-500">{tx('Click any account card to inspect full specs, or buy with instant password delivery', 'คลิกที่การ์ดเพื่อดูสเปคไอดีแบบละเอียด หรือกดซื้อเพื่อรับรหัสผ่านทันที')}</p>
           </div>
           <button onClick={() => switchView('accounts')} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center space-x-1 whitespace-nowrap shrink-0">
             <span>{tx('View All Stock', 'ดูไอดีทั้งหมด')}</span>
@@ -184,23 +184,64 @@ export function HomeView() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="home-account-preview-grid">
           {accountProducts.slice(0, 4).map((acc) => (
-            <div key={acc.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition group flex flex-col justify-between">
-              <div className="relative h-36 bg-slate-900">
+            <div
+              key={acc.id}
+              onClick={() => openAccountDetail(acc)}
+              className="cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-indigo-300 transition group flex flex-col justify-between"
+            >
+              <div className="relative h-36 bg-slate-900 overflow-hidden">
                 <img src={acc.image} alt={acc.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                 <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap ${acc.game === 'Roblox' ? 'bg-indigo-600' : 'bg-red-600'}`}>{acc.game}</span>
                 <div className="absolute bottom-2 right-2 bg-white/95 px-2 py-0.5 rounded shadow text-xs font-black text-slate-900 whitespace-nowrap">฿{acc.price}</div>
               </div>
               <div className="p-3.5">
-                <h4 className="font-bold text-xs text-slate-900 line-clamp-2">{acc.title}</h4>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="text-[10px] text-emerald-600 font-bold whitespace-nowrap">● {tx('Clean Unlinked', 'สะอาด ไม่ติดเมล')}</span>
-                  <button onClick={() => buyAccount(acc.id)} className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-[11px] font-bold whitespace-nowrap shrink-0">
+                <h4 className="font-bold text-xs text-slate-900 line-clamp-2 group-hover:text-indigo-600 transition">{acc.title}</h4>
+                <div className="mt-2.5 flex items-center justify-between gap-2">
+                  <span className="text-[11px] text-indigo-600 font-bold inline-flex items-center gap-1 whitespace-nowrap">
+                    <Eye className="w-3 h-3 shrink-0" />
+                    {tx('Details', 'ดูสเปค')}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      buyAccount(acc.id);
+                    }}
+                    className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[11px] font-bold whitespace-nowrap shrink-0 shadow-xs"
+                  >
                     {tx('Buy', 'ซื้อ')} ฿{acc.price}
                   </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Supported Payment & Trust Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs flex flex-wrap items-center justify-between gap-6">
+          <div className="flex items-center space-x-4">
+            <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-sm tracking-wider shrink-0">IQ</div>
+            <div>
+              <div className="text-sm font-bold text-slate-900 flex flex-wrap items-center gap-2">
+                <span>{tx('Integrated with IQ-Bank Dynamic PromptPay', 'เชื่อมต่อระบบพร้อมเพย์อัตโนมัติ IQ-Bank Dynamic QR')}</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 whitespace-nowrap shrink-0">{tx('Certified Webhook', 'ยืนยันยอดอัตโนมัติ')}</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {tx(
+                  'Thai Mobile Banking scan support (KBANK, SCB, KKP, BBL, Krungthai). Verified auto-settlement.',
+                  'รองรับการสแกนผ่านแอปธนาคารไทยทุกธนาคาร (กสิกรไทย, ไทยพาณิชย์, กรุงเทพ, กรุงไทย) ตรวจสอบยอดเรียลไทม์'
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <button onClick={() => switchView('simulator')} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center space-x-2 whitespace-nowrap shrink-0">
+              <PlayCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{tx('Launch Demo Bank Simulator', 'เปิดระบบจำลองการโอนเงิน IQ-Bank')}</span>
+            </button>
+          </div>
         </div>
       </section>
     </div>

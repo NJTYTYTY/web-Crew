@@ -20,6 +20,12 @@ export interface AccountProduct {
   dbId?: number;
   game: 'Roblox' | 'RoV';
   title: string;
+  description?: string;
+  levelOrRank?: string;
+  serverRegion?: string;
+  emailStatus?: string;
+  heroesOrFruitsCount?: string;
+  skinsOrWeaponsCount?: string;
   price: number;
   tags: string[];
   stock: 'in_stock' | 'sold_out';
@@ -110,4 +116,9 @@ export interface StoreContextValue {
   simulateQRUpload: () => void;
   triggerWebhookSuccess: () => Promise<void>;
   triggerWebhookFailed: () => Promise<void>;
+  selectedAccountForDetail: AccountProduct | null;
+  openAccountDetail: (acc: AccountProduct) => void;
+  closeAccountDetail: () => void;
+  isAuthPromptOpen: boolean;
+  closeAuthPrompt: () => void;
 }

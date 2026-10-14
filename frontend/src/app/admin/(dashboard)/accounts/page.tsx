@@ -7,6 +7,8 @@ import AccountFormDrawer from "@/components/admin/accounts/AccountFormDrawer";
 import AdminToast from "@/components/admin/AdminToast";
 import { useLanguage } from "@/context/LanguageContext";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
 export default function AdminAccountsPage() {
   const { tx } = useLanguage();
   const [accounts, setAccounts] = useState<AdminGameAccount[]>(INITIAL_GAME_ACCOUNTS);
@@ -33,6 +35,7 @@ export default function AdminAccountsPage() {
         acc.code.toLowerCase().includes(q) ||
         acc.spec1.toLowerCase().includes(q) ||
         acc.spec2.toLowerCase().includes(q) ||
+        (acc.description || "").toLowerCase().includes(q) ||
         acc.username.toLowerCase().includes(q);
       return matchesGame && matchesStock && matchesSearch;
     });
@@ -40,15 +43,37 @@ export default function AdminAccountsPage() {
 
   const handleDelete = (id: string, title: string) => {
     setAccounts((prev) => prev.filter((a) => a.id !== id));
+    fetch(`${API_BASE}/api/admin/accounts/${id}`, { method: "DELETE" }).catch(() => {});
     triggerToast(tx("Listing Removed", "ลบรายการแล้ว"), tx(`Removed "${title}" from active inventory.`, `ลบ "${title}" ออกจากคลังแล้ว`));
   };
 
   const handleSaveAccount = (
-    data: Omit<AdminGameAccount, "id" | "code" | "imageUrl">,
+    data: Omit<AdminGameAccount, "id" | "code">,
     isDraft?: boolean
   ) => {
+    const syncPayload = {
+      title: data.title,
+      gameName: data.platform === "roblox" ? "Roblox" : "RoV",
+      price: data.priceThb,
+      imageUrl: data.imageUrl,
+      details: JSON.stringify({
+        rank: data.spec1,
+        heroes: data.spec2,
+        skins: data.spec3,
+        server: data.serverRegion,
+        description: data.description,
+        tags: data.tags,
+      }),
+      credentials: `${data.username}:${data.password}`,
+    };
+
     if (editingAccount) {
       setAccounts((prev) => prev.map((a) => (a.id === editingAccount.id ? { ...a, ...data } : a)));
+      fetch(`${API_BASE}/api/admin/accounts/${editingAccount.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(syncPayload),
+      }).catch(() => {});
       triggerToast(
         isDraft ? tx("Draft Saved", "บันทึกฉบับร่างแล้ว") : tx("Account Updated", "อัปเดตไอดีเกมแล้ว"),
         tx(`Changes to ${editingAccount.code} saved in AES-256 vault.`, `บันทึกการแก้ไข ${editingAccount.code} ในคลังนิรภัยแล้ว`)
@@ -59,9 +84,13 @@ export default function AdminAccountsPage() {
         ...data,
         id: `acc-${Date.now()}`,
         code: newCode,
-        imageUrl: INITIAL_GAME_ACCOUNTS[data.platform === "roblox" ? 0 : 1].imageUrl,
       };
       setAccounts((prev) => [newAcc, ...prev]);
+      fetch(`${API_BASE}/api/admin/accounts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(syncPayload),
+      }).catch(() => {});
       triggerToast(
         isDraft ? tx("Draft Saved", "บันทึกฉบับร่างแล้ว") : tx("Account Published", "วางขายไอดีเกมแล้ว"),
         tx("Account safely encrypted in vault and listed for live instant delivery.", "เข้ารหัสข้อมูลไอดีและเปิดขายพร้อมจัดส่งอัตโนมัติแล้ว")
@@ -90,8 +119,8 @@ export default function AdminAccountsPage() {
           </h1>
           <p className="font-body-md text-body-md text-on-surface-variant">
             {tx(
-              "Manage listed pre-leveled accounts, credentials delivery, and pricing.",
-              "จัดการรายการไอดีเกม ข้อมูลรหัสผ่านสำหรับจัดส่งอัตโนมัติ และการตั้งราคา"
+              "Manage listed pre-leveled accounts, detailed specs, credentials delivery, and pricing.",
+              "จัดการรายการไอดีเกม รายละเอียดสเปคเชิงลึก ข้อมูลรหัสผ่านสำหรับจัดส่งอัตโนมัติ และการตั้งราคา"
             )}
           </p>
         </div>
@@ -191,14 +220,6 @@ export default function AdminAccountsPage() {
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
           </button>
-          <button
-            type="button"
-            onClick={() => triggerToast(tx("Batch Pricing Mode", "โหมดปรับราคาแบบกลุ่ม"), tx("FX multiplier synced with USD/THB spot rate.", "ซิงค์อัตราแลกเปลี่ยน USD/THB เรียบร้อย"))}
-            className="p-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors shrink-0"
-            title={tx("Batch Pricing", "ปรับราคาแบบกลุ่ม")}
-          >
-            <span className="material-symbols-outlined text-[18px]">tune</span>
-          </button>
         </div>
       </div>
 
@@ -208,45 +229,6 @@ export default function AdminAccountsPage() {
         onDelete={handleDelete}
         onToast={triggerToast}
       />
-
-      {/* Inventory Quick Telemetry Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg">
-        <div className="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{tx("Automated Delivery Rate", "อัตราจัดส่งอัตโนมัติ")}</span>
-            <span className="material-symbols-outlined text-secondary text-[20px] shrink-0">bolt</span>
-          </div>
-          <div className="mt-space-md flex items-baseline gap-space-sm">
-            <span className="font-headline-lg text-headline-lg text-on-surface whitespace-nowrap">99.8%</span>
-            <span className="font-label-sm text-label-sm text-secondary font-semibold whitespace-nowrap">{tx("+0.4% this week", "+0.4% สัปดาห์นี้")}</span>
-          </div>
-          <p className="mt-space-xs font-body-sm text-body-sm text-outline">{tx("Credentials dispatched under 1.2s post IQ-Bank prompt verification", "ส่งรหัสผ่านภายใน 1.2 วินาทีหลังยืนยันยอดเงิน IQ-Bank")}</p>
-        </div>
-
-        <div className="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{tx("Roblox Catalog Velocity", "ยอดหมุนเวียนไอดี Roblox")}</span>
-            <span className="material-symbols-outlined text-primary text-[20px] shrink-0">trending_up</span>
-          </div>
-          <div className="mt-space-md flex items-baseline gap-space-sm">
-            <span className="font-headline-lg text-headline-lg text-on-surface whitespace-nowrap">฿129,400</span>
-            <span className="font-label-sm text-label-sm text-primary font-semibold whitespace-nowrap">{tx("Blox Fruits peak", "Blox Fruits ยอดนิยม")}</span>
-          </div>
-          <p className="mt-space-xs font-body-sm text-body-sm text-outline">{tx("Average hold time before account sale: 4.8 hours", "ระยะเวลาเฉลี่ยก่อนขายออก: 4.8 ชั่วโมง")}</p>
-        </div>
-
-        <div className="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between">
-          <div className="flex items-center justify-between gap-2">
-            <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">{tx("RoV High-Tier Demand", "ความต้องการไอดี RoV แรงค์สูง")}</span>
-            <span className="material-symbols-outlined text-tertiary text-[20px] shrink-0">workspace_premium</span>
-          </div>
-          <div className="mt-space-md flex items-baseline gap-space-sm">
-            <span className="font-headline-lg text-headline-lg text-on-surface whitespace-nowrap">{tx("42 Available", "พร้อมขาย 42 ไอดี")}</span>
-            <span className="font-label-sm text-label-sm text-tertiary font-semibold whitespace-nowrap">{tx("Conqueror grade", "ระดับ Conqueror")}</span>
-          </div>
-          <p className="mt-space-xs font-body-sm text-body-sm text-outline">{tx("Garena clean unbind verifications passed 100%", "ผ่านการตรวจสอบไอดีสะอาดไม่ติดเบอร์ 100%")}</p>
-        </div>
-      </div>
 
       <AccountFormDrawer open={drawerOpen} editingAccount={editingAccount} onClose={() => setDrawerOpen(false)} onSave={handleSaveAccount} />
       <AdminToast visible={toast.visible} title={toast.title} message={toast.message} onClose={() => setToast((prev) => ({ ...prev, visible: false }))} />

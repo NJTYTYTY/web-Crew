@@ -95,18 +95,28 @@ export function normalizeBanners(res: any): BannerItem[] | null {
 export function normalizeAccounts(res: any): AccountProduct[] | null {
   const list = Array.isArray(res) ? res : res?.accounts;
   if (!Array.isArray(list) || list.length === 0) return null;
-  return list.map((a: any, idx: number) => ({
-    id: `acc-${a.id ?? idx + 1}`,
-    dbId: a.id,
-    game: a.gameCategory === 'ROV' || a.game === 'RoV' ? 'RoV' : 'Roblox',
-    title: a.title,
-    price: Number(a.price),
-    tags: Array.isArray(a.highlightTags) ? a.highlightTags : a.tags || [],
-    stock: a.status === 'SOLD' || a.stock === 'sold_out' ? 'sold_out' : 'in_stock',
-    image: a.imageUrl || a.image || initialAccountProducts[idx % initialAccountProducts.length].image,
-    revealedUser: a.accountUsername || 'blox_godhuman_99',
-    revealedPass: a.accountPassword || 'KitsunePass#2024',
-  }));
+  return list.map((a: any, idx: number) => {
+    const fallback = initialAccountProducts[idx % initialAccountProducts.length];
+    const isRov = a.gameCategory === 'ROV' || a.game === 'RoV';
+    return {
+      id: `acc-${a.id ?? idx + 1}`,
+      dbId: a.id,
+      game: isRov ? 'RoV' : 'Roblox',
+      title: a.title || fallback.title,
+      description: a.description || fallback.description,
+      levelOrRank: a.levelOrRank || fallback.levelOrRank || (isRov ? 'Conqueror / Master Rank' : 'Max Level 2550'),
+      serverRegion: a.serverRegion || fallback.serverRegion || (isRov ? 'Garena Thailand (TH)' : 'Global / SEA'),
+      emailStatus: a.emailStatus || fallback.emailStatus || '100% Clean Unlinked',
+      heroesOrFruitsCount: a.heroesOrFruitsCount || fallback.heroesOrFruitsCount,
+      skinsOrWeaponsCount: a.skinsOrWeaponsCount || fallback.skinsOrWeaponsCount,
+      price: Number(a.price),
+      tags: Array.isArray(a.highlightTags) ? a.highlightTags : a.tags || fallback.tags,
+      stock: a.status === 'SOLD' || a.stock === 'sold_out' ? 'sold_out' : 'in_stock',
+      image: a.imageUrl || a.image || fallback.image,
+      revealedUser: a.accountUsername || fallback.revealedUser,
+      revealedPass: a.accountPassword || fallback.revealedPass,
+    };
+  });
 }
 
 export function normalizeTopupGames(res: any): PackagesByGame | null {

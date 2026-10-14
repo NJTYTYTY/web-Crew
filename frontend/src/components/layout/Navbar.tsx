@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Gamepad2, Globe, Menu, ShieldCheck, User, X } from 'lucide-react';
+import { Gamepad2, Globe, LogOut, Menu, ShieldCheck, User, X } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
 
 export function Navbar() {
-  const { currentView, switchView, user } = useStore();
+  const { currentView, switchView, user, logout } = useStore();
   const { lang, toggleLang, tx } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -97,18 +97,28 @@ export function Navbar() {
           {/* Auth State Button */}
           <div id="nav-user-area" className="shrink-0">
             {user ? (
-              <button
-                type="button"
-                onClick={() => handleNav('orders')}
-                className="whitespace-nowrap shrink-0 inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl cursor-pointer transition"
-              >
-                <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                  {user.username.charAt(0).toUpperCase()}
-                </div>
-                <span className="text-xs font-bold text-slate-800 max-w-[110px] truncate">
-                  {user.username}
-                </span>
-              </button>
+              <div className="inline-flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleNav('orders')}
+                  className="whitespace-nowrap shrink-0 inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl cursor-pointer transition"
+                >
+                  <div className="w-6 h-6 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 max-w-[110px] truncate">
+                    {user.username}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={logout}
+                  title={tx('Sign Out', 'ออกจากระบบ')}
+                  className="p-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200/80 transition shrink-0"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
             ) : (
               <button
                 type="button"
