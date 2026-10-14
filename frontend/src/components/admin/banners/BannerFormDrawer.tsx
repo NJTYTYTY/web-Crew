@@ -11,6 +11,7 @@ interface BannerFormDrawerProps {
   onSave: (data: {
     title: string;
     caption: string;
+    imageUrl: string;
     targetUrl: string;
     order: number;
     scheduleLabel: string;
@@ -19,32 +20,39 @@ interface BannerFormDrawerProps {
   onTestRender: () => void;
 }
 
-const DEFAULT_PREVIEW_IMG =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuDY18QAc90tR7KgdmuyEr9w4OvTJI7pqQTKnzVQZz1K1qnGfzFiwWVnRUfoWtEG5ykkJf72RyGJ3DSA4bfOdQ_y1WsVPo7123iZmGBc_Gl20SUze0fqlECWMERf7-1pvAHZqHtRToJBTb02O5gShXa6NlYLEf-WvkA2XsaHlt7_vDV6bj1ePfkzmgitAE17Ba6qsxasvrU5s9mqTdwCanY4FIk_UEUB4R7myGxc4g63ypMXjoNG3lgY";
+const SLIDE_PRESETS = [
+  { label: "Roblox (WebP)", url: "/pic-banner-slide/roblox.webp" },
+  { label: "RoV (JPEG)", url: "/pic-banner-slide/rov.jpeg" },
+  { label: "Free Fire (JPEG)", url: "/pic-banner-slide/freefire.jpeg" },
+  { label: "Roblox 2 (JPEG)", url: "/pic-banner-slide/roblox.jpeg" },
+];
 
 export default function BannerFormDrawer({ open, editingBanner, onClose, onSave, onTestRender }: BannerFormDrawerProps) {
   const { tx } = useLanguage();
   const [title, setTitle] = useState("Roblox Blox Fruits Special Deal");
-  const [caption, setCaption] = useState("Instant Robux delivery + free Legendary Fruit roll chance for purchases exceeding 500฿.");
-  const [targetUrl, setTargetUrl] = useState("/topup/roblox");
+  const [caption, setCaption] = useState("Instant Robux delivery + verified Max Level Blox Fruits accounts.");
+  const [imageUrl, setImageUrl] = useState("/pic-banner-slide/roblox.webp");
+  const [targetUrl, setTargetUrl] = useState("/topup");
   const [order, setOrder] = useState(1);
-  const [schedule, setSchedule] = useState("2025-03-01 — 2025-03-31");
+  const [schedule, setSchedule] = useState("Always Active");
   const [active, setActive] = useState(true);
 
   useEffect(() => {
     if (editingBanner) {
       setTitle(editingBanner.title);
       setCaption(editingBanner.caption);
+      setImageUrl(editingBanner.imageUrl || "/pic-banner-slide/roblox.webp");
       setTargetUrl(editingBanner.targetUrl);
       setOrder(editingBanner.order);
       setSchedule(editingBanner.scheduleLabel);
       setActive(editingBanner.active);
     } else {
       setTitle("");
-      setCaption("Instant Robux delivery + free Legendary Fruit roll chance for purchases exceeding 500฿.");
-      setTargetUrl("/topup/roblox");
+      setCaption("Instant Robux delivery + verified Max Level Blox Fruits accounts.");
+      setImageUrl("/pic-banner-slide/roblox.webp");
+      setTargetUrl("/topup");
       setOrder(1);
-      setSchedule("2025-03-01 — 2025-03-31");
+      setSchedule("Always Active");
       setActive(true);
     }
   }, [editingBanner, open]);
@@ -55,9 +63,10 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
     onSave({
       title: title.trim() || "New Storefront Campaign Banner",
       caption: caption.trim() || "Limited-time promotional bonus across all game packages.",
+      imageUrl: imageUrl.trim() || "/pic-banner-slide/roblox.webp",
       targetUrl: targetUrl.trim() || "/topup",
       order: Number(order) || 1,
-      scheduleLabel: schedule.trim() || "Until 31 Mar, 23:59",
+      scheduleLabel: schedule.trim() || "Always Active",
       active,
     });
   };
@@ -83,10 +92,7 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
                 : tx("Add New Promotional Banner", "เพิ่มแบนเนอร์โปรโมชั่นใหม่")}
             </h2>
             <p className="font-body-sm text-body-sm text-on-surface-variant">
-              {tx(
-                "Configure artwork, storefront destination URLs, and publication timeframe.",
-                "ตั้งค่ารูปภาพ ลิงก์ปลายทางบนหน้าร้าน และช่วงเวลาการแสดงผล"
-              )}
+              {tx("Configure slide background image, storefront destination URLs, and publication order.", "ตั้งค่ารูปภาพพื้นหลังสไลด์ ลิงก์ปลายทางบนหน้าร้าน และลำดับการแสดงผล")}
             </p>
           </div>
           <button type="button" onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
@@ -99,10 +105,7 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
             <label className="block font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wide">
               {tx("Banner Title *", "หัวข้อแบนเนอร์ *")}
             </label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" placeholder="e.g. Steam Summer Sale Extravaganza" type="text" />
-            <p className="font-body-sm text-body-sm text-outline">
-              {tx("Displayed in slider navigation bullets and accessibility labels.", "แสดงในจุดนำทางสไลด์และป้ายกำกับของแบนเนอร์")}
-            </p>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" placeholder="e.g. Roblox Blox Fruits Special Deal" type="text" />
           </div>
 
           <div className="space-y-1.5">
@@ -115,27 +118,30 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wide">
-                {tx("Banner Artwork Preview *", "ตัวอย่างรูปภาพแบนเนอร์ *")}
+                {tx("Banner Image URL / Slide Asset *", "ลิงก์รูปภาพแบนเนอร์ / รูปในโฟลเดอร์ pic-banner-slide *")}
               </label>
-              <span className="font-label-sm text-label-sm text-outline">
-                {tx("Aspect Ratio: 16:5 (1920 × 600 px)", "อัตราส่วน: 16:5 (1920 × 600 px)")}
-              </span>
+              <span className="font-label-sm text-label-sm text-outline">{tx("Auto-Slide Hero Background", "ภาพพื้นหลังสไลด์หน้าแรก")}</span>
             </div>
-            <div className="relative group rounded-xl bg-surface-container-low overflow-hidden transition-all flex flex-col items-center justify-center min-h-[170px] p-space-md text-center">
-              <div className="absolute inset-0 z-0 opacity-80 group-hover:opacity-40 transition-opacity">
-                <img className="w-full h-full object-cover" src={editingBanner?.imageUrl || DEFAULT_PREVIEW_IMG} alt="Banner preview" />
-              </div>
-              <div className="relative z-10 flex flex-col items-center justify-center space-y-2 p-space-sm bg-inverse-surface/60 backdrop-blur-md rounded-xl text-inverse-on-surface max-w-sm">
-                <span className="material-symbols-outlined text-[28px] text-secondary-fixed">cloud_upload</span>
-                <div>
-                  <p className="font-body-sm text-body-sm font-medium">
-                    {tx("Drag & drop new high-res artwork or ", "ลากและวางรูปภาพความละเอียดสูง หรือ ")}
-                    <span className="text-secondary-fixed underline cursor-pointer">{tx("browse", "เลือกไฟล์")}</span>
-                  </p>
-                  <p className="font-label-sm text-[11px] text-inverse-on-surface/80">
-                    {tx("WebP, PNG, or AVIF (Max 4MB per asset)", "รองรับ WebP, PNG หรือ AVIF (สูงสุด 4MB)")}
-                  </p>
-                </div>
+            <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" placeholder="/pic-banner-slide/roblox.webp or https://..." type="text" />
+
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <span className="font-label-sm text-label-sm text-outline">{tx("pic-banner-slide Presets:", "เลือกรูปจาก pic-banner-slide:")}</span>
+              {SLIDE_PRESETS.map((preset) => (
+                <button
+                  key={preset.url}
+                  type="button"
+                  onClick={() => setImageUrl(preset.url)}
+                  className={`px-2.5 py-1 rounded font-label-sm text-label-sm transition-colors ${imageUrl === preset.url ? "bg-primary text-on-primary font-semibold" : "bg-surface-container text-on-surface-variant hover:bg-primary-fixed hover:text-primary"}`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative rounded-xl bg-surface-container-low overflow-hidden h-40 border border-surface-container mt-2">
+              <img className="w-full h-full object-cover" src={imageUrl || "/pic-banner-slide/roblox.webp"} alt="Banner preview" />
+              <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded bg-inverse-surface/80 backdrop-blur-md text-inverse-on-surface font-label-sm text-[11px]">
+                {imageUrl}
               </div>
             </div>
           </div>
@@ -144,28 +150,12 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
             <label className="block font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wide">
               {tx("Target Link URL *", "ลิงก์ปลายทางเมื่อคลิก *")}
             </label>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">link</span>
-                <input value={targetUrl} onChange={(e) => setTargetUrl(e.target.value)} className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" placeholder="/topup/game-slug or https://..." type="text" />
-              </div>
-              <button type="button" onClick={() => setTargetUrl("/topup")} className="h-10 px-space-md rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-body-sm text-body-sm flex items-center gap-1 shadow-sm shrink-0">
-                <span className="material-symbols-outlined text-[16px]">touch_app</span>
-                <span>{tx("Internal Route", "ลิงก์ภายในเว็บ")}</span>
-              </button>
-            </div>
-
+            <input value={targetUrl} onChange={(e) => setTargetUrl(e.target.value)} className="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-label-md text-label-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" placeholder="/topup or /accounts" type="text" />
             <div className="flex flex-wrap items-center gap-1.5 pt-1">
               <span className="font-label-sm text-label-sm text-outline">{tx("Quick Select:", "เลือกด่วน:")}</span>
-              {[
-                { label: "/topup/roblox", val: "/topup/roblox" },
-                { label: "/accounts/rov", val: "/accounts/rov" },
-                { label: "/topup", val: "/topup" },
-                { label: "/accounts", val: "/accounts" },
-                { label: "Discord URL", val: "https://discord.gg/apexpay" },
-              ].map((route) => (
-                <button key={route.label} type="button" onClick={() => setTargetUrl(route.val)} className="px-2 py-0.5 rounded bg-surface-container font-label-sm text-label-sm text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-colors">
-                  {route.label}
+              {["/topup", "/accounts", "/orders"].map((val) => (
+                <button key={val} type="button" onClick={() => setTargetUrl(val)} className="px-2 py-0.5 rounded bg-surface-container font-label-sm text-label-sm text-on-surface-variant hover:bg-primary-fixed hover:text-primary transition-colors">
+                  {val}
                 </button>
               ))}
             </div>
@@ -176,22 +166,14 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
               <label className="block font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wide">
                 {tx("Display Sort Order", "ลำดับการแสดงผล")}
               </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">format_list_numbered</span>
-                <input value={order} onChange={(e) => setOrder(Number(e.target.value))} className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" max={10} min={1} type="number" />
-              </div>
-              <p className="font-body-sm text-body-sm text-outline">{tx("#1 appears first on storefront home.", "ลำดับ #1 จะแสดงเป็นภาพแรกสุดบนหน้าเว็บ")}</p>
+              <input value={order} onChange={(e) => setOrder(Number(e.target.value))} className="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" max={10} min={1} type="number" />
             </div>
 
             <div className="space-y-1.5">
               <label className="block font-label-sm text-label-sm text-on-surface font-medium uppercase tracking-wide">
                 {tx("Promotion Schedule", "ระยะเวลาโปรโมชั่น")}
               </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-2.5 text-[18px] text-outline">calendar_month</span>
-                <input value={schedule} onChange={(e) => setSchedule(e.target.value)} className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-lowest font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" type="text" />
-              </div>
-              <p className="font-body-sm text-body-sm text-outline">{tx("Auto-deactivates at campaign expiry.", "ปิดการแสดงผลอัตโนมัติเมื่อสิ้นสุดแคมเปญ")}</p>
+              <input value={schedule} onChange={(e) => setSchedule(e.target.value)} className="w-full h-10 px-3.5 rounded-lg bg-surface-container-lowest font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-sm border border-surface-container" type="text" />
             </div>
           </div>
 

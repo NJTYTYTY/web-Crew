@@ -33,22 +33,22 @@ async function seed() {
     await db.insert(banners).values([
       {
         title: 'Roblox Blox Fruits Special Deal — Instant Robux & Godhuman IDs',
-        imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1600&q=80',
+        imageUrl: '/pic-banner-slide/roblox.webp',
         linkUrl: '/topup', sortOrder: 1, isActive: true,
       },
       {
         title: 'RoV Champion League 2025 Top-Up Bonus (+25% Extra Coupons)',
-        imageUrl: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1600&q=80',
+        imageUrl: '/pic-banner-slide/rov.jpeg',
         linkUrl: '/accounts', sortOrder: 2, isActive: true,
       },
       {
-        title: 'IQ-Bank PromptPay 0% Fee Weekend — Instant 5-Sec Verification',
-        imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1600&q=80',
+        title: 'Free Fire Instant UID Diamonds — 5-Second Auto Delivery',
+        imageUrl: '/pic-banner-slide/freefire.jpeg',
         linkUrl: '/topup', sortOrder: 3, isActive: true,
       },
       {
-        title: 'Verified Conqueror & Supreme Rank RoV Accounts Restocked',
-        imageUrl: 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=1600&q=80',
+        title: 'Verified Roblox & RoV Accounts — 100% Clean Handover',
+        imageUrl: '/pic-banner-slide/roblox.jpeg',
         linkUrl: '/accounts', sortOrder: 4, isActive: true,
       },
     ]);

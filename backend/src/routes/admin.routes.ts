@@ -213,7 +213,7 @@ router.post('/banners', async (req: Request, res: Response) => {
   res.status(201).json({ banner: created });
 });
 
-router.patch('/banners/:id', async (req: Request, res: Response) => {
+const updateBannerHandler = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
   const parsed = bannerSchema.partial().safeParse(req.body);
   if (!parsed.success) {
@@ -222,7 +222,9 @@ router.patch('/banners/:id', async (req: Request, res: Response) => {
   }
   const [updated] = await db.update(banners).set(parsed.data).where(eq(banners.id, id)).returning();
   res.json({ banner: updated });
-});
+};
+router.patch('/banners/:id', updateBannerHandler);
+router.put('/banners/:id', updateBannerHandler);
 
 router.delete('/banners/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);
