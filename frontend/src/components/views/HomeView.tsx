@@ -85,12 +85,12 @@ export function HomeView() {
                 src={slide.imageUrl}
                 alt={slide.title}
                 className={`absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 ease-in-out ${
-                  index === activeSlideIdx ? 'opacity-65 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+                  index === activeSlideIdx ? 'opacity-80 scale-100' : 'opacity-0 scale-105 pointer-events-none'
                 }`}
               />
             ))}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/75 to-slate-900/45" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-slate-950/20" />
           </div>
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-10 lg:p-12 pb-14 sm:pb-14 items-center w-full">
@@ -135,50 +135,6 @@ export function HomeView() {
                 <div className="flex items-center space-x-1.5 whitespace-nowrap">
                   <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>{tx('100% Anti-Hack Guarantee', 'รับประกันไอดีสะอาด 100%')}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-5 hidden lg:flex justify-end">
-              <div className="w-full max-w-sm bg-slate-900/85 backdrop-blur-md rounded-xl p-5 border border-slate-700/80 shadow-2xl relative">
-                <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-800">
-                  <div className="flex items-center space-x-2 min-w-0">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 pulse-ring shrink-0" />
-                    <span className="text-xs font-bold text-slate-200 truncate">{tx('LIVE PROMPTPAY GATEWAY', 'เกตเวย์พร้อมเพย์เรียลไทม์')}</span>
-                  </div>
-                  <span className="text-[10px] mono bg-indigo-900/60 text-indigo-300 px-2 py-0.5 rounded font-bold whitespace-nowrap shrink-0">IQ-BANK V2</span>
-                </div>
-                <div className="py-4 space-y-3">
-                  <div className="flex justify-between items-center gap-2 bg-slate-800/70 p-3 rounded-lg border border-slate-700">
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center font-bold text-xs shrink-0">RoV</div>
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-white truncate">{tx('350 Coupons + Bonus', '350 คูปอง + โบนัส')}</div>
-                        <div className="text-[11px] text-slate-400 truncate">UID: 981244012</div>
-                      </div>
-                    </div>
-                    <div className="text-right whitespace-nowrap shrink-0">
-                      <div className="text-xs font-bold text-emerald-400">฿95.00</div>
-                      <span className="text-[9px] text-slate-400 font-mono">{tx('Instant', 'เข้าทันที')}</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center gap-2 bg-slate-800/70 p-3 rounded-lg border border-slate-700">
-                    <div className="flex items-center space-x-3 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs shrink-0">R$</div>
-                      <div className="min-w-0">
-                        <div className="text-xs font-bold text-white truncate">{tx('800 Robux Clean', '800 Robux เรทคุ้ม')}</div>
-                        <div className="text-[11px] text-slate-400 truncate">User: BloxMasterX</div>
-                      </div>
-                    </div>
-                    <div className="text-right whitespace-nowrap shrink-0">
-                      <div className="text-xs font-bold text-emerald-400">฿290.00</div>
-                      <span className="text-[9px] text-slate-400 font-mono">{tx('Instant', 'เข้าทันที')}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="pt-2 flex items-center justify-between text-xs text-slate-400">
-                  <span className="whitespace-nowrap">{tx('Transactions Today:', 'รายการสำเร็จวันนี้:')}</span>
-                  <span className="font-bold text-white mono whitespace-nowrap">{tx('1,489 completed', '1,489 รายการ')}</span>
                 </div>
               </div>
             </div>
