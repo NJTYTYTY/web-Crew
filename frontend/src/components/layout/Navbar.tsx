@@ -42,7 +42,7 @@ export function Navbar() {
                 NEXUS<span className="text-indigo-600">PLAY</span>
               </span>
               <span className="text-[10px] block font-semibold text-slate-400 tracking-wider uppercase -mt-1">
-                {tx('THAI GAMING HUB', 'ศูนย์รวมเกมเมอร์ไทย')}
+                {tx('CHEAP ACCOUNTS & TOP-UP', 'แอคเคาและเติมเกมราคาถูก')}
               </span>
             </div>
           </button>
