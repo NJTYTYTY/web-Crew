@@ -9,9 +9,9 @@ import { AuthRequiredModal } from '@/components/modal/AuthRequiredModal';
 
 export function StoreShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col antialiased selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-slate-50 flex flex-col antialiased selection:bg-indigo-100 selection:text-indigo-900">
       <Navbar />
-      <main className="flex-1 pb-16">{children}</main>
+      <main className="flex-1 w-full min-w-0 pb-16">{children}</main>
       <AccountDetailModal />
       <AuthRequiredModal />
       <PaymentCheckoutModal />
