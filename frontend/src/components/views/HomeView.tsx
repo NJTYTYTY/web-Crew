@@ -178,7 +178,30 @@ export function HomeView() {
           </div>
 
           <div onClick={() => switchView('topup')} className="group cursor-pointer bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex items-start space-x-4 sm:space-x-5">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all shrink-0"><Zap className="w-7 h-7" /></div>
+            {/* 3 Stacked Playing-Card Game Logos (RoV, Roblox, Free Fire) */}
+            <div className="relative w-20 h-16 flex items-center justify-center shrink-0 select-none pt-1">
+              {/* Left Card: RoV */}
+              <div className="absolute w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 -rotate-12 -translate-x-3 translate-y-1 group-hover:-rotate-16 group-hover:-translate-x-4 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-red-400 z-10">
+                <img src="/pic-banner-slide/rov.jpeg" alt="RoV" className="w-full h-full object-cover opacity-85" />
+                <div className="absolute inset-0 bg-gradient-to-t from-red-950/90 via-transparent to-transparent flex items-end justify-center pb-1">
+                  <span className="text-[9px] font-black text-white tracking-tighter drop-shadow">RoV</span>
+                </div>
+              </div>
+              {/* Center Card (Pops up on card hover): Roblox */}
+              <div className="absolute w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-lg bg-slate-900 rotate-0 -translate-y-0.5 group-hover:-translate-y-2.5 group-hover:scale-110 group-hover:ring-2 group-hover:ring-emerald-400 transition-all duration-300 ease-out hover:!-translate-y-3 hover:!scale-115 hover:!z-30 z-20">
+                <img src="/pic-banner-slide/roblox.webp" alt="Roblox" className="w-full h-full object-cover opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-indigo-950/90 via-transparent to-transparent flex items-end justify-center pb-1">
+                  <span className="text-[9px] font-black text-sky-300 tracking-tighter drop-shadow">R$</span>
+                </div>
+              </div>
+              {/* Right Card: Free Fire */}
+              <div className="absolute w-11 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 rotate-12 translate-x-3 translate-y-1 group-hover:rotate-16 group-hover:translate-x-4 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-amber-400 z-10">
+                <img src="/pic-banner-slide/freefire.jpeg" alt="Free Fire" className="w-full h-full object-cover opacity-85" />
+                <div className="absolute inset-0 bg-gradient-to-t from-amber-950/90 via-transparent to-transparent flex items-end justify-center pb-1">
+                  <span className="text-[9px] font-black text-amber-300 tracking-tighter drop-shadow">FF</span>
+                </div>
+              </div>
+            </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition">{tx('24/7 Automated Game Top-Up', 'บริการเติมเกมอัตโนมัติ 24 ชม.')}</h3>
