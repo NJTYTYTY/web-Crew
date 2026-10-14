@@ -163,7 +163,18 @@ export function HomeView() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div onClick={() => switchView('accounts')} className="group cursor-pointer bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-md hover:border-indigo-300 transition-all flex items-start space-x-4 sm:space-x-5">
-            <div className="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all shrink-0"><Shield className="w-7 h-7" /></div>
+            {/* 3 Stacked Playing-Card Top Account Previews */}
+            <div className="relative w-20 h-16 flex items-center justify-center shrink-0 select-none pt-1">
+              <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 -rotate-12 -translate-x-3.5 translate-y-1 group-hover:-rotate-16 group-hover:-translate-x-4.5 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-indigo-400 z-10">
+                <img src={accountProducts[0]?.image || '/game-account_sale/roblox01.png'} alt="Top Account 1" className="w-full h-full object-cover" />
+              </div>
+              <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-lg bg-slate-900 rotate-0 -translate-y-0.5 group-hover:-translate-y-2.5 group-hover:scale-110 group-hover:ring-2 group-hover:ring-indigo-500 transition-all duration-300 ease-out hover:!-translate-y-3 hover:!scale-115 hover:!z-30 z-20">
+                <img src={accountProducts[1]?.image || '/game-account_sale/rov1.png'} alt="Top Account 2" className="w-full h-full object-cover" />
+              </div>
+              <div className="absolute w-12 h-14 rounded-xl overflow-hidden border-2 border-white shadow-md bg-slate-900 rotate-12 translate-x-3.5 translate-y-1 group-hover:rotate-16 group-hover:translate-x-4.5 transition-all duration-300 ease-out hover:!-translate-y-2.5 hover:!rotate-0 hover:!scale-115 hover:!z-30 hover:ring-2 hover:ring-sky-400 z-10">
+                <img src={accountProducts[2]?.image || '/game-account_sale/roblox02.png'} alt="Top Account 3" className="w-full h-full object-cover" />
+              </div>
+            </div>
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-indigo-600 transition">{tx('Buy Ready-to-Play Game Accounts', 'เลือกซื้อไอดีเกมพร้อมเล่นทันที')}</h3>
