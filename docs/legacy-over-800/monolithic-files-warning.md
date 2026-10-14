@@ -1,12 +1,15 @@
-# 🚨 Monolithic Files Warning (800+ Lines)
+# 🚨 Monolithic Files Audit Report (800+ Lines)
 
-The following files in the workspace exceed the **800-line AI-Native boundary** (`view_file` single-read limit):
+## 1. Application Source Code (`/frontend/src` & `/backend/src`)
+* **Status:** ✅ **PASS (0 monolithic code files)**
+* All **54 TypeScript/React source files** across `/frontend/src` and `/backend/src` are strictly **under 260 lines** (largest file: `frontend/src/app/admin/login/page.tsx` at 258 lines), adhering to the **< 300 lines AI-Native modular design standard**.
 
-| File Path | Line Count | Status / Action Plan |
+## 2. Static UI Prototype Reference Files (`store-ui/` & `admin-dashboard-ui/`)
+The following static `.html` design reference files exceed 800 lines, and have now been converted into modular Next.js components (< 260 lines each) inside `/frontend/src`:
+
+| Reference HTML File | Line Count | Converted Modular Next.js Target (`< 260 lines`) |
 | :--- | :---: | :--- |
-| `store/code.html` | **1,880 lines** | UI Prototype Reference — When converting to `/frontend`, split into modular Next.js pages and components (< 300 lines each). |
-| `admin-dashboard/top_up_games_packages/code.html` | **895 lines** | UI Prototype Reference — Split into modular Admin Top-Up components (< 300 lines each). |
-| `admin-dashboard/orders_iq_bank_queue/code.html` | **860 lines** | UI Prototype Reference — Split into modular Admin Orders & Webhook Log components (< 300 lines each). |
-| `admin-dashboard/game_accounts_inventory/code.html` | **856 lines** | UI Prototype Reference — Split into modular Admin Accounts Inventory components (< 300 lines each). |
-
-> **Recommendation:** Keep static `.html` files as design references only. All new TypeScript/React files created inside `/frontend` and `/backend` should stay under **300 lines per file** for optimal AI-Native performance and maintainability.
+| `store-ui/code.html` | **1,880 lines** | ✅ Converted into 15 modular files under `frontend/src/components/views/`, `frontend/src/components/modal/`, and `frontend/src/app/*` |
+| `admin-dashboard-ui/top_up_games_packages/code.html` | **895 lines** | ✅ Converted into `app/admin/(dashboard)/topup/page.tsx`, `PackagesTable.tsx`, `PackageFormDrawer.tsx`, `GatewayLatencyModal.tsx` |
+| `admin-dashboard-ui/orders_iq_bank_queue/code.html` | **860 lines** | ✅ Converted into `app/admin/(dashboard)/orders/page.tsx` and `OrderInspectModal.tsx` |
+| `admin-dashboard-ui/game_accounts_inventory/code.html` | **856 lines** | ✅ Converted into `app/admin/(dashboard)/accounts/page.tsx`, `AccountsTable.tsx`, and `AccountFormDrawer.tsx` |

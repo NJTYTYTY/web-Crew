@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexusplay-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nexusplay
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nexusplay_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d nexusplay"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nexusplay-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/nexusplay
+      JWT_SECRET: nexusplay-super-secret-jwt-key-2026
+      IQBANK_WEBHOOK_SECRET: iqbank_hmac_sha256_secret_2026
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - "4000:4000"
+    networks:
+      - nexusplay_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nexusplay-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+    ports:
+      - "3000:3000"
+    networks:
+      - nexusplay_net
+
+networks:
+  nexusplay_net:
+    driver: bridge
+
+volumes:
+  postgres_data:

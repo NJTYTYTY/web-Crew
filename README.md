@@ -14,8 +14,8 @@ cedt-crew/
 │   ├── api/           # REST API & IQ-Bank Webhook Specification
 │   ├── operations/    # Docker & Deployment Guides
 │   └── legacy-over-800/ # Monolithic file audit warnings
-├── store/             # Storefront HTML/Tailwind UI Reference Prototypes
-└── admin-dashboard/   # Admin Backoffice HTML/Tailwind UI Reference Prototypes
+├── store-ui/          # Storefront HTML/Tailwind UI Reference Prototypes
+└── admin-dashboard-ui/# Admin Backoffice HTML/Tailwind UI Reference Prototypes
 ```
 
 ## 🛠️ Tech Stack
