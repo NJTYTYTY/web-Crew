@@ -30,7 +30,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const [currentView, setCurrentView] = useState<StoreViewName>('home');
   const [authMode, setAuthMode] = useState<AuthMode>('login');
-  const [user, setUser] = useState<UserProfile | null>(() => getStoredUser());
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [banners, setBanners] = useState<BannerItem[]>(initialBanners);
   const [accountProducts, setAccountProducts] = useState<AccountProduct[]>(initialAccountProducts);
   const [packagesData, setPackagesData] = useState<PackagesByGame>(initialPackagesData);
