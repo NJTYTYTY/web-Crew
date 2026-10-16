@@ -1,15 +1,26 @@
-# 🚨 Monolithic Files Audit Report (800+ Lines)
+# 🚨 Monolithic Files Warning (> 800 Lines Audit)
 
-## 1. Application Source Code (`/frontend/src` & `/backend/src`)
-* **Status:** ✅ **PASS (0 monolithic code files)**
-* All **54 TypeScript/React source files** across `/frontend/src` and `/backend/src` are strictly **under 260 lines** (largest file: `frontend/src/app/admin/login/page.tsx` at 258 lines), adhering to the **< 300 lines AI-Native modular design standard**.
+> **Audit Date:** 2026-10-16  
+> **Threshold:** 800 lines per file (AI-Native modular design & `view_file` single-chunk limit)
 
-## 2. Static UI Prototype Reference Files (`store-ui/` & `admin-dashboard-ui/`)
-The following static `.html` design reference files exceed 800 lines, and have now been converted into modular Next.js components (< 260 lines each) inside `/frontend/src`:
+---
 
-| Reference HTML File | Line Count | Converted Modular Next.js Target (`< 260 lines`) |
+## 1. Active Production Codebase (`frontend/src/**` & `backend/src/**`)
+✅ **0 Active Code Files Exceed 800 Lines!**  
+All active TypeScript and React files in `frontend/src/` and `backend/src/` adhere to modular design (every active `.ts` / `.tsx` file is between **17 and 317 lines**).
+
+---
+
+## 2. Flagged Legacy / Static HTML Reference Files (> 800 Lines)
+The following **static `.html` design reference files** in the workspace exceed 800 lines:
+
+| File Path | Line Count | Status / Recommendation |
 | :--- | :---: | :--- |
-| `store-ui/code.html` | **1,880 lines** | ✅ Converted into 15 modular files under `frontend/src/components/views/`, `frontend/src/components/modal/`, and `frontend/src/app/*` |
-| `admin-dashboard-ui/top_up_games_packages/code.html` | **895 lines** | ✅ Converted into `app/admin/(dashboard)/topup/page.tsx`, `PackagesTable.tsx`, `PackageFormDrawer.tsx`, `GatewayLatencyModal.tsx` |
-| `admin-dashboard-ui/orders_iq_bank_queue/code.html` | **860 lines** | ✅ Converted into `app/admin/(dashboard)/orders/page.tsx` and `OrderInspectModal.tsx` |
-| `admin-dashboard-ui/game_accounts_inventory/code.html` | **856 lines** | ✅ Converted into `app/admin/(dashboard)/accounts/page.tsx`, `AccountsTable.tsx`, and `AccountFormDrawer.tsx` |
+| `store-ui/code.html` | **1,880 lines** | Legacy static HTML prototype (already migrated into modular Next.js components under `frontend/src/`). Exceeds AI single-view boundary (800 lines). |
+| `admin-dashboard-ui/top_up_games_packages/code.html` | **895 lines** | Legacy static HTML prototype (migrated to `frontend/src/app/admin/(dashboard)/topup/page.tsx` + `components/admin/packages/*`). |
+| `admin-dashboard-ui/orders_iq_bank_queue/code.html` | **860 lines** | Legacy static HTML prototype (migrated to `frontend/src/app/admin/(dashboard)/orders/page.tsx` + `OrderInspectModal.tsx`). |
+| `admin-dashboard-ui/game_accounts_inventory/code.html` | **856 lines** | Legacy static HTML prototype (migrated to `frontend/src/app/admin/(dashboard)/accounts/page.tsx` + `components/admin/accounts/*`). |
+
+### Recommendation
+- Keep all active `.ts` and `.tsx` source files in `frontend/src/` and `backend/src/` strictly **under 300 lines** to guarantee fast AI-Native tool inspection and low token usage.
+- The legacy `.html` folders (`store-ui/` and `admin-dashboard-ui/`) are retained only as static visual references and are not bundled into the Next.js or Express production builds.
