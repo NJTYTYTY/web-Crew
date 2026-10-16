@@ -14,10 +14,12 @@ interface PackagesTableProps {
 }
 
 const GAME_META = {
-  roblox: { titleEn: "Roblox Top-Up Packages", titleTh: "แพ็กเกจเติมเกม Roblox", badgeEn: "10 Active SKU", badgeTh: "10 แพ็กเกจที่เปิดขาย", icon: "token" },
-  rov: { titleEn: "Arena of Valor (RoV) Top-Up Packages", titleTh: "แพ็กเกจเติมคูปอง RoV", badgeEn: "14 Active SKU", badgeTh: "14 แพ็กเกจที่เปิดขาย", icon: "sports_esports" },
-  freefire: { titleEn: "Free Fire Top-Up Packages", titleTh: "แพ็กเกจเติมเพชร Free Fire", badgeEn: "18 Active SKU", badgeTh: "18 แพ็กเกจที่เปิดขาย", icon: "local_fire_department" },
+  roblox: { titleEn: "Roblox Top-Up Packages", titleTh: "แพ็กเกจเติมเกม Roblox", icon: "token" },
+  rov: { titleEn: "Arena of Valor (RoV) Top-Up Packages", titleTh: "แพ็กเกจเติมคูปอง RoV", icon: "sports_esports" },
+  freefire: { titleEn: "Free Fire Top-Up Packages", titleTh: "แพ็กเกจเติมเพชร Free Fire", icon: "local_fire_department" },
 };
+
+const GAME_NAME_MAP = { roblox: "Roblox", rov: "RoV", freefire: "FreeFire" } as const;
 
 export default function PackagesTable({
   selectedGame,
@@ -31,7 +33,20 @@ export default function PackagesTable({
   const [skuFilter, setSkuFilter] = useState<"all" | "popular" | "high-margin">("all");
   const meta = GAME_META[selectedGame];
 
-  const filteredPackages = packages.filter((pkg) => {
+  const gamePackages = packages.filter((pkg) => pkg.game === GAME_NAME_MAP[selectedGame]);
+  const activeCount = gamePackages.filter((pkg) => pkg.active).length;
+  const totalValue = gamePackages.filter((pkg) => pkg.active).reduce((sum, pkg) => sum + pkg.price, 0);
+  const avgMargin =
+    gamePackages.length > 0
+      ? (
+          gamePackages.reduce(
+            (sum, pkg) => sum + (pkg.price > 0 ? ((pkg.price - pkg.cost) / pkg.price) * 100 : 0),
+            0
+          ) / gamePackages.length
+        ).toFixed(2)
+      : "0.00";
+
+  const filteredPackages = gamePackages.filter((pkg) => {
     const marginPct = pkg.price > 0 ? ((pkg.price - pkg.cost) / pkg.price) * 100 : 0;
     if (skuFilter === "popular") return pkg.tag !== "Standard";
     if (skuFilter === "high-margin") return marginPct > 18;
@@ -62,7 +77,7 @@ export default function PackagesTable({
             <div className="flex flex-wrap items-center gap-space-sm">
               <h2 className="font-headline-md text-headline-md text-on-surface">{tx(meta.titleEn, meta.titleTh)}</h2>
               <span className="px-space-sm py-0.5 rounded-md bg-surface-container-high font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap shrink-0">
-                {tx(meta.badgeEn, meta.badgeTh)}
+                {tx(`${activeCount} Active SKU`, `${activeCount} แพ็กเกจที่เปิดขาย`)}
               </span>
             </div>
             <span className="font-body-sm text-body-sm text-on-surface-variant">
@@ -114,7 +129,7 @@ export default function PackagesTable({
           <div className="flex flex-col">
             <span className="font-label-sm text-label-sm text-outline uppercase">{tx("Active Catalog Value", "มูลค่าแพ็กเกจทั้งหมด")}</span>
             <span className="font-headline-sm text-headline-sm text-on-surface whitespace-nowrap">
-              ฿12,840 <span className="font-body-sm text-body-sm text-on-surface-variant font-normal">{tx("/ cart capacity", "/ ความจุตะกร้า")}</span>
+              ฿{totalValue.toLocaleString()} <span className="font-body-sm text-body-sm text-on-surface-variant font-normal">{tx("/ active sum", "/ รวมที่เปิดขาย")}</span>
             </span>
           </div>
           <span className="material-symbols-outlined text-outline text-[22px] shrink-0">account_balance_wallet</span>
@@ -122,7 +137,7 @@ export default function PackagesTable({
         <div className="p-space-md rounded-xl bg-surface-container-low flex items-center justify-between gap-2">
           <div className="flex flex-col">
             <span className="font-label-sm text-label-sm text-outline uppercase">{tx("Avg. Gross Margin", "กำไรขั้นต้นเฉลี่ย")}</span>
-            <span className="font-headline-sm text-headline-sm text-secondary whitespace-nowrap">21.84%</span>
+            <span className="font-headline-sm text-headline-sm text-secondary whitespace-nowrap">{avgMargin}%</span>
           </div>
           <span className="material-symbols-outlined text-secondary text-[22px] shrink-0">trending_up</span>
         </div>
@@ -239,16 +254,16 @@ export default function PackagesTable({
       <div className="flex flex-col sm:flex-row items-center justify-between gap-space-sm pt-space-sm">
         <span className="font-label-sm text-label-sm text-outline">
           {tx(
-            `Showing ${filteredPackages.length} of 10 configured game packages • Auto-sync interval: 60s`,
-            `แสดง ${filteredPackages.length} จาก 10 แพ็กเกจ • ซิงค์อัตโนมัติทุก 60 วินาที`
+            `Showing ${filteredPackages.length} of ${gamePackages.length} configured game packages • Live PostgreSQL Sync`,
+            `แสดง ${filteredPackages.length} จาก ${gamePackages.length} แพ็กเกจ • ซิงค์กับฐานข้อมูลเรียลไทม์`
           )}
         </span>
         <div className="flex items-center gap-space-xs shrink-0">
           <button type="button" disabled className="px-space-md py-1 rounded-lg bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container transition-colors disabled:opacity-40 whitespace-nowrap">
             {tx("Previous", "ก่อนหน้า")}
           </button>
-          <span className="px-space-sm font-label-sm text-label-sm text-on-surface whitespace-nowrap">{tx("Page 1 / 2", "หน้า 1 / 2")}</span>
-          <button type="button" className="px-space-md py-1 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors whitespace-nowrap">
+          <span className="px-space-sm font-label-sm text-label-sm text-on-surface whitespace-nowrap">{tx("Page 1 / 1", "หน้า 1 / 1")}</span>
+          <button type="button" disabled className="px-space-md py-1 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors disabled:opacity-40 whitespace-nowrap">
             {tx("Next", "ถัดไป")}
           </button>
         </div>

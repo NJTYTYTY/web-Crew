@@ -183,8 +183,8 @@ export default function RecentTransactionsTable({
       <div className="p-space-md bg-surface-container-low/40 flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-surface-container font-label-sm text-label-sm">
         <span className="text-on-surface-variant whitespace-nowrap">
           {tx(
-            `Showing ${filtered.length} of 3,842 queued orders`,
-            `แสดง ${filtered.length} จาก 3,842 รายการในคิว`
+            `Showing ${filtered.length} of ${transactions.length} recent orders`,
+            `แสดง ${filtered.length} จาก ${transactions.length} รายการล่าสุด`
           )}
         </span>
         <div className="flex items-center gap-space-xs shrink-0">
@@ -196,12 +196,10 @@ export default function RecentTransactionsTable({
             {tx("Previous", "ก่อนหน้า")}
           </button>
           <span className="px-space-sm py-1 rounded bg-primary text-on-primary">1</span>
-          <button type="button" className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors">2</button>
-          <button type="button" className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors">3</button>
-          <span className="px-1 text-outline">...</span>
           <button
             type="button"
-            className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors whitespace-nowrap"
+            disabled
+            className="px-space-sm py-1 rounded bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors disabled:opacity-40 whitespace-nowrap"
           >
             {tx("Next", "ถัดไป")}
           </button>

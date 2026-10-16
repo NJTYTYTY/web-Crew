@@ -122,19 +122,26 @@ export default function TransactionInspectorDrawer({
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
+                    const cleanOrderId = transaction.id.replace("#", "");
+                    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+                    await fetch(`${apiBase}/api/admin/orders/${encodeURIComponent(cleanOrderId)}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ status: "PAID", fulfillmentStatus: "COMPLETED" }),
+                    }).catch(() => {});
                     onActionToast(
-                      tx("Manual Re-Queue Initiated", "ส่งเข้าคิวใหม่เรียบร้อย"),
+                      tx("Order Resolved in DB", "อัปเดตสถานะในฐานข้อมูลเรียบร้อย"),
                       tx(
-                        `Order ${transaction.id} pushed to high-priority worker queue.`,
-                        `ส่งคำสั่งซื้อ ${transaction.id} เข้าสู่คิวด่วนพิเศษแล้ว`
+                        `Order ${transaction.id} marked as PAID & COMPLETED in PostgreSQL.`,
+                        `อัปเดตคำสั่งซื้อ ${transaction.id} เป็นชำระเงินและจัดส่งสำเร็จในฐานข้อมูลแล้ว`
                       )
                     );
                     onClose();
                   }}
                   className="w-full py-2 bg-error-container text-on-error-container hover:opacity-90 rounded-lg font-label-sm text-label-sm text-left px-3 flex items-center justify-between"
                 >
-                  <span>{tx("Force Manual Re-Queue or Refund", "บังคับส่งคิวใหม่หรือคืนเงิน")}</span>
+                  <span>{tx("Force Manual Resolve / Complete in DB", "บังคับยืนยันสำเร็จลงฐานข้อมูล")}</span>
                   <span className="material-symbols-outlined text-[16px]">replay</span>
                 </button>
               </div>

@@ -188,16 +188,14 @@ export default function AccountsTable({
                           {isSold ? "history_edu" : "key"}
                         </span>
                       </button>
-                      {!isSold && (
-                        <button
-                          type="button"
-                          onClick={() => onDelete(acc.id, acc.title)}
-                          className="p-1.5 rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-colors"
-                          title={tx("Remove listing", "ลบรายการ")}
-                        >
-                          <span className="material-symbols-outlined text-[18px]">delete</span>
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => onDelete(acc.id, acc.title)}
+                        className="p-1.5 rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-colors"
+                        title={tx("Remove listing", "ลบรายการ")}
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -210,11 +208,11 @@ export default function AccountsTable({
       <div className="px-space-lg py-space-md bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-md">
         <div className="flex items-center gap-space-sm whitespace-nowrap">
           <span className="font-label-sm text-label-sm text-on-surface-variant">
-            {tx("Page 1 of 25", "หน้า 1 จาก 25")}
+            {tx(`Page 1 of 1 (${accounts.length} items)`, `หน้า 1 จาก 1 (${accounts.length} รายการ)`)}
           </span>
           <span className="text-outline-variant font-label-sm">•</span>
           <span className="font-label-sm text-label-sm text-outline">
-            {tx("Queue latency: 18ms", "ความหน่วงคิว: 18ms")}
+            {tx("Live PostgreSQL Sync", "เชื่อมต่อฐานข้อมูลเรียลไทม์")}
           </span>
         </div>
         <div className="flex items-center gap-space-xs shrink-0">
@@ -226,13 +224,10 @@ export default function AccountsTable({
             {tx("Previous", "ก่อนหน้า")}
           </button>
           <button type="button" className="w-8 h-8 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm flex items-center justify-center font-bold">1</button>
-          <button type="button" className="w-8 h-8 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center hover:bg-surface-container transition-colors">2</button>
-          <button type="button" className="w-8 h-8 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center hover:bg-surface-container transition-colors">3</button>
-          <span className="px-1 text-outline font-label-sm text-label-sm">...</span>
-          <button type="button" className="w-8 h-8 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center hover:bg-surface-container transition-colors">25</button>
           <button
             type="button"
-            className="px-space-md py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors whitespace-nowrap"
+            disabled
+            className="px-space-md py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant font-label-sm text-label-sm hover:text-on-surface transition-colors disabled:opacity-40 whitespace-nowrap"
           >
             {tx("Next", "ถัดไป")}
           </button>

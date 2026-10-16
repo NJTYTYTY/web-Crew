@@ -66,11 +66,17 @@ export default function AdminTopUpPage() {
           });
           setProviderEnabled(nextEnabled);
         }
-        const dbPkgs = Array.isArray(data?.packages) ? data.packages : [];
-        if (dbPkgs.length > 0) {
+        if (Array.isArray(data?.packages)) {
           setPackages(
-            dbPkgs.map((pkg: Record<string, any>) => {
-              const gameName: "Roblox" | "RoV" | "FreeFire" = pkg.gameId === 1 ? "RoV" : pkg.gameId === 2 ? "FreeFire" : "Roblox";
+            data.packages.map((pkg: Record<string, any>) => {
+              const matchedGame = dbGames.find((g: Record<string, any>) => g.id === pkg.gameId);
+              const slug = String(matchedGame?.slug || "").toLowerCase();
+              const gameName: "Roblox" | "RoV" | "FreeFire" =
+                slug === "rov" || pkg.gameId === 1
+                  ? "RoV"
+                  : slug === "freefire" || pkg.gameId === 2
+                  ? "FreeFire"
+                  : "Roblox";
               const price = Number(pkg.price || 100);
               return {
                 sku: `PKG-${pkg.id}`, name: String(pkg.packageName || "Package"), subtitle: `DB ID: #${pkg.id} • Instant Delivery`,

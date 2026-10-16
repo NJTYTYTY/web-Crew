@@ -26,7 +26,7 @@ export default function AdminOrdersPage() {
   const loadOrdersFromDb = useCallback(async () => {
     try {
       const res = await apiRequest<{ orders: any[] }>("/api/admin/orders");
-      if (Array.isArray(res?.orders) && res.orders.length > 0) {
+      if (Array.isArray(res?.orders)) {
         setOrders(res.orders.map(mapDbOrderToAdminItem));
       }
     } catch {}
@@ -77,7 +77,13 @@ export default function AdminOrdersPage() {
       showToast(tx("Order status marked as COMPLETED in PostgreSQL.", "อัปเดตสถานะเป็นเสร็จสมบูรณ์ในฐานข้อมูลแล้ว"));
       setSelectedOrder(null);
     } else if (action === "REDELIVER") {
-      showToast(tx("Triggered re-delivery webhook to gaming server worker.", "ส่งคำสั่งจัดส่งซ้ำไปยังเซิร์ฟเวอร์บอทเติมเกมแล้ว"));
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, fulfillment: "Processing" } : o)));
+      await apiRequest(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ fulfillmentStatus: "PROCESSING" }),
+      }).catch(() => {});
+      showToast(tx("Triggered re-delivery webhook & updated status to PROCESSING in DB.", "ส่งคำสั่งจัดส่งซ้ำและอัปเดตสถานะเป็นกำลังเติมในฐานข้อมูลแล้ว"));
+      setSelectedOrder(null);
     } else if (action === "REFUND") {
       setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, payment: "FAILED", fulfillment: "Pending" } : o)));
       await apiRequest(`/api/admin/orders/${encodeURIComponent(orderId)}`, {
@@ -273,14 +279,22 @@ export default function AdminOrdersPage() {
         <div className="flex flex-wrap items-center justify-between gap-2 pb-space-sm">
           <div className="flex items-center gap-space-sm">
             <div className="flex gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-error"></span><span className="w-2.5 h-2.5 rounded-full bg-secondary-fixed"></span><span className="w-2.5 h-2.5 rounded-full bg-tertiary-fixed"></span></div>
-            <span className="font-label-sm text-label-sm font-mono text-outline-variant">iq_bank_webhook_stream.log (Socket 8089)</span>
+            <span className="font-label-sm text-label-sm font-mono text-outline-variant">iq_bank_webhook_stream.log (PostgreSQL Live Stream)</span>
           </div>
-          <div className="flex items-center gap-space-sm font-label-sm text-label-sm whitespace-nowrap"><span className="text-secondary-fixed font-mono">STATUS: 200 OK</span><span className="text-outline">Heartbeat 14:32:12</span></div>
+          <div className="flex items-center gap-space-sm font-label-sm text-label-sm whitespace-nowrap"><span className="text-secondary-fixed font-mono">STATUS: 200 OK</span><span className="text-outline">{orders.length} records synced</span></div>
         </div>
         <div className="font-label-sm text-label-sm font-mono space-y-1 pt-space-xs text-slate-300">
-          <div className="flex gap-2"><span className="text-outline">14:32:10.104</span><span className="text-secondary-fixed">[INGEST]</span><span>POST /api/v1/iq-bank/ipn - Ref: IQ-TXN-902184 - Match Order #ORD-88291 (฿850.00 THB) - VERIFIED HMAC_SHA256</span></div>
-          <div className="flex gap-2"><span className="text-outline">14:32:04.891</span><span className="text-primary-fixed-dim">[BOT_DISPATCH]</span><span>Dispatching RoV API worker #04 -&gt; UID 2981048194 -&gt; diamonds: 520 (Attempt 1)</span></div>
-          <div className="flex gap-2"><span className="text-outline">14:31:52.220</span><span className="text-error">[ALERT]</span><span>Timeout on SCB_PROMPTPAY callback for #ORD-88288. Worker marked queue retry state (Retry #2 in 60s)</span></div>
+          {orders.slice(0, 3).map((ord, idx) => (
+            <div key={ord.id + idx} className="flex gap-2">
+              <span className="text-outline">LIVE-DB</span>
+              <span className={ord.payment === "PAID" ? "text-secondary-fixed" : ord.payment === "FAILED" ? "text-error" : "text-primary-fixed-dim"}>
+                [{ord.payment === "PAID" ? "SETTLED" : ord.payment === "FAILED" ? "ALERT" : "QUEUE"}]
+              </span>
+              <span>
+                Ref: {ord.iqRef} - Match Order #{ord.id} (฿{ord.amount.toFixed(2)} THB) - Customer: {ord.customerName} ({ord.targetTitle}) -&gt; {ord.fulfillment}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 

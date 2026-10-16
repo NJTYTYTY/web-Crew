@@ -102,7 +102,7 @@ export function OrdersView() {
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right whitespace-nowrap">
-                        {ord.status === 'PAID' && ord.revealedPass && ord.revealedPass !== 'COMPLETED' && ord.revealedPass !== 'PENDING' ? (
+                        {ord.status === 'PAID' && ord.type.toLowerCase().includes('account') && ord.revealedPass ? (
                           <button
                             onClick={() => revealOrderCredentials(ord.revealedUser, ord.revealedPass, ord.title)}
                             className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold rounded-lg text-[11px] border border-indigo-200 whitespace-nowrap"

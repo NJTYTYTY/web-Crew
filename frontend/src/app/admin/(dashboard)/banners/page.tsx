@@ -31,9 +31,8 @@ export default function AdminBannersPage() {
     fetch(`${API_BASE}/api/admin/banners`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        const list = Array.isArray(data?.banners) ? data.banners : [];
-        if (list.length > 0) {
-          const mapped: AdminBannerItem[] = list.map((b: Record<string, unknown>, idx: number) => ({
+        if (Array.isArray(data?.banners)) {
+          const mapped: AdminBannerItem[] = data.banners.map((b: Record<string, unknown>, idx: number) => ({
             id: String(b.id),
             order: Number(b.sortOrder) || idx + 1,
             title: String(b.title || "Storefront Banner"),

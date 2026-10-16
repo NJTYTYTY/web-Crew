@@ -57,8 +57,7 @@ export default function AdminAccountsPage() {
     fetch(`${API_BASE}/api/admin/accounts`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        const list = Array.isArray(data?.accounts) ? data.accounts : [];
-        if (list.length > 0) setAccounts(list.map(mapDbAccountToAdmin));
+        if (Array.isArray(data?.accounts)) setAccounts(data.accounts.map(mapDbAccountToAdmin));
       })
       .catch(() => {});
   }, []);

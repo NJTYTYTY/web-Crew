@@ -20,15 +20,15 @@ export default function OrderInspectModal({ order, onClose, onCopy, onAction }: 
   const rawPayload = JSON.stringify(
     {
       gateway: "IQ-BANK-TH",
+      orderId: order.id,
       transactionRef: order.iqRef,
       bank: order.paymentChannel,
-      accountDestination: "APEXPAY_ESCROW_01",
+      customer: order.customerName,
+      target: order.targetUid,
       amount: order.amount,
       currency: "THB",
       status: order.payment === "PAID" ? "SUCCESS" : order.payment,
-      ipnSignature: "sha256_9f81a7b8e5c2d10041a98e2194b5cd",
-      clientIp: "203.144.144.20",
-      timestamp: "2025-05-14T14:32:10Z",
+      fulfillmentStatus: order.fulfillment.toUpperCase(),
     },
     null,
     2
@@ -75,7 +75,7 @@ export default function OrderInspectModal({ order, onClose, onCopy, onAction }: 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-space-md p-space-md rounded-xl bg-surface-container-low">
             <div>
               <span className="font-label-sm text-label-sm text-on-surface-variant uppercase">{tx("Customer", "ลูกค้า")}</span>
-              <p className="font-body-sm text-body-sm font-semibold text-on-surface mt-0.5">{order.customerName} (UID: 9481)</p>
+              <p className="font-body-sm text-body-sm font-semibold text-on-surface mt-0.5">{order.customerName}</p>
             </div>
             <div>
               <span className="font-label-sm text-label-sm text-on-surface-variant uppercase">{tx("Order Item", "รายการที่สั่งซื้อ")}</span>

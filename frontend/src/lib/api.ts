@@ -112,44 +112,43 @@ export async function triggerIqBankSimulatorApi(payload: {
 
 export function normalizeBanners(res: any): BannerItem[] | null {
   const list = Array.isArray(res) ? res : res?.banners;
-  return Array.isArray(list) && list.length > 0 ? list : null;
+  return Array.isArray(list) ? list : null;
 }
 
 export function normalizeAccounts(res: any): AccountProduct[] | null {
   const list = Array.isArray(res) ? res : res?.accounts;
-  if (!Array.isArray(list) || list.length === 0) return null;
+  if (!Array.isArray(list)) return null;
   return list.map((a: any, idx: number) => {
-    const fallback = initialAccountProducts[idx % initialAccountProducts.length];
     const isRov = a.gameCategory === 'ROV' || a.game === 'RoV';
     const specs = a.specs || {};
     return {
       id: `acc-${a.id ?? idx + 1}`,
       dbId: a.id,
       game: isRov ? 'RoV' : 'Roblox',
-      title: a.title || fallback.title,
-      description: a.description || fallback.description,
-      levelOrRank: specs.levelOrRank || a.levelOrRank || fallback.levelOrRank || (isRov ? 'Conqueror / Master Rank' : 'Max Level 2550'),
-      serverRegion: specs.serverRegion || a.serverRegion || fallback.serverRegion || (isRov ? 'Garena Thailand (TH)' : 'Global / SEA'),
-      emailStatus: specs.emailStatus || a.emailStatus || fallback.emailStatus || '100% Clean Unlinked',
-      heroesOrFruitsCount: specs.heroesOrFruitsCount || a.heroesOrFruitsCount || fallback.heroesOrFruitsCount,
-      skinsOrWeaponsCount: specs.skinsOrWeaponsCount || a.skinsOrWeaponsCount || fallback.skinsOrWeaponsCount,
+      title: a.title || 'Game Account',
+      description: a.description ?? '',
+      levelOrRank: specs.levelOrRank || a.levelOrRank || (isRov ? 'Conqueror / Master Rank' : 'Max Level 2550'),
+      serverRegion: specs.serverRegion || a.serverRegion || (isRov ? 'Garena Thailand (TH)' : 'Global / SEA'),
+      emailStatus: specs.emailStatus || a.emailStatus || '100% Clean Unlinked',
+      heroesOrFruitsCount: specs.heroesOrFruitsCount || a.heroesOrFruitsCount || undefined,
+      skinsOrWeaponsCount: specs.skinsOrWeaponsCount || a.skinsOrWeaponsCount || undefined,
       price: Number(a.price),
-      tags: Array.isArray(a.highlightTags) ? a.highlightTags : a.tags || fallback.tags,
+      tags: Array.isArray(a.highlightTags) ? a.highlightTags : Array.isArray(a.tags) ? a.tags : [],
       stock: a.status === 'SOLD' || a.stock === 'sold_out' ? 'sold_out' : 'in_stock',
-      image: a.imageUrl || a.image || fallback.image,
-      revealedUser: a.accountUsername || fallback.revealedUser,
-      revealedPass: a.accountPassword || fallback.revealedPass,
+      image: a.imageUrl || a.image || (isRov ? '/game-logos/rov/rov-banner.png' : '/game-logos/roblox/blox-fruits.png'),
+      revealedUser: a.accountUsername || '',
+      revealedPass: a.accountPassword || '',
     };
   });
 }
 
 export function normalizeTopupGames(res: any): PackagesByGame | null {
   const list = Array.isArray(res) ? res : res?.games;
-  if (!Array.isArray(list) || list.length === 0) return null;
+  if (!Array.isArray(list)) return null;
   const mapped: PackagesByGame = { ...initialPackagesData };
   list.forEach((g: any) => {
     const slug = (g.slug || '').toLowerCase() as TopupGameKey;
-    if ((slug === 'rov' || slug === 'freefire' || slug === 'roblox') && Array.isArray(g.packages) && g.packages.length > 0) {
+    if ((slug === 'rov' || slug === 'freefire' || slug === 'roblox') && Array.isArray(g.packages)) {
       mapped[slug] = g.packages.map((p: any, i: number) => ({
         id: `${slug}-${p.id ?? i + 1}`,
         dbId: p.id,

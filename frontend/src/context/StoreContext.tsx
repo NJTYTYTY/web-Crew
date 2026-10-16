@@ -40,7 +40,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [uidInput, setUidInput] = useState('9842109841');
   const [robloxUser, setRobloxUser] = useState('BloxMaster_TH');
   const [robloxPass, setRobloxPass] = useState('SafePassword123');
-  const [customerOrders, setCustomerOrders] = useState<CustomerOrder[]>(initialCustomerOrders);
+  const [customerOrders, setCustomerOrders] = useState<CustomerOrder[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalState, setModalState] = useState<ModalStateName>('waiting');
   const [activeOrder, setActiveOrder] = useState<ActiveOrder>(defaultActiveOrder);
@@ -58,9 +58,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     fetchTopupGamesApi().then((r) => {
       const m = normalizeTopupGames(r); const meta = normalizeTopupGamesMeta(r);
       if (meta) setTopupGamesMeta(meta);
-      if (m) { setPackagesData(m); setSelectedPackage((prev) => m.rov.find((p) => p.id === prev?.id) || m.rov[2] || m.rov[0]); }
+      if (m) {
+        setPackagesData(m);
+        setSelectedPackage((prev) => {
+          const allPkgs = [...(m.rov || []), ...(m.freefire || []), ...(m.roblox || [])];
+          return allPkgs.find((p) => p.id === prev?.id) || m.rov[2] || m.rov[0];
+        });
+      }
     }).catch(() => {});
-    fetchOrdersApi().then((r) => { if (Array.isArray(r?.orders) && r.orders.length > 0) setCustomerOrders(r.orders); }).catch(() => {});
+    fetchOrdersApi().then((r) => { if (Array.isArray(r?.orders)) setCustomerOrders(r.orders); }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -89,15 +95,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [refreshStoreCatalog]);
 
   useEffect(() => {
-    const applyCrossTabSuccess = (orderData?: ActiveOrder) => {
+    const applyCrossTabSuccess = async (orderData?: ActiveOrder) => {
       const ord = orderData || activeOrder;
-      setCustomerOrders((prev) => prev.some((o) => o.ref === ord.txRef) ? prev : [{
-        id: ord.id, ref: ord.txRef, title: ord.title,
-        type: ord.type === 'account' ? 'Account Purchase' : 'Top-Up Delivery',
-        date: 'Just now', amount: ord.price, status: 'PAID',
-        revealedUser: ord.username || 'auto_delivery',
-        revealedPass: ord.type === 'account' ? ord.password || 'NexPass#7741' : 'COMPLETED',
-      }, ...prev]);
+      if (ord.dbId) {
+        try {
+          const st = await fetchOrderStatusApi(ord.dbId);
+          const creds = st?.credentials || st?.order?.credentials;
+          if (creds?.accountUsername) {
+            setActiveOrder((prev) => ({ ...prev, username: creds.accountUsername, password: creds.accountPassword || prev.password }));
+          }
+        } catch {}
+      }
       refreshStoreCatalog();
       if (!window.location.pathname.startsWith('/iq-bank-simulator')) { setModalState('success'); setIsModalOpen(true); }
     };
@@ -194,6 +202,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const executeTopupCheckout = async () => {
+    const isIdPass = (topupGamesMeta[activeTopupGame]?.inputMode || (activeTopupGame === 'roblox' ? 'ID_PASS' : 'UID')) === 'ID_PASS';
     const gameLabel = topupGamesMeta[activeTopupGame]?.name || (activeTopupGame === 'roblox' ? 'Roblox Robux' : activeTopupGame === 'rov' ? 'RoV Coupons' : 'Free Fire Diamonds');
     const price = selectedPackage ? selectedPackage.price : 95;
     let id = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
@@ -202,11 +211,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await createOrderApi({
         orderType: 'TOPUP', topupPackageId: selectedPackage?.dbId ?? 1,
-        targetMetadata: activeTopupGame === 'roblox' ? { robloxUsername: robloxUser, robloxPassword: robloxPass } : { playerUid: uidInput },
+        targetMetadata: isIdPass ? { robloxUsername: robloxUser, robloxPassword: robloxPass } : { playerUid: uidInput },
       });
       id = res?.order?.orderNumber || id; dbId = res?.order?.id; txRef = res?.payment?.transactionRef || txRef;
     } catch {}
-    syncActiveOrder({ id, dbId, txRef, title: `${gameLabel} - ${selectedPackage?.label || 'Package'}`, type: 'topup', price, username: activeTopupGame === 'roblox' ? robloxUser : `UID: ${uidInput}`, date: 'Just now' });
+    syncActiveOrder({ id, dbId, txRef, title: `${gameLabel} - ${selectedPackage?.label || 'Package'}`, type: 'topup', price, username: isIdPass ? robloxUser : `UID: ${uidInput}`, date: 'Just now' });
     setSimLogs((prev) => [...prev, `[INFO] Standby for Top-Up payment dispatch. Active Ref: ${txRef}`]);
     openModal('waiting');
   };
@@ -235,7 +244,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const nextUser: UserProfile = { id: res?.user?.id, username: res?.user?.username || fallbackUsername, role: res?.user?.role || 'CUSTOMER' };
     setUser(nextUser); setStoredUser(nextUser);
     const ordRes = await fetchOrdersApi().catch(() => null);
-    if (Array.isArray(ordRes?.orders) && ordRes.orders.length > 0) setCustomerOrders(ordRes.orders);
+    if (Array.isArray(ordRes?.orders)) setCustomerOrders(ordRes.orders);
   };
 
   const login = async (username: string, password: string) => {
@@ -250,7 +259,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     await finishAuthAndResume(pendingPurchase);
   };
 
-  const logout = async () => { await logoutApi().catch(() => {}); setStoredToken(null); setStoredUser(null); setUser(null); };
+  const logout = async () => { await logoutApi().catch(() => {}); setStoredToken(null); setStoredUser(null); setUser(null); setCustomerOrders([]); };
 
   const simulateQRUpload = () => {
     setSimLogs((prev) => [...prev, '[QR SCANNER] Detected EMVCo PromptPay QR Code!', `[PAYLOAD] Merch: NEXUS PLAY | Ref: ${activeOrder.txRef} | Amt: ฿${activeOrder.price}`]);
@@ -259,13 +268,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const triggerWebhookSuccess = async () => {
     await triggerIqBankSimulatorApi({ transactionRef: activeOrder.txRef, status: 'SUCCESS', amount: activeOrder.price }).catch(() => {});
     setSimLogs((prev) => [...prev, '[WEBHOOK DISPATCH] POST /api/webhooks/iqbank HTTP/1.1 (200 OK)', `[IQ-BANK SUCCESS] Payment verified for ${activeOrder.txRef}. Amount: ฿${activeOrder.price} — Storefront tab updated!`]);
-    setCustomerOrders((prev) => [{
-      id: activeOrder.id, ref: activeOrder.txRef, title: activeOrder.title,
-      type: activeOrder.type === 'account' ? 'Account Purchase' : 'Top-Up Delivery',
-      date: 'Just now', amount: activeOrder.price, status: 'PAID',
-      revealedUser: activeOrder.username || 'auto_delivery',
-      revealedPass: activeOrder.type === 'account' ? activeOrder.password || 'NexPass#7741' : 'COMPLETED',
-    }, ...prev]);
+    refreshStoreCatalog();
     try {
       localStorage.setItem('nexusplay_payment_event', JSON.stringify({ status: 'SUCCESS', txRef: activeOrder.txRef, order: activeOrder, ts: Date.now() }));
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {

@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { APEX_ADMIN_LOGO_URL } from "@/data/mockAdminData";
 import { useLanguage } from "@/context/LanguageContext";
+import { getStoredUser } from "@/lib/api";
 
 interface AdminHeaderProps {
   onToggleMobileMenu?: () => void;
@@ -14,11 +15,17 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
   const { lang, toggleLang, tx } = useLanguage();
   const [globalQuery, setGlobalQuery] = useState("");
   const [showNotifToast, setShowNotifToast] = useState(false);
+  const [operatorName, setOperatorName] = useState("admin_iq");
+
+  useEffect(() => {
+    const u = getStoredUser();
+    if (u?.username) setOperatorName(u.username);
+  }, []);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (globalQuery.trim()) {
-      router.push("/admin/orders");
+      router.push(`/admin/orders?q=${encodeURIComponent(globalQuery.trim())}`);
     }
   };
 
@@ -83,11 +90,11 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
 
         <div className="hidden md:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-surface-container-low text-on-surface-variant whitespace-nowrap shrink-0">
           <span className="material-symbols-outlined text-[16px] shrink-0">schedule</span>
-          <span className="font-label-sm text-label-sm whitespace-nowrap">UTC+7 14:32:09</span>
+          <span className="font-label-sm text-label-sm whitespace-nowrap">UTC+7 LIVE</span>
         </div>
 
         <div className="hidden sm:inline-flex items-center px-space-sm py-space-xs rounded-xl bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap shrink-0">
-          {tx("admin_iq: ACTIVE", "แอดมิน_iq: ออนไลน์")}
+          {tx(`${operatorName}: ACTIVE`, `${operatorName}: ออนไลน์`)}
         </div>
 
         <div className="relative shrink-0">
