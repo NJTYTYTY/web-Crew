@@ -10,7 +10,7 @@ Body Limit: `15mb` (supports Base64 image uploads from Admin Dashboard)
 
 ## 2. Authentication Endpoints (`/api/auth`)
 - `POST /api/auth/register` — Validates `{ username, password, confirmPassword }` via `zod`. Creates `CUSTOMER` in `users` (or signs in if `username` already exists) and returns `{ token, user }`.
-- `POST /api/auth/login` — Authenticates `{ username, password }` (auto-provisions user in PostgreSQL if not yet registered) and returns 7-day JWT `{ token, user }`.
+- `POST /api/auth/login` — Authenticates `{ username, password }`. Verifies password against PostgreSQL `passwordHash` via `bcrypt.compare`. Returns 7-day JWT `{ token, user }` on success, or `401 Unauthorized` (`{ error: 'Invalid username or password' }`) if credentials are invalid. Supports seeded default accounts (`alex_gamer` / `password123` as `CUSTOMER`, `admin_iq` / `admin123` as `ADMIN`).
 - `POST /api/auth/logout` — Clears `token` cookie.
 - `GET /api/auth/me` — Verifies Bearer / Cookie JWT and returns `{ user }`.
 

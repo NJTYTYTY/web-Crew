@@ -108,12 +108,19 @@ A standalone mock banking web interface built into the project to demonstrate th
   - **`[Confirm Payment (Trigger Webhook)]`**: Calls the simulator backend endpoint which signs the payload with `HMAC-SHA256` and dispatches an HTTP POST webhook to `POST /api/webhooks/iqbank`.
   - **`[Simulate Failed Payment]`**: Dispatches a failed webhook event to test error handling.
 
-### 4.7 Admin Backoffice (`/admin/login` & `/admin/*`)
-- **Admin Login (`/admin/login`):** Restricted login page (`Username` and `Password` only) verifying `role === 'ADMIN'`.
-- **Dashboard Overview (`/admin`):** Displays KPI cards (Total Revenue `฿`, Game Accounts Sold, Pending Top-Up Orders, Active Banners) and a Recent Transactions table with live IQ-Bank webhook statuses.
+### 4.7 Admin Backoffice (`/admin/login` & `/admin/*`) — NEXUS PLAY Precision Slate
+- **Branding & Visual Identity:** Branded as **NEXUS PLAY** featuring the official logo (`/logopic.webp`) and dark Precision Slate design system across all backoffice screens.
+- **Strict Route Guard & Access Control (`/admin/(dashboard)/layout.tsx`):**
+  - All `/admin/*` routes (except `/admin/login`) are protected by a client-side route guard checking `getAdminSession()`.
+  - Direct URL access without an active `ADMIN` session immediately aborts rendering and redirects to `/admin/login`.
+  - Non-admin users (`CUSTOMER` role) attempting to sign in on `/admin/login` are rejected with an explicit security alert.
+  - Admin authentication state is isolated from customer storefront sessions using dedicated storage keys (`nexus_play_admin_user` and `nexus_play_admin_token`).
+  - One-click Sign Out in `AdminSidebar` and `AdminHeader` clears the admin session and returns the user to `/admin/login`.
+- **Admin Login (`/admin/login`):** Restricted login page (`Username` and `Password` only) requiring credentials of an account with `role === 'ADMIN'` (e.g. seeded account `admin_iq` / `admin123`).
+- **Dashboard Overview (`/admin`):** Displays dynamic KPI cards (Total Revenue `฿`, Game Accounts Sold, Pending Top-Up Orders, Active Banners) and a Recent Transactions table with live IQ-Bank webhook statuses.
 - **Module 1 — Game Accounts CRUD (`/admin/accounts`):** Create, read, update, and delete Roblox/RoV accounts, including managing the secret `accountUsername` and `accountPassword` fields and stock status (`AVAILABLE` / `SOLD`).
 - **Module 2 — Top-Up Games & Packages CRUD (`/admin/topup`):** Manage supported games (`RoV`, `Free Fire`, `Roblox`), input modes (`UID` vs `ID_PASS`), and CRUD operations for package denominations, prices, bonus tags, and active states.
-- **Module 3 — Orders, Top-Up Queue & Webhook Logs (`/admin/orders`):** Inspect all orders, view raw IQ-Bank webhook JSON payloads, copy customer-submitted UIDs or Roblox credentials, and update fulfillment status (`PENDING` -> `PROCESSING` -> `COMPLETED` / `FAILED`).
+- **Module 3 — Orders, Top-Up Queue & Webhook Logs (`/admin/orders`):** Inspect all orders, view live IQ-Bank webhook logs in the gateway audit terminal, inspect raw webhook JSON payloads, copy customer-submitted UIDs or Roblox credentials, and update fulfillment status (`PENDING` -> `PROCESSING` -> `COMPLETED` / `FAILED`).
 - **Module 4 — Homepage Banner CRUD (`/admin/banners`):** Add, edit, delete, reorder (`sortOrder`), and toggle active/inactive status for homepage hero banners.
 
 ---

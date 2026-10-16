@@ -6,21 +6,20 @@ Full-stack **Gaming Account Marketplace** (Roblox, RoV) and **Automated Game Top
 
 ```
 cedt-crew/
-├── frontend/          # Next.js (App Router) + TypeScript + Tailwind CSS (Storefront, IQ-Bank Simulator, Admin UI)
+├── frontend/          # Next.js 14 (App Router) + TypeScript + Tailwind CSS (Storefront, IQ-Bank Simulator, Admin Dashboard)
 ├── backend/           # Node.js + Express.js + TypeScript + Drizzle ORM + Zod (REST API & Webhook Engine)
-├── docs/              # Project Documentation
+├── docs/              # Project Documentation Suite
 │   ├── product/       # Product Requirements Document (PRD.md)
 │   ├── technical/     # System Architecture, Database Schema, Design System
 │   ├── api/           # REST API & IQ-Bank Webhook Specification
 │   ├── operations/    # Docker & Deployment Guides
-│   └── legacy-over-800/ # Monolithic file audit warnings
-├── store-ui/          # Storefront HTML/Tailwind UI Reference Prototypes
-└── admin-dashboard-ui/# Admin Backoffice HTML/Tailwind UI Reference Prototypes
+│   └── legacy-over-800/ # Monolithic file audit & modularity reports
+└── docker-compose.yml # PostgreSQL 16 Alpine, Backend & Frontend multi-service orchestration
 ```
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** Next.js (App Router), React, TypeScript, Tailwind CSS, Lucide React
-* **Backend:** Node.js, Express.js, TypeScript, `bcrypt`, `jsonwebtoken` (JWT), `zod`, `cors`, Node `crypto` (HMAC-SHA256)
-* **Database:** PostgreSQL 16 + Drizzle ORM (`drizzle-orm`, `drizzle-kit`)
-* **DevOps:** Docker & Docker Compose
+* **Frontend:** Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Lucide React, NEXUS PLAY branding (`/logopic.webp`), bilingual `EN | TH` support
+* **Backend:** Node.js, Express.js, TypeScript, Drizzle ORM, `bcrypt` password verification, `jsonwebtoken` (JWT), `zod`, Node `crypto` (HMAC-SHA256)
+* **Database:** PostgreSQL 16 Alpine (`postgres:16-alpine`) + Drizzle Kit
+* **DevOps:** Docker, Docker Compose, Colima compatibility

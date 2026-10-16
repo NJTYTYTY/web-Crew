@@ -2,8 +2,8 @@
 
 ## 1. High-Level Overview
 
-**CEDT-Crew (NEXUS PLAY / ApexPay)** is a full-stack Gaming E-Commerce & Automated Game Top-Up Platform consisting of:
-1. **Frontend (`/frontend` — Port `3000`)**: Next.js 14 (App Router) + TypeScript + Tailwind CSS (Clean Minimal Light Storefront + Precision Slate Admin Backoffice) with bilingual `EN | ไทย` support (`LanguageContext`).
+**CEDT-Crew (NEXUS PLAY)** is a full-stack Gaming E-Commerce & Automated Game Top-Up Platform consisting of:
+1. **Frontend (`/frontend` — Port `3000`)**: Next.js 14 (App Router) + TypeScript + Tailwind CSS (Clean Minimal Light Storefront + Precision Slate Admin Backoffice) with bilingual `EN | ไทย` support (`LanguageContext`) and NEXUS PLAY branding (`/logopic.webp`).
 2. **Backend (`/backend` — Port `4000`)**: Node.js + Express.js + TypeScript + Drizzle ORM + Zod validation (`express.json({ limit: '15mb' })` for direct image uploads).
 3. **Database (`postgres` — Port `5432`)**: PostgreSQL 16 (`postgres:16-alpine`) running in Docker (`nexusplay-postgres`) with persistent volume `postgres_data`.
 4. **Mock Banking Gateway (`IQ-Bank`)**: Dynamic PromptPay QR generator + HMAC-SHA256 webhook verification + cross-tab new-window simulator (`/iq-bank-simulator`).
@@ -12,10 +12,14 @@
 
 ## 2. Core Business & Technical Flows
 
-### Flow A: Persistent Authentication (`/login`, `/register`, `/admin/login`)
-- **Username + Password Only**: Hashed with `bcrypt` and stored in PostgreSQL `users` table (`CUSTOMER` and `ADMIN` roles).
+### Flow A: Persistent Authentication & Strict Admin Route Guard (`/login`, `/register`, `/admin/login`)
+- **Username + Password Authentication**: Password verified with `bcrypt.compare` against `passwordHash` in PostgreSQL `users` table (`CUSTOMER` and `ADMIN` roles).
 - **Session Persistence**: Returns a 7-day JWT token stored in both an HTTP-only cookie (`token`) and `localStorage` (`nexus_play_token` + `nexus_play_user`).
 - **SSR-Safe Hydration**: `StoreContext` initializes `user` to `null` for Next.js SSR compatibility and hydrates from `localStorage` + verifies via `GET /api/auth/me` inside `useEffect` on mount.
+- **Admin Route Guard (`/admin/(dashboard)/layout.tsx`)**:
+  - Automatically verifies `getAdminSession()`. If not authenticated as an `ADMIN`, the layout immediately blocks dashboard rendering and redirects to `/admin/login`.
+  - Non-admin customers (`CUSTOMER` role) are rejected on `/admin/login` with an `Access Denied` security alert.
+  - Dedicated Sign Out action in `AdminSidebar` and `AdminHeader` clears the admin session (`clearAdminSession()`) and redirects to `/admin/login`.
 
 ### Flow B: 100% Dynamic Admin CMS -> Storefront Sync
 All images, game logos, banners, accounts, and packages are database-driven with zero hardcoded lock-in:
