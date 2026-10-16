@@ -69,12 +69,20 @@ export default function PackageFormDrawer({ open, editingPackage, onClose, onSav
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name.trim()) {
+      alert("Please enter package name");
+      return;
+    }
+    if (!numPrice || numPrice <= 0) {
+      alert("Please enter a valid retail price (> 0)");
+      return;
+    }
     onSave({
       game,
-      name: name.trim() || "2,000 Robux",
-      denomination: denomination.trim() || "2000",
-      cost: numCost || 250,
-      price: numPrice || 320,
+      name: name.trim(),
+      denomination: denomination.trim() || name.trim(),
+      cost: numCost > 0 ? numCost : Math.round(numPrice * 0.8),
+      price: numPrice,
       tag: tag.trim() || "Standard",
     });
   };

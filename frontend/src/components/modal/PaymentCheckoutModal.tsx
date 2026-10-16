@@ -188,25 +188,33 @@ export function PaymentCheckoutModal() {
                   <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800">
                     <span className="text-slate-400 whitespace-nowrap">{tx('Account Username:', 'ชื่อผู้ใช้ไอดีเกม:')}</span>
                     <div className="flex items-center space-x-2">
-                      <span className="font-bold text-amber-300" id="revealed-user">{activeOrder.username || 'blox_kitsune_99'}</span>
-                      <button
-                        onClick={() => copyToClipboard(activeOrder.username || 'blox_kitsune_99', 'user')}
-                        className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300 whitespace-nowrap shrink-0"
-                      >
-                        {copiedLabel === 'user' ? tx('Copied!', 'คัดลอกแล้ว!') : tx('Copy', 'คัดลอก')}
-                      </button>
+                      <span className="font-bold text-amber-300" id="revealed-user">
+                        {activeOrder.username || tx('Retrieving...', 'กำลังโหลด...')}
+                      </span>
+                      {activeOrder.username && (
+                        <button
+                          onClick={() => copyToClipboard(activeOrder.username || '', 'user')}
+                          className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300 whitespace-nowrap shrink-0"
+                        >
+                          {copiedLabel === 'user' ? tx('Copied!', 'คัดลอกแล้ว!') : tx('Copy', 'คัดลอก')}
+                        </button>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-slate-400 whitespace-nowrap">{tx('Account Password:', 'รหัสผ่านไอดีเกม:')}</span>
                     <div className="flex items-center space-x-2">
-                      <span className="font-bold text-emerald-400" id="revealed-pass">{activeOrder.password || 'NexPass#7741'}</span>
-                      <button
-                        onClick={() => copyToClipboard(activeOrder.password || 'NexPass#7741', 'pass')}
-                        className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300 whitespace-nowrap shrink-0"
-                      >
-                        {copiedLabel === 'pass' ? tx('Copied!', 'คัดลอกแล้ว!') : tx('Copy', 'คัดลอก')}
-                      </button>
+                      <span className="font-bold text-emerald-400" id="revealed-pass">
+                        {activeOrder.password || tx('Retrieving...', 'กำลังโหลด...')}
+                      </span>
+                      {activeOrder.password && (
+                        <button
+                          onClick={() => copyToClipboard(activeOrder.password || '', 'pass')}
+                          className="text-[10px] bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded text-slate-300 whitespace-nowrap shrink-0"
+                        >
+                          {copiedLabel === 'pass' ? tx('Copied!', 'คัดลอกแล้ว!') : tx('Copy', 'คัดลอก')}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

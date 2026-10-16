@@ -12,12 +12,8 @@ interface AccountFormDrawerProps {
 }
 
 const ACCOUNT_IMG_PRESETS = [
-  { label: "Roblox #1", url: "/game-account_sale/roblox01.png" },
-  { label: "Roblox #2", url: "/game-account_sale/roblox02.png" },
-  { label: "Roblox #3", url: "/game-account_sale/roblox03.png" },
-  { label: "RoV #1", url: "/game-account_sale/rov1.png" },
-  { label: "RoV #2", url: "/game-account_sale/rov2.png" },
-  { label: "RoV #3", url: "/game-account_sale/rov3.png" },
+  { label: "Roblox #1", url: "/game-account_sale/roblox01.png" }, { label: "Roblox #2", url: "/game-account_sale/roblox02.png" }, { label: "Roblox #3", url: "/game-account_sale/roblox03.png" },
+  { label: "RoV #1", url: "/game-account_sale/rov1.png" }, { label: "RoV #2", url: "/game-account_sale/rov2.png" }, { label: "RoV #3", url: "/game-account_sale/rov3.png" },
 ];
 
 export default function AccountFormDrawer({ open, editingAccount, onClose, onSave }: AccountFormDrawerProps) {
@@ -76,11 +72,27 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
   };
 
   const handleSubmit = (isDraft = false) => {
-    const numPrice = Number(priceThb) || 450;
+    if (!title.trim()) {
+      alert("Please enter account title");
+      return;
+    }
+    const numPrice = Number(priceThb);
+    if (!numPrice || numPrice <= 0) {
+      alert("Please enter a valid price in THB (> 0)");
+      return;
+    }
+    if (!username.trim()) {
+      alert("Please enter account login username");
+      return;
+    }
+    if (!password.trim()) {
+      alert("Please enter account login password");
+      return;
+    }
     const defaultImg = INITIAL_GAME_ACCOUNTS[platform === "roblox" ? 0 : 1].imageUrl;
     onSave(
       {
-        title: title.trim() || "Roblox Blox Fruits Max Lvl + Godhuman Vault",
+        title: title.trim(),
         subtitle: emailStatus.trim() || "100% Clean ID • Instant Ownership",
         subIcon: "vpn_key",
         platform,
@@ -94,8 +106,8 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
         priceThb: numPrice,
         priceUsd: `~ $${(numPrice / 35).toFixed(2)} USD`,
         status,
-        username: username.trim() || "nexus_vault_user99",
-        password: password.trim() || "NexusSecret#2025",
+        username: username.trim(),
+        password: password.trim(),
         pin: pin.trim() || "None",
         tags,
       },

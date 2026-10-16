@@ -231,27 +231,33 @@ export function HomeView() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="home-account-preview-grid">
-          {accountProducts.slice(0, 4).map((acc) => (
-            <div key={acc.id} onClick={() => openAccountDetail(acc)} className="cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-indigo-300 transition group flex flex-col justify-between">
-              <div className="relative h-36 bg-slate-900 overflow-hidden">
-                <img src={acc.image} alt={acc.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap ${acc.game === 'Roblox' ? 'bg-indigo-600' : 'bg-red-600'}`}>{acc.game}</span>
-                <div className="absolute bottom-2 right-2 bg-white/95 px-2 py-0.5 rounded shadow text-xs font-black text-slate-900 whitespace-nowrap">฿{acc.price}</div>
-              </div>
-              <div className="p-3.5">
-                <h4 className="font-bold text-xs text-slate-900 line-clamp-2 group-hover:text-indigo-600 transition">{acc.title}</h4>
-                <div className="mt-2.5 flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-indigo-600 font-bold inline-flex items-center gap-1 whitespace-nowrap">
-                    <Eye className="w-3 h-3 shrink-0" />
-                    {tx('Details', 'ดูสเปค')}
-                  </span>
-                  <button type="button" onClick={(e) => { e.stopPropagation(); buyAccount(acc.id); }} className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[11px] font-bold whitespace-nowrap shrink-0 shadow-xs">
-                    {tx('Buy', 'ซื้อ')} ฿{acc.price}
-                  </button>
+          {accountProducts.length === 0 ? (
+            <div className="col-span-full py-10 text-center text-slate-400 bg-white rounded-2xl border border-slate-200 p-6">
+              <p className="text-xs font-semibold">{tx('New verified game accounts arriving soon. Check back shortly!', 'กำลังอัปเดตสต็อกไอดีเกมชุดใหม่เร็วๆ นี้ โปรดกลับมาตรวจสอบอีกครั้ง')}</p>
+            </div>
+          ) : (
+            accountProducts.slice(0, 4).map((acc) => (
+              <div key={acc.id} onClick={() => openAccountDetail(acc)} className="cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-indigo-300 transition group flex flex-col justify-between">
+                <div className="relative h-36 bg-slate-900 overflow-hidden">
+                  <img src={acc.image} alt={acc.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap ${acc.game === 'Roblox' ? 'bg-indigo-600' : 'bg-red-600'}`}>{acc.game}</span>
+                  <div className="absolute bottom-2 right-2 bg-white/95 px-2 py-0.5 rounded shadow text-xs font-black text-slate-900 whitespace-nowrap">฿{acc.price}</div>
+                </div>
+                <div className="p-3.5">
+                  <h4 className="font-bold text-xs text-slate-900 line-clamp-2 group-hover:text-indigo-600 transition">{acc.title}</h4>
+                  <div className="mt-2.5 flex items-center justify-between gap-2">
+                    <span className="text-[11px] text-indigo-600 font-bold inline-flex items-center gap-1 whitespace-nowrap">
+                      <Eye className="w-3 h-3 shrink-0" />
+                      {tx('Details', 'ดูสเปค')}
+                    </span>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); buyAccount(acc.id); }} className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[11px] font-bold whitespace-nowrap shrink-0 shadow-xs">
+                      {tx('Buy', 'ซื้อ')} ฿{acc.price}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </section>
     </div>

@@ -60,10 +60,18 @@ export default function BannerFormDrawer({ open, editingBanner, onClose, onSave,
   if (!open) return null;
 
   const handleSubmit = () => {
+    if (!title.trim()) {
+      alert("Please enter banner campaign title");
+      return;
+    }
+    if (!imageUrl.trim()) {
+      alert("Please provide or upload a banner image");
+      return;
+    }
     onSave({
-      title: title.trim() || "New Storefront Campaign Banner",
-      caption: caption.trim() || "Limited-time promotional bonus across all game packages.",
-      imageUrl: imageUrl.trim() || "/pic-banner-slide/roblox.webp",
+      title: title.trim(),
+      caption: caption.trim() || "Promotional banner",
+      imageUrl: imageUrl.trim(),
       targetUrl: targetUrl.trim() || "/topup",
       order: Number(order) || 1,
       scheduleLabel: schedule.trim() || "Always Active",

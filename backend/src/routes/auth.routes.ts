@@ -60,19 +60,7 @@ router.post('/register', async (req: Request, res: Response) => {
       .limit(1);
 
     if (existing) {
-      const userPayload = {
-        id: existing.id,
-        username: existing.username,
-        role: existing.role,
-        createdAt: existing.createdAt,
-      };
-      const token = jwt.sign(
-        { id: existing.id, username: existing.username, role: existing.role },
-        JWT_SECRET,
-        { expiresIn: '7d' }
-      );
-      setAuthCookie(res, token);
-      res.status(200).json({ token, user: userPayload });
+      res.status(409).json({ error: 'Username is already registered. Please sign in.' });
       return;
     }
 

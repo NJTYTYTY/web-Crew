@@ -152,7 +152,7 @@ export function AccountDetailModal() {
           </div>
 
           {/* Footer Action Buttons */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3">
             <button type="button" onClick={closeAccountDetail} className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition whitespace-nowrap">
               {tx('Close', 'ปิดหน้าต่าง')}
             </button>

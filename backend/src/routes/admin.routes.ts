@@ -1,63 +1,19 @@
 import { Router, Request, Response } from 'express';
-import { z } from 'zod';
 import { asc, desc, eq } from 'drizzle-orm';
 import {
   db, users, banners, gameAccounts, topupGames, topupPackages, orders, payments,
 } from '../db';
 import { requireAdmin } from '../middleware/auth';
+import {
+  accountSchema,
+  bannerSchema,
+  gameUpdateSchema,
+  orderUpdateSchema,
+  packageSchema,
+} from './admin.schemas';
 
 const router = Router();
 router.use(requireAdmin);
-
-const accountSchema = z.object({
-  gameCategory: z.enum(['ROBLOX', 'ROV']),
-  title: z.string().min(1),
-  description: z.string().optional().nullable(),
-  highlightTags: z.array(z.string()).default([]),
-  specs: z
-    .object({
-      levelOrRank: z.string().optional(),
-      heroesOrFruitsCount: z.string().optional(),
-      skinsOrWeaponsCount: z.string().optional(),
-      serverRegion: z.string().optional(),
-      emailStatus: z.string().optional(),
-    })
-    .optional()
-    .nullable(),
-  price: z.coerce.number().int().nonnegative(),
-  imageUrl: z.string().min(1),
-  accountUsername: z.string().min(1),
-  accountPassword: z.string().min(1),
-  status: z.enum(['AVAILABLE', 'RESERVED', 'SOLD']).default('AVAILABLE'),
-});
-
-const packageSchema = z.object({
-  gameId: z.coerce.number().int().positive(),
-  packageName: z.string().min(1),
-  bonusTag: z.string().optional().nullable(),
-  price: z.coerce.number().int().nonnegative(),
-  isActive: z.boolean().default(true),
-});
-
-const gameUpdateSchema = z.object({
-  name: z.string().min(1).optional(),
-  iconUrl: z.string().min(1).optional(),
-  inputMode: z.enum(['UID', 'ID_PASS']).optional(),
-  isActive: z.boolean().optional(),
-});
-
-const bannerSchema = z.object({
-  title: z.string().min(1),
-  imageUrl: z.string().min(1),
-  linkUrl: z.string().optional().nullable(),
-  sortOrder: z.coerce.number().int().default(1),
-  isActive: z.boolean().default(true),
-});
-
-const orderUpdateSchema = z.object({
-  status: z.enum(['PENDING', 'PAID', 'CANCELLED']).optional(),
-  fulfillmentStatus: z.enum(['PENDING', 'PROCESSING', 'COMPLETED', 'FAILED']).optional(),
-});
 
 // 1. GET /api/admin/overview
 router.get('/overview', async (_req: Request, res: Response) => {
@@ -70,17 +26,13 @@ router.get('/overview', async (_req: Request, res: Response) => {
     const allGames = await db.select().from(topupGames);
     const allUsers = await db.select({ id: users.id, username: users.username }).from(users);
 
-    const totalRevenue = allOrders
-      .filter((o) => o.status === 'PAID')
-      .reduce((sum, o) => sum + o.totalAmount, 0);
+    const totalRevenue = allOrders.filter((o) => o.status === 'PAID').reduce((sum, o) => sum + o.totalAmount, 0);
     const accountsSold = allAccounts.filter((a) => a.status === 'SOLD').length;
     const totalAccounts = allAccounts.length;
     const inStockAccounts = allAccounts.filter((a) => a.status === 'AVAILABLE').length;
     const rovAccountsCount = allAccounts.filter((a) => a.gameCategory === 'ROV').length;
     const robloxAccountsCount = allAccounts.filter((a) => a.gameCategory === 'ROBLOX').length;
-    const pendingTopups = allOrders.filter(
-      (o) => o.fulfillmentStatus !== 'COMPLETED' && o.status !== 'CANCELLED'
-    ).length;
+    const pendingTopups = allOrders.filter((o) => o.fulfillmentStatus !== 'COMPLETED' && o.status !== 'CANCELLED').length;
     const completedOrdersCount = allOrders.filter((o) => o.fulfillmentStatus === 'COMPLETED').length;
     const activeBannersList = allBanners.filter((b) => b.isActive);
     const activeBanners = activeBannersList.length;
@@ -148,20 +100,34 @@ const updateAccountHandler = async (req: Request, res: Response) => {
     res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid update payload' });
     return;
   }
-  const [updated] = await db
-    .update(gameAccounts)
-    .set(parsed.data)
-    .where(eq(gameAccounts.id, id))
-    .returning();
+  const [updated] = await db.update(gameAccounts).set(parsed.data).where(eq(gameAccounts.id, id)).returning();
   res.json({ account: updated });
 };
-router.patch('/accounts/:id', updateAccountHandler);
-router.put('/accounts/:id', updateAccountHandler);
+router.route('/accounts/:id').patch(updateAccountHandler).put(updateAccountHandler);
 
 router.delete('/accounts/:id', async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  await db.delete(gameAccounts).where(eq(gameAccounts.id, id));
-  res.json({ success: true });
+  try {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id) || id <= 0) {
+      res.status(400).json({ error: 'Invalid account ID' });
+      return;
+    }
+    const [existing] = await db.select().from(gameAccounts).where(eq(gameAccounts.id, id)).limit(1);
+    if (!existing) {
+      res.status(404).json({ error: 'Game account not found' });
+      return;
+    }
+    const tiedOrders = await db.select({ id: orders.id }).from(orders).where(eq(orders.gameAccountId, id)).limit(1);
+    if (tiedOrders.length > 0) {
+      res.status(409).json({ error: 'Cannot delete an account with existing orders. Mark status as SOLD instead.' });
+      return;
+    }
+    await db.delete(gameAccounts).where(eq(gameAccounts.id, id));
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete account error:', err);
+    res.status(500).json({ error: 'Failed to delete game account' });
+  }
 });
 
 // 3. Top-Up Games & Packages CRUD (/api/admin/topup)
@@ -175,13 +141,23 @@ router.get('/topup', async (_req: Request, res: Response) => {
 });
 
 router.post('/topup', async (req: Request, res: Response) => {
-  const parsed = packageSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid package payload' });
-    return;
+  try {
+    const parsed = packageSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid package payload' });
+      return;
+    }
+    const [game] = await db.select().from(topupGames).where(eq(topupGames.id, parsed.data.gameId)).limit(1);
+    if (!game) {
+      res.status(404).json({ error: 'Target top-up game not found' });
+      return;
+    }
+    const [created] = await db.insert(topupPackages).values(parsed.data).returning();
+    res.status(201).json({ package: created });
+  } catch (err) {
+    console.error('Create package error:', err);
+    res.status(500).json({ error: 'Failed to create top-up package' });
   }
-  const [created] = await db.insert(topupPackages).values(parsed.data).returning();
-  res.status(201).json({ package: created });
 });
 
 const updateGameHandler = async (req: Request, res: Response) => {
@@ -191,15 +167,10 @@ const updateGameHandler = async (req: Request, res: Response) => {
     res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid game update' });
     return;
   }
-  const [updated] = await db
-    .update(topupGames)
-    .set(parsed.data)
-    .where(eq(topupGames.slug, slug))
-    .returning();
+  const [updated] = await db.update(topupGames).set(parsed.data).where(eq(topupGames.slug, slug)).returning();
   res.json({ game: updated });
 };
-router.patch('/topup/games/:slug', updateGameHandler);
-router.put('/topup/games/:slug', updateGameHandler);
+router.route('/topup/games/:slug').patch(updateGameHandler).put(updateGameHandler);
 
 const updatePackageHandler = async (req: Request, res: Response) => {
   const id = Number(req.params.id);
@@ -208,20 +179,34 @@ const updatePackageHandler = async (req: Request, res: Response) => {
     res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid package update' });
     return;
   }
-  const [updated] = await db
-    .update(topupPackages)
-    .set(parsed.data)
-    .where(eq(topupPackages.id, id))
-    .returning();
+  const [updated] = await db.update(topupPackages).set(parsed.data).where(eq(topupPackages.id, id)).returning();
   res.json({ package: updated });
 };
-router.patch('/topup/:id', updatePackageHandler);
-router.put('/topup/:id', updatePackageHandler);
+router.route('/topup/:id').patch(updatePackageHandler).put(updatePackageHandler);
 
 router.delete('/topup/:id', async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  await db.delete(topupPackages).where(eq(topupPackages.id, id));
-  res.json({ success: true });
+  try {
+    const id = Number(req.params.id);
+    if (Number.isNaN(id) || id <= 0) {
+      res.status(400).json({ error: 'Invalid package ID' });
+      return;
+    }
+    const [existing] = await db.select().from(topupPackages).where(eq(topupPackages.id, id)).limit(1);
+    if (!existing) {
+      res.status(404).json({ error: 'Package not found' });
+      return;
+    }
+    const tiedOrders = await db.select({ id: orders.id }).from(orders).where(eq(orders.topupPackageId, id)).limit(1);
+    if (tiedOrders.length > 0) {
+      res.status(409).json({ error: 'Cannot delete package with past orders. Set active to false instead.' });
+      return;
+    }
+    await db.delete(topupPackages).where(eq(topupPackages.id, id));
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete package error:', err);
+    res.status(500).json({ error: 'Failed to delete top-up package' });
+  }
 });
 
 // 4. Orders, Top-Up Queue & Webhook Logs (/api/admin/orders)
@@ -296,8 +281,7 @@ const updateBannerHandler = async (req: Request, res: Response) => {
   const [updated] = await db.update(banners).set(parsed.data).where(eq(banners.id, id)).returning();
   res.json({ banner: updated });
 };
-router.patch('/banners/:id', updateBannerHandler);
-router.put('/banners/:id', updateBannerHandler);
+router.route('/banners/:id').patch(updateBannerHandler).put(updateBannerHandler);
 
 router.delete('/banners/:id', async (req: Request, res: Response) => {
   const id = Number(req.params.id);

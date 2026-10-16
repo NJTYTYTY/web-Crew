@@ -49,6 +49,14 @@ async function processVerifiedWebhook(
     return { statusCode: 404, body: { error: `Transaction ${transactionRef} not found` } };
   }
 
+  // Verify amount matches the order payment amount
+  if (payload.amount !== undefined && Math.abs(Number(payload.amount) - Number(payment.amount)) > 0.01) {
+    return {
+      statusCode: 400,
+      body: { error: `Amount mismatch: expected ${payment.amount} but received ${payload.amount}` },
+    };
+  }
+
   // Idempotency guard: if already SUCCESS, return 200 without re-executing side effects
   if (payment.status === 'SUCCESS') {
     const [existingOrder] = await db
@@ -126,6 +134,13 @@ async function processVerifiedWebhook(
       })
       .where(eq(orders.id, payment.orderId))
       .returning();
+
+    if (updatedOrder && updatedOrder.orderType === 'ACCOUNT' && updatedOrder.gameAccountId) {
+      await db
+        .update(gameAccounts)
+        .set({ status: 'AVAILABLE' })
+        .where(eq(gameAccounts.id, updatedOrder.gameAccountId));
+    }
 
     return {
       statusCode: 200,

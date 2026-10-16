@@ -121,24 +121,10 @@ export async function triggerIqBankSimulatorApi(payload: {
   status: 'SUCCESS' | 'FAILED';
   amount: number;
 }) {
-  try {
-    return await apiRequest<any>('/api/webhooks/iqbank/simulate', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-  } catch {
-    return await apiRequest<any>('/api/webhooks/iqbank', {
-      method: 'POST',
-      headers: { 'x-iqbank-signature': 'demo-simulator-bypass' },
-      body: JSON.stringify({
-        event: payload.status === 'SUCCESS' ? 'payment.succeeded' : 'payment.failed',
-        transactionRef: payload.transactionRef,
-        amount: payload.amount,
-        status: payload.status,
-        timestamp: new Date().toISOString(),
-      }),
-    });
-  }
+  return await apiRequest<any>('/api/webhooks/iqbank/simulate', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }
 
 export function normalizeBanners(res: any): BannerItem[] | null {

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Eye, ShoppingCart } from 'lucide-react';
+import { Eye, ShoppingBag, ShoppingCart } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -9,22 +9,31 @@ export function AccountMarketplaceView() {
   const { accountProducts, buyAccount, openAccountDetail } = useStore();
   const { tx } = useLanguage();
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'Roblox' | 'RoV'>('all');
+  const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'sold'>('all');
   const [sortOption, setSortOption] = useState<'featured' | 'price-asc' | 'price-desc'>('featured');
 
   const filteredAndSorted = useMemo(() => {
-    const base =
+    let base =
       categoryFilter === 'all'
         ? [...accountProducts]
         : accountProducts.filter((a) => a.game.toLowerCase() === categoryFilter.toLowerCase());
 
+    if (availabilityFilter === 'available') base = base.filter((a) => a.stock === 'in_stock');
+    if (availabilityFilter === 'sold') base = base.filter((a) => a.stock === 'sold_out');
+
     if (sortOption === 'price-asc') base.sort((a, b) => a.price - b.price);
     if (sortOption === 'price-desc') base.sort((a, b) => b.price - a.price);
     return base;
-  }, [accountProducts, categoryFilter, sortOption]);
+  }, [accountProducts, categoryFilter, availabilityFilter, sortOption]);
 
   const filterBtnClass = (cat: 'all' | 'Roblox' | 'RoV') =>
     `acc-filter px-3 py-1.5 rounded-lg transition whitespace-nowrap shrink-0 ${
       categoryFilter === cat ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+    }`;
+
+  const availBtnClass = (avail: 'all' | 'available' | 'sold') =>
+    `px-3 py-1.5 rounded-lg transition whitespace-nowrap shrink-0 ${
+      availabilityFilter === avail ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
     }`;
 
   return (
@@ -65,6 +74,19 @@ export function AccountMarketplaceView() {
                 </button>
               </div>
 
+              {/* Availability Filter */}
+              <div className="bg-slate-100 p-1 rounded-xl flex items-center space-x-1 text-xs font-bold overflow-x-auto hide-scrollbar max-w-full">
+                <button onClick={() => setAvailabilityFilter('all')} className={availBtnClass('all')}>
+                  {tx('All Stock', 'ทั้งหมด')}
+                </button>
+                <button onClick={() => setAvailabilityFilter('available')} className={availBtnClass('available')}>
+                  {tx('In Stock', 'พร้อมส่ง')}
+                </button>
+                <button onClick={() => setAvailabilityFilter('sold')} className={availBtnClass('sold')}>
+                  {tx('Sold Out', 'ขายแล้ว')}
+                </button>
+              </div>
+
               {/* Sort Dropdown */}
               <select
                 id="acc-sort"
@@ -80,8 +102,21 @@ export function AccountMarketplaceView() {
           </div>
         </div>
 
-        {/* Account Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="account-marketplace-grid">
+        {/* Account Cards Grid or Empty State */}
+        {filteredAndSorted.length === 0 ? (
+          <div className="py-16 text-center bg-white rounded-2xl border border-slate-200 p-8 shadow-xs">
+            <ShoppingBag className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-slate-800">{tx('No Game Accounts Found', 'ไม่พบไอดีเกมที่ตรงกับเงื่อนไข')}</h3>
+            <p className="text-xs text-slate-500 mt-1">{tx('Try resetting your filters or check back later.', 'ลองเปลี่ยนตัวกรอง หรือกลับมาตรวจสอบใหม่อีกครั้ง')}</p>
+            <button
+              onClick={() => { setCategoryFilter('all'); setAvailabilityFilter('all'); }}
+              className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-sm"
+            >
+              {tx('Reset Filters', 'รีเซ็ตตัวกรอง')}
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="account-marketplace-grid">
           {filteredAndSorted.map((acc) => {
             const isInStock = acc.stock === 'in_stock';
             return (
@@ -170,6 +205,7 @@ export function AccountMarketplaceView() {
             );
           })}
         </div>
+      )}
       </div>
     </div>
   );

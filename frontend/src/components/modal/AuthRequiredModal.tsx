@@ -25,10 +25,14 @@ export function AuthRequiredModal() {
       setErrorMsg(tx('Passwords do not match.', 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน'));
       return;
     }
-    if (mode === 'register') {
-      await register(username, password, confirmPassword);
-    } else {
-      await login(username, password);
+    try {
+      if (mode === 'register') {
+        await register(username, password, confirmPassword);
+      } else {
+        await login(username, password);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || tx('Authentication failed. Please try again.', 'เกิดข้อผิดพลาดในการยืนยันตัวตน โปรดลองอีกครั้ง'));
     }
   };
 

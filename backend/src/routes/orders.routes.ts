@@ -4,7 +4,7 @@ import { desc, eq } from 'drizzle-orm';
 import {
   db, orders, payments, gameAccounts, topupPackages, topupGames, users,
 } from '../db';
-import { optionalAuth } from '../middleware/auth';
+import { optionalAuth, requireAuth } from '../middleware/auth';
 
 const router = Router();
 
@@ -28,14 +28,8 @@ function buildPromptPayQrPayload(transactionRef: string, amount: number): string
   return `00020101021229370016A000000677010111011300668000000005802TH530376454${amtLen}${amtStr}621705${refLen}${transactionRef}6304IQBK`;
 }
 
-async function resolveUserId(req: Request): Promise<number> {
-  if (req.user?.id) return req.user.id;
-  const [fallbackUser] = await db.select().from(users).limit(1);
-  return fallbackUser ? fallbackUser.id : 1;
-}
-
 // POST /api/orders — Create order & dynamic QR payment
-router.post('/', optionalAuth, async (req: Request, res: Response) => {
+router.post('/', requireAuth, async (req: Request, res: Response) => {
   try {
     const parsed = createOrderSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -44,7 +38,7 @@ router.post('/', optionalAuth, async (req: Request, res: Response) => {
     }
 
     const { orderType, gameAccountId, topupPackageId, targetMetadata } = parsed.data;
-    const userId = await resolveUserId(req);
+    const userId = req.user!.id;
     let totalAmount = 0;
     let itemTitle = '';
 
@@ -62,17 +56,45 @@ router.post('/', optionalAuth, async (req: Request, res: Response) => {
         res.status(409).json({ error: 'This game account has already been sold' });
         return;
       }
+      if (account.status === 'RESERVED') {
+        res.status(409).json({ error: 'This game account is currently reserved for checkout' });
+        return;
+      }
       totalAmount = account.price;
       itemTitle = account.title;
+      await db.update(gameAccounts).set({ status: 'RESERVED' }).where(eq(gameAccounts.id, gameAccountId));
     } else {
       if (!topupPackageId) {
         res.status(400).json({ error: 'topupPackageId is required for TOPUP orders' });
         return;
       }
       const [pkg] = await db.select().from(topupPackages).where(eq(topupPackages.id, topupPackageId)).limit(1);
-      if (!pkg) {
-        res.status(404).json({ error: 'Top-up package not found' });
+      if (!pkg || !pkg.isActive) {
+        res.status(404).json({ error: 'Top-up package not found or inactive' });
         return;
+      }
+      const [game] = await db.select().from(topupGames).where(eq(topupGames.id, pkg.gameId)).limit(1);
+      if (!game || !game.isActive) {
+        res.status(404).json({ error: 'Game not found or inactive' });
+        return;
+      }
+      if (game.inputMode === 'UID') {
+        const uid = targetMetadata?.playerUid?.trim();
+        if (!uid || !/^[a-zA-Z0-9_-]{3,32}$/.test(uid)) {
+          res.status(400).json({ error: 'Valid player UID is required (3-32 characters)' });
+          return;
+        }
+      } else if (game.inputMode === 'ID_PASS') {
+        const robloxUser = targetMetadata?.robloxUsername?.trim();
+        const robloxPass = targetMetadata?.robloxPassword;
+        if (!robloxUser || robloxUser.length < 3) {
+          res.status(400).json({ error: 'Roblox username is required (minimum 3 characters)' });
+          return;
+        }
+        if (!robloxPass || robloxPass.length < 4) {
+          res.status(400).json({ error: 'Roblox password is required (minimum 4 characters)' });
+          return;
+        }
       }
       totalAmount = pkg.price;
       itemTitle = pkg.packageName;
@@ -119,9 +141,9 @@ router.post('/', optionalAuth, async (req: Request, res: Response) => {
 });
 
 // GET /api/orders — List customer orders (reveals credentials ONLY when status === 'PAID')
-router.get('/', optionalAuth, async (req: Request, res: Response) => {
+router.get('/', requireAuth, async (req: Request, res: Response) => {
   try {
-    const userId = await resolveUserId(req);
+    const userId = req.user!.id;
     const userOrders = await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
     const allPayments = await db.select().from(payments);
     const allAccounts = await db.select().from(gameAccounts);
@@ -174,8 +196,8 @@ router.get('/', optionalAuth, async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/orders/:id/status — Poll live payment & fulfillment status
-router.get('/:id/status', async (req: Request, res: Response) => {
+// GET /api/orders/:id/status — Poll live payment & fulfillment status (protects credentials from IDOR)
+router.get('/:id/status', optionalAuth, async (req: Request, res: Response) => {
   try {
     const param = String(req.params.id);
     const numericId = Number(param);
@@ -201,7 +223,8 @@ router.get('/:id/status', async (req: Request, res: Response) => {
     const [payment] = await db.select().from(payments).where(eq(payments.orderId, ord.id)).limit(1);
 
     let credentials = null;
-    if (ord.status === 'PAID' && ord.orderType === 'ACCOUNT' && ord.gameAccountId) {
+    const isAuthorized = req.user && (req.user.id === ord.userId || req.user.role === 'ADMIN');
+    if (ord.status === 'PAID' && ord.orderType === 'ACCOUNT' && ord.gameAccountId && isAuthorized) {
       const [acc] = await db
         .select({ accountUsername: gameAccounts.accountUsername, accountPassword: gameAccounts.accountPassword })
         .from(gameAccounts)

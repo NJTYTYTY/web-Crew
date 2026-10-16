@@ -47,12 +47,13 @@ router.get('/accounts', async (req: Request, res: Response) => {
       conditions.push(eq(gameAccounts.status, rawStatus));
     }
 
-    const orderByClause =
-      sort === 'price-asc'
-        ? [asc(gameAccounts.price), asc(gameAccounts.id)]
-        : sort === 'price-desc'
-          ? [desc(gameAccounts.price), asc(gameAccounts.id)]
-          : [asc(gameAccounts.id)];
+    const isAsc = sort === 'price-asc' || sort === 'low_high' || sort === 'low-high';
+    const isDesc = sort === 'price-desc' || sort === 'high_low' || sort === 'high-low';
+    const orderByClause = isAsc
+      ? [asc(gameAccounts.price), asc(gameAccounts.id)]
+      : isDesc
+        ? [desc(gameAccounts.price), asc(gameAccounts.id)]
+        : [asc(gameAccounts.id)];
 
     const rows = await db
       .select({

@@ -11,9 +11,10 @@ import {
 } from '@/data/mockStoreData';
 import {
   createOrderApi, fetchAccountsApi, fetchBannersApi, fetchMeApi, fetchOrdersApi,
-  fetchOrderStatusApi, fetchTopupGamesApi, getStoredUser, loginApi, logoutApi, normalizeAccounts,
+  fetchTopupGamesApi, getStoredUser, loginApi, logoutApi, normalizeAccounts,
   normalizeBanners, normalizeTopupGames, normalizeTopupGamesMeta, registerApi, setStoredToken, setStoredUser, triggerIqBankSimulatorApi,
 } from '@/lib/api';
+import { useStoreOrderSync } from './useStoreOrderSync';
 
 const StoreContext = createContext<StoreContextValue | undefined>(undefined);
 
@@ -94,53 +95,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('focus', onFocus);
   }, [refreshStoreCatalog]);
 
-  useEffect(() => {
-    const applyCrossTabSuccess = async (orderData?: ActiveOrder) => {
-      const ord = orderData || activeOrder;
-      if (ord.dbId) {
-        try {
-          const st = await fetchOrderStatusApi(ord.dbId);
-          const creds = st?.credentials || st?.order?.credentials;
-          if (creds?.accountUsername) {
-            setActiveOrder((prev) => ({ ...prev, username: creds.accountUsername, password: creds.accountPassword || prev.password }));
-          }
-        } catch {}
-      }
-      refreshStoreCatalog();
-      if (!window.location.pathname.startsWith('/iq-bank-simulator')) { setModalState('success'); setIsModalOpen(true); }
-    };
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === 'nexusplay_active_order' && e.newValue) { try { const p = JSON.parse(e.newValue); if (p?.txRef) setActiveOrder(p); } catch {} }
-      if (e.key === 'nexusplay_payment_event' && e.newValue) { try { const evt = JSON.parse(e.newValue); if (evt?.status === 'SUCCESS') applyCrossTabSuccess(evt.order); } catch {} }
-      refreshStoreCatalog();
-    };
-    let bc: BroadcastChannel | null = null;
-    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-      bc = new BroadcastChannel('nexusplay_payment_channel');
-      bc.onmessage = (ev) => {
-        if (ev.data?.type === 'ACTIVE_ORDER' && ev.data?.order) setActiveOrder(ev.data.order);
-        if (ev.data?.type === 'PAYMENT_SUCCESS') applyCrossTabSuccess(ev.data.order);
-      };
-    }
-    window.addEventListener('storage', onStorage);
-    return () => { window.removeEventListener('storage', onStorage); if (bc) bc.close(); };
-  }, [activeOrder, refreshStoreCatalog]);
-
-  useEffect(() => {
-    if (!isModalOpen || modalState !== 'waiting' || !activeOrder.dbId) return;
-    const timer = setInterval(async () => {
-      try {
-        const res = await fetchOrderStatusApi(activeOrder.dbId!);
-        if ((res?.status || res?.order?.status) === 'PAID') {
-          const creds = res?.credentials || res?.order?.credentials;
-          if (creds?.accountUsername) setActiveOrder((prev) => ({ ...prev, username: creds.accountUsername, password: creds.accountPassword || prev.password }));
-          setModalState('success');
-          refreshStoreCatalog();
-        }
-      } catch {}
-    }, 2000);
-    return () => clearInterval(timer);
-  }, [isModalOpen, modalState, activeOrder.dbId, refreshStoreCatalog]);
+  useStoreOrderSync({
+    isModalOpen,
+    modalState,
+    activeOrder,
+    setActiveOrder,
+    setModalState,
+    setIsModalOpen,
+    refreshStoreCatalog,
+  });
 
   const syncActiveOrder = (nextOrder: ActiveOrder) => {
     setActiveOrder(nextOrder);
@@ -193,28 +156,40 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     let txRef = 'IQB-TX-' + Math.floor(100000 + Math.random() * 900000);
     let dbId: number | undefined;
     try {
-      const res = await createOrderApi({ orderType: 'ACCOUNT', gameAccountId: acc.dbId ?? 1 });
-      id = res?.order?.orderNumber || id; dbId = res?.order?.id; txRef = res?.payment?.transactionRef || txRef;
-    } catch {}
-    syncActiveOrder({ id, dbId, txRef, title: acc.title, type: 'account', price: acc.price, username: acc.revealedUser, password: acc.revealedPass, date: 'Just now' });
+      const res = await createOrderApi({ orderType: 'ACCOUNT', gameAccountId: acc.dbId || Number(acc.id) });
+      id = res?.order?.orderNumber || id;
+      dbId = res?.order?.id;
+      txRef = res?.payment?.transactionRef || txRef;
+    } catch (err: any) {
+      alert(err.message || 'Failed to checkout account');
+      return;
+    }
+    syncActiveOrder({ id, dbId, txRef, title: acc.title, type: 'account', price: acc.price, username: '', password: '', date: 'Just now' });
     setSimLogs((prev) => [...prev, `[INFO] New pending order created. Active Ref: ${txRef} (฿${acc.price})`]);
     openModal('waiting');
   };
 
   const executeTopupCheckout = async () => {
+    if (!selectedPackage || !selectedPackage.dbId) return;
     const isIdPass = (topupGamesMeta[activeTopupGame]?.inputMode || (activeTopupGame === 'roblox' ? 'ID_PASS' : 'UID')) === 'ID_PASS';
     const gameLabel = topupGamesMeta[activeTopupGame]?.name || (activeTopupGame === 'roblox' ? 'Roblox Robux' : activeTopupGame === 'rov' ? 'RoV Coupons' : 'Free Fire Diamonds');
-    const price = selectedPackage ? selectedPackage.price : 95;
+    const price = selectedPackage.price;
     let id = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
     let txRef = 'IQB-TX-' + Math.floor(100000 + Math.random() * 900000);
     let dbId: number | undefined;
     try {
       const res = await createOrderApi({
-        orderType: 'TOPUP', topupPackageId: selectedPackage?.dbId ?? 1,
+        orderType: 'TOPUP',
+        topupPackageId: selectedPackage.dbId,
         targetMetadata: isIdPass ? { robloxUsername: robloxUser, robloxPassword: robloxPass } : { playerUid: uidInput },
       });
-      id = res?.order?.orderNumber || id; dbId = res?.order?.id; txRef = res?.payment?.transactionRef || txRef;
-    } catch {}
+      id = res?.order?.orderNumber || id;
+      dbId = res?.order?.id;
+      txRef = res?.payment?.transactionRef || txRef;
+    } catch (err: any) {
+      alert(err.message || 'Failed to checkout top-up');
+      return;
+    }
     syncActiveOrder({ id, dbId, txRef, title: `${gameLabel} - ${selectedPackage?.label || 'Package'}`, type: 'topup', price, username: isIdPass ? robloxUser : `UID: ${uidInput}`, date: 'Just now' });
     setSimLogs((prev) => [...prev, `[INFO] Standby for Top-Up payment dispatch. Active Ref: ${txRef}`]);
     openModal('waiting');
@@ -248,14 +223,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const login = async (username: string, password: string) => {
-    try { await applyAuthSession(await loginApi(username, password), username); }
-    catch { const u: UserProfile = { username, role: 'CUSTOMER' }; setUser(u); setStoredUser(u); }
+    const res = await loginApi(username, password);
+    await applyAuthSession(res, username);
     await finishAuthAndResume(pendingPurchase);
   };
 
   const register = async (username: string, password: string, confirmPassword: string) => {
-    try { await applyAuthSession(await registerApi(username, password, confirmPassword), username); }
-    catch { const u: UserProfile = { username, role: 'CUSTOMER' }; setUser(u); setStoredUser(u); }
+    const res = await registerApi(username, password, confirmPassword);
+    await applyAuthSession(res, username);
     await finishAuthAndResume(pendingPurchase);
   };
 

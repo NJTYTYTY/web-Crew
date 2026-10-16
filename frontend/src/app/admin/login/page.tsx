@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
-import { clearAdminSession, loginApi, setAdminSession } from "@/lib/api";
+import { clearAdminSession, loginApi, logoutApi, setAdminSession } from "@/lib/api";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -26,6 +26,7 @@ export default function AdminLoginPage() {
       const role = res?.user?.role;
       if (role !== "ADMIN") {
         clearAdminSession();
+        await logoutApi().catch(() => {});
         setErrorMessage(
           tx(
             "Access Denied: This account does not have ADMIN operator privileges.",
@@ -47,15 +48,9 @@ export default function AdminLoginPage() {
       setIsVerifying(false);
       router.replace("/admin");
     } catch (err: any) {
-      // Fallback only if backend is unreachable AND exact default admin credentials are provided
-      if (err?.message?.includes("Failed to fetch") && username.trim() === "admin_iq" && password === "admin123") {
-        setAdminSession({ username: "admin_iq", role: "ADMIN" }, "offline-admin-token");
-        setIsVerifying(false);
-        router.replace("/admin");
-        return;
-      }
       clearAdminSession();
       setErrorMessage(
+        err?.message ||
         tx(
           "Invalid operator username or password. Access attempt logged.",
           "รหัสผู้ดูแลระบบหรือรหัสผ่านไม่ถูกต้อง บันทึกความพยายามเข้าถึงแล้ว"

@@ -128,7 +128,7 @@ export function GameTopupView() {
                         <label className="block text-xs font-semibold text-slate-700 mb-1">{tx('Roblox Username', 'ชื่อผู้ใช้ Roblox (Username)')} <span className="text-red-500">*</span></label>
                         <div className="relative">
                           <input
-                            type="text" id="input-roblox-user" value={robloxUser} onChange={(e) => setRobloxUser(e.target.value)} placeholder="Roblox username"
+                            type="text" id="input-roblox-user" value={robloxUser} onChange={(e) => setRobloxUser(e.target.value)} placeholder={tx('Roblox username', 'ชื่อผู้ใช้ Roblox')}
                             className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition"
                           />
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><User className="w-4 h-4" /></div>
@@ -138,7 +138,7 @@ export function GameTopupView() {
                         <label className="block text-xs font-semibold text-slate-700 mb-1">{tx('Roblox Password', 'รหัสผ่าน Roblox (Password)')} <span className="text-red-500">*</span></label>
                         <div className="relative">
                           <input
-                            type="password" id="input-roblox-pass" value={robloxPass} onChange={(e) => setRobloxPass(e.target.value)} placeholder="Roblox password"
+                            type="password" id="input-roblox-pass" value={robloxPass} onChange={(e) => setRobloxPass(e.target.value)} placeholder={tx('Roblox password', 'รหัสผ่าน Roblox')}
                             className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition"
                           />
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Lock className="w-4 h-4" /></div>
@@ -159,28 +159,34 @@ export function GameTopupView() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3" id="topup-packages-container">
-                  {pkgs.map((pkg) => {
-                    const isSelected = selectedPackage?.id === pkg.id;
-                    return (
-                      <button
-                        key={pkg.id} type="button" onClick={() => selectPackage(pkg.id)} id={`pkg-btn-${pkg.id}`}
-                        className={`package-card text-left p-3.5 rounded-xl border-2 transition-all relative ${
-                          isSelected ? 'border-indigo-600 bg-indigo-50/60 shadow-xs' : 'border-slate-200 hover:border-slate-300 bg-white'
-                        }`}
-                      >
-                        {pkg.hot && (
-                          <span className="absolute -top-2.5 right-2 px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-600 text-white uppercase tracking-wider whitespace-nowrap">{tx('Popular', 'ขายดี')}</span>
-                        )}
-                        <div className="font-bold text-xs text-slate-900">{pkg.label}</div>
-                        {pkg.bonus ? (
-                          <div className="text-[10px] text-emerald-600 font-semibold">{pkg.bonus}</div>
-                        ) : (
-                          <div className="text-[10px] text-slate-400">{tx('Standard Delivery', 'จัดส่งมาตรฐาน')}</div>
-                        )}
-                        <div className="mt-2 text-sm font-black text-slate-900 whitespace-nowrap">฿{pkg.price}</div>
-                      </button>
-                    );
-                  })}
+                  {pkgs.length === 0 ? (
+                    <div className="col-span-full py-8 text-center text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200 p-4">
+                      <p className="text-xs font-semibold">{tx('No top-up packages currently available for this game.', 'ยังไม่มีแพ็กเกจเติมเงินสำหรับเกมนี้ในขณะนี้')}</p>
+                    </div>
+                  ) : (
+                    pkgs.map((pkg) => {
+                      const isSelected = selectedPackage?.id === pkg.id;
+                      return (
+                        <button
+                          key={pkg.id} type="button" onClick={() => selectPackage(pkg.id)} id={`pkg-btn-${pkg.id}`}
+                          className={`package-card text-left p-3.5 rounded-xl border-2 transition-all relative ${
+                            isSelected ? 'border-indigo-600 bg-indigo-50/60 shadow-xs' : 'border-slate-200 hover:border-slate-300 bg-white'
+                          }`}
+                        >
+                          {pkg.hot && (
+                            <span className="absolute -top-2.5 right-2 px-1.5 py-0.5 rounded text-[9px] font-black bg-indigo-600 text-white uppercase tracking-wider whitespace-nowrap">{tx('Popular', 'ขายดี')}</span>
+                          )}
+                          <div className="font-bold text-xs text-slate-900">{pkg.label}</div>
+                          {pkg.bonus ? (
+                            <div className="text-[10px] text-emerald-600 font-semibold">{pkg.bonus}</div>
+                          ) : (
+                            <div className="text-[10px] text-slate-400">{tx('Standard Delivery', 'จัดส่งมาตรฐาน')}</div>
+                          )}
+                          <div className="mt-2 text-sm font-black text-slate-900 whitespace-nowrap">฿{pkg.price}</div>
+                        </button>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </div>
@@ -204,13 +210,13 @@ export function GameTopupView() {
                     {isIdPassMode ? tx('Roblox User:', 'ชื่อผู้ใช้ Roblox:') : tx('Player UID:', 'หมายเลข UID:')}
                   </span>
                   <span className="font-mono font-bold text-slate-900 truncate max-w-[160px]" id="summary-account-val">
-                    {isIdPassMode ? robloxUser || 'Unspecified' : uidInput || 'Unspecified'}
+                    {isIdPassMode ? robloxUser || tx('Unspecified', 'ไม่ได้ระบุ') : uidInput || tx('Unspecified', 'ไม่ได้ระบุ')}
                   </span>
                 </div>
                 <div className="flex justify-between items-center gap-2">
                   <span className="text-slate-500 whitespace-nowrap">{tx('Selected Package:', 'แพ็กเกจที่เลือก:')}</span>
                   <span className="font-bold text-indigo-600 text-right" id="summary-package-name">
-                    {selectedPackage ? `${selectedPackage.label}${selectedPackage.bonus ? ` (${selectedPackage.bonus})` : ''}` : 'None'}
+                    {selectedPackage ? `${selectedPackage.label}${selectedPackage.bonus ? ` (${selectedPackage.bonus})` : ''}` : tx('None selected', 'ยังไม่ได้เลือก')}
                   </span>
                 </div>
                 <div className="flex justify-between items-center gap-2">
@@ -233,10 +239,39 @@ export function GameTopupView() {
                 </div>
               </div>
 
-              <button onClick={handleTopupCheckout} className="w-full py-3.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold rounded-xl shadow-md shadow-indigo-600/25 transition flex items-center justify-center space-x-2 whitespace-nowrap">
-                <QrCode className="w-4 h-4 shrink-0" />
-                <span>{tx('Confirm & Pay (PromptPay QR)', 'ยืนยันและสแกนจ่าย (PromptPay QR)')}</span>
-              </button>
+              {(() => {
+                const isUidValid = !isIdPassMode ? /^[a-zA-Z0-9_-]{3,32}$/.test(uidInput.trim()) : true;
+                const isIdPassValid = isIdPassMode ? (robloxUser.trim().length >= 3 && robloxPass.length >= 4) : true;
+                const canCheckout = pkgs.length > 0 && !!selectedPackage && isUidValid && isIdPassValid;
+                return (
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      disabled={!canCheckout}
+                      onClick={handleTopupCheckout}
+                      className={`w-full py-3.5 px-4 font-bold rounded-xl transition flex items-center justify-center space-x-2 whitespace-nowrap ${
+                        canCheckout
+                          ? 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white shadow-md shadow-indigo-600/25 cursor-pointer'
+                          : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      }`}
+                    >
+                      <QrCode className="w-4 h-4 shrink-0" />
+                      <span>{tx('Confirm & Pay (PromptPay QR)', 'ยืนยันและสแกนจ่าย (PromptPay QR)')}</span>
+                    </button>
+                    {!canCheckout && (
+                      <p className="text-[11px] text-amber-600 text-center font-medium">
+                        {!isUidValid
+                          ? tx('Please enter a valid Player UID (3-32 chars)', 'กรุณากรอก UID ให้ถูกต้อง (3-32 ตัวอักษร)')
+                          : !isIdPassValid
+                            ? tx('Please enter Roblox username (min 3) & password (min 4)', 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน Roblox ให้ครบถ้วน')
+                            : !selectedPackage
+                              ? tx('Please select a top-up package', 'กรุณาเลือกแพ็กเกจราคา')
+                              : tx('No packages available for this game', 'ไม่มีแพ็กเกจสำหรับเกมนี้')}
+                      </p>
+                    )}
+                  </div>
+                );
+              })()}
 
               <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-center space-x-2 text-[11px] text-slate-400">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />

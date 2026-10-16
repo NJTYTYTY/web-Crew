@@ -6,8 +6,7 @@ import { AdminBannerItem, INITIAL_ADMIN_BANNERS } from "@/data/mockAdminData";
 import BannerFormDrawer from "@/components/admin/banners/BannerFormDrawer";
 import AdminToast from "@/components/admin/AdminToast";
 import { useLanguage } from "@/context/LanguageContext";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { apiRequest } from "@/lib/api";
 
 export default function AdminBannersPage() {
   const { tx } = useLanguage();
@@ -28,8 +27,7 @@ export default function AdminBannersPage() {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/admin/banners`)
-      .then((r) => (r.ok ? r.json() : null))
+    apiRequest<any>("/api/admin/banners")
       .then((data) => {
         if (Array.isArray(data?.banners)) {
           const mapped: AdminBannerItem[] = data.banners.map((b: Record<string, unknown>, idx: number) => ({
@@ -53,7 +51,9 @@ export default function AdminBannersPage() {
           syncLocalBanners(mapped);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Fetch banners error:", err);
+      });
   }, []);
 
   const triggerToast = (title: string, message: string) => {
@@ -89,61 +89,66 @@ export default function AdminBannersPage() {
       );
       setBanners(next);
       syncLocalBanners(next);
-      fetch(`${API_BASE}/api/admin/banners/${editingBanner.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: data.title, imageUrl: data.imageUrl, linkUrl: data.targetUrl, sortOrder: data.order, isActive: data.active }),
-      }).catch(() => {});
-      triggerToast(tx("Banner Updated", "อัปเดตแบนเนอร์แล้ว"), tx(`Saved changes to "${data.title}".`, `บันทึกการแก้ไข "${data.title}" แล้ว`));
-    } else {
-      let createdId = `${Date.now()}`;
       try {
-        const res = await fetch(`${API_BASE}/api/admin/banners`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        await apiRequest<any>(`/api/admin/banners/${editingBanner.id}`, {
+          method: "PATCH",
           body: JSON.stringify({ title: data.title, imageUrl: data.imageUrl, linkUrl: data.targetUrl, sortOrder: data.order, isActive: data.active }),
         });
-        if (res.ok) {
-          const json = await res.json();
-          if (json?.banner?.id) createdId = String(json.banner.id);
-        }
-      } catch {
-        // Offline fallback
+        triggerToast(tx("Banner Updated", "อัปเดตแบนเนอร์แล้ว"), tx(`Saved changes to "${data.title}".`, `บันทึกการแก้ไข "${data.title}" แล้ว`));
+      } catch (err: any) {
+        triggerToast(tx("Update Failed", "อัปเดตไม่สำเร็จ"), err.message || "Failed to update banner");
       }
-      const newBan: AdminBannerItem = {
-        id: createdId, order: data.order, title: data.title, caption: data.caption,
-        badgeText: isExt ? "External" : "Active", badgeTone: isExt ? "external" : "active",
-        heroBadge: `Hero Slide #${data.order}`, targetUrl: data.targetUrl, isExternal: isExt,
-        scheduleLabel: data.scheduleLabel, scheduleIcon: "calendar_today", clicks: "0", ctr: "0.0% CTR",
-        active: data.active, imageUrl: data.imageUrl,
-      };
-      const next = [...banners, newBan];
-      setBanners(next);
-      syncLocalBanners(next);
-      triggerToast(tx("Banner Published", "เผยแพร่แบนเนอร์แล้ว"), tx(`Added "${data.title}" to storefront hero slider.`, `เพิ่ม "${data.title}" ลงในสไลด์หน้าแรกแล้ว`));
+    } else {
+      try {
+        const res = await apiRequest<any>("/api/admin/banners", {
+          method: "POST",
+          body: JSON.stringify({ title: data.title, imageUrl: data.imageUrl, linkUrl: data.targetUrl, sortOrder: data.order, isActive: data.active }),
+        });
+        const createdId = res?.banner?.id ? String(res.banner.id) : `${Date.now()}`;
+        const newBan: AdminBannerItem = {
+          id: createdId, order: data.order, title: data.title, caption: data.caption,
+          badgeText: isExt ? "External" : "Active", badgeTone: isExt ? "external" : "active",
+          heroBadge: `Hero Slide #${data.order}`, targetUrl: data.targetUrl, isExternal: isExt,
+          scheduleLabel: data.scheduleLabel, scheduleIcon: "calendar_today", clicks: "0", ctr: "0.0% CTR",
+          active: data.active, imageUrl: data.imageUrl,
+        };
+        const next = [...banners, newBan];
+        setBanners(next);
+        syncLocalBanners(next);
+        triggerToast(tx("Banner Published", "เผยแพร่แบนเนอร์แล้ว"), tx(`Added "${data.title}" to storefront hero slider.`, `เพิ่ม "${data.title}" ลงในสไลด์หน้าแรกแล้ว`));
+      } catch (err: any) {
+        triggerToast(tx("Publish Failed", "เผยแพร่ไม่สำเร็จ"), err.message || "Failed to create banner");
+      }
     }
     setDrawerOpen(false);
   };
 
-  const handleToggleBanner = (item: AdminBannerItem) => {
+  const handleToggleBanner = async (item: AdminBannerItem) => {
     const nextActive = !item.active;
     const next = banners.map((b) => (b.id === item.id ? { ...b, active: nextActive } : b));
     setBanners(next);
     syncLocalBanners(next);
-    fetch(`${API_BASE}/api/admin/banners/${item.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isActive: nextActive }),
-    }).catch(() => {});
-    triggerToast(tx("Banner Status Updated", "อัปเดตสถานะแบนเนอร์แล้ว"), tx(`Toggled visibility for "${item.title}".`, `สลับการแสดงผลของ "${item.title}" แล้ว`));
+    try {
+      await apiRequest<any>(`/api/admin/banners/${item.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ isActive: nextActive }),
+      });
+      triggerToast(tx("Banner Status Updated", "อัปเดตสถานะแบนเนอร์แล้ว"), tx(`Toggled visibility for "${item.title}".`, `สลับการแสดงผลของ "${item.title}" แล้ว`));
+    } catch (err: any) {
+      triggerToast(tx("Update Failed", "อัปเดตไม่สำเร็จ"), err.message || "Failed to toggle status");
+    }
   };
 
-  const handleDeleteBanner = (item: AdminBannerItem) => {
+  const handleDeleteBanner = async (item: AdminBannerItem) => {
     const next = banners.filter((b) => b.id !== item.id);
     setBanners(next);
     syncLocalBanners(next);
-    fetch(`${API_BASE}/api/admin/banners/${item.id}`, { method: "DELETE" }).catch(() => {});
-    triggerToast(tx("Banner Deleted", "ลบแบนเนอร์แล้ว"), tx(`Removed "${item.title}" from carousel.`, `ลบ "${item.title}" ออกจากสไลด์แล้ว`));
+    try {
+      await apiRequest<any>(`/api/admin/banners/${item.id}`, { method: "DELETE" });
+      triggerToast(tx("Banner Deleted", "ลบแบนเนอร์แล้ว"), tx(`Removed "${item.title}" from carousel.`, `ลบ "${item.title}" ออกจากสไลด์แล้ว`));
+    } catch (err: any) {
+      triggerToast(tx("Delete Failed", "ลบไม่สำเร็จ"), err.message || "Failed to delete banner");
+    }
   };
 
   return (

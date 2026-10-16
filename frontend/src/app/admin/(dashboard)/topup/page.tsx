@@ -8,8 +8,7 @@ import GatewayLatencyModal from "@/components/admin/packages/GatewayLatencyModal
 import GameLogoEditModal, { EditableGameProvider } from "@/components/admin/packages/GameLogoEditModal";
 import AdminToast from "@/components/admin/AdminToast";
 import { useLanguage } from "@/context/LanguageContext";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { apiRequest } from "@/lib/api";
 
 const INITIAL_PROVIDERS = [
   {
@@ -47,8 +46,7 @@ export default function AdminTopUpPage() {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/admin/topup`)
-      .then((r) => (r.ok ? r.json() : null))
+    apiRequest<any>("/api/admin/topup")
       .then((data) => {
         const dbGames = Array.isArray(data?.games) ? data.games : [];
         if (dbGames.length > 0) {
@@ -89,17 +87,23 @@ export default function AdminTopUpPage() {
           );
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Fetch topup error:", err);
+      });
   }, []);
 
   const handleSaveLogo = async (slug: "rov" | "freefire" | "roblox", data: { name: string; iconUrl: string; isActive: boolean }) => {
     setProviders((prev) => prev.map((p) => (p.id === slug ? { ...p, name: data.name, imageUrl: data.iconUrl } : p)));
     setProviderEnabled((prev) => ({ ...prev, [slug]: data.isActive }));
     setEditingLogoProv(null);
-    await fetch(`${API_BASE}/api/admin/topup/games/${slug}`, {
-      method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data),
-    }).catch(() => {});
-    triggerToast(tx("Game Logo Updated", "อัปเดตโลโก้เกมสำเร็จ"), tx(`${data.name} logo updated on Home 3-card fan and /topup.`, `อัปเดตโลโก้ ${data.name} บนหน้าแรกและหน้าเติมเกมแล้ว`));
+    try {
+      await apiRequest<any>(`/api/admin/topup/games/${slug}`, {
+        method: "PATCH", body: JSON.stringify(data),
+      });
+      triggerToast(tx("Game Logo Updated", "อัปเดตโลโก้เกมสำเร็จ"), tx(`${data.name} logo updated on Home 3-card fan and /topup.`, `อัปเดตโลโก้ ${data.name} บนหน้าแรกและหน้าเติมเกมแล้ว`));
+    } catch (err: any) {
+      triggerToast(tx("Update Failed", "อัปเดตไม่สำเร็จ"), err.message || "Failed to update game");
+    }
   };
 
   const handleSavePackage = async (data: { game: "Roblox" | "RoV" | "FreeFire"; name: string; denomination: string; cost: number; price: number; tag: string }) => {
@@ -107,33 +111,37 @@ export default function AdminTopUpPage() {
     const payload = { gameId, packageName: data.name, bonusTag: data.tag === "Standard" ? "" : data.tag, price: data.price, isActive: true };
 
     if (editingPkg) {
-      setPackages((prev) => prev.map((p) => (p.sku === editingPkg.sku ? { ...p, ...data } : p)));
       const numericId = Number(editingPkg.sku.replace(/\D/g, ""));
       if (numericId) {
-        await fetch(`${API_BASE}/api/admin/topup/${numericId}`, {
-          method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-        }).catch(() => {});
-      }
-      triggerToast(tx("SKU Updated", "อัปเดตแพ็กเกจแล้ว"), tx(`Updated ${editingPkg.sku} pricing on storefront.`, `อัปเดตราคาแพ็กเกจ ${editingPkg.sku} บนหน้าร้านแล้ว`));
-    } else {
-      const tempSku = `PKG-${Date.now()}`;
-      setPackages((prev) => [{
-        sku: tempSku, name: data.name, subtitle: `SKU: ${tempSku} • Ready`, icon: "diamond", iconStyle: "surface",
-        tag: data.tag, tagStyle: data.tag === "Standard" ? "standard" : "secondary",
-        cost: data.cost, price: data.price, denomination: data.denomination, game: data.game, active: true,
-      }, ...prev]);
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/topup`, {
-          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
-        });
-        if (res.ok) {
-          const json = await res.json();
-          if (json?.package?.id) setPackages((prev) => prev.map((p) => (p.sku === tempSku ? { ...p, sku: `PKG-${json.package.id}` } : p)));
+        try {
+          await apiRequest<any>(`/api/admin/topup/${numericId}`, {
+            method: "PATCH", body: JSON.stringify(payload),
+          });
+          setPackages((prev) => prev.map((p) => (p.sku === editingPkg.sku ? { ...p, ...data } : p)));
+          triggerToast(tx("SKU Updated", "อัปเดตแพ็กเกจแล้ว"), tx(`Updated ${editingPkg.sku} pricing on storefront.`, `อัปเดตราคาแพ็กเกจ ${editingPkg.sku} บนหน้าร้านแล้ว`));
+          setDrawerOpen(false);
+        } catch (err: any) {
+          triggerToast(tx("Update Failed", "อัปเดตไม่สำเร็จ"), err.message || "Failed to update package");
         }
-      } catch {}
-      triggerToast(tx("SKU Published", "เพิ่มแพ็กเกจสำเร็จ"), tx(`${data.name} added to live storefront.`, `เพิ่มแพ็กเกจ ${data.name} ลงหน้าร้านแล้ว`));
+      }
+    } else {
+      try {
+        const res = await apiRequest<any>("/api/admin/topup", {
+          method: "POST", body: JSON.stringify(payload),
+        });
+        const createdId = res?.package?.id;
+        const newSku = createdId ? `PKG-${createdId}` : `PKG-${Date.now()}`;
+        setPackages((prev) => [{
+          sku: newSku, name: data.name, subtitle: `SKU: ${newSku} • Ready`, icon: "diamond", iconStyle: "surface",
+          tag: data.tag, tagStyle: data.tag === "Standard" ? "standard" : "secondary",
+          cost: data.cost, price: data.price, denomination: data.denomination, game: data.game, active: true,
+        }, ...prev]);
+        triggerToast(tx("SKU Published", "เพิ่มแพ็กเกจสำเร็จ"), tx(`${data.name} added to live storefront.`, `เพิ่มแพ็กเกจ ${data.name} ลงหน้าร้านแล้ว`));
+        setDrawerOpen(false);
+      } catch (err: any) {
+        triggerToast(tx("Publish Failed", "เพิ่มแพ็กเกจไม่สำเร็จ"), err.message || "Failed to create package");
+      }
     }
-    setDrawerOpen(false);
   };
 
   return (
@@ -203,7 +211,7 @@ export default function AdminTopUpPage() {
                       <input checked={isEnabled} onChange={(e) => {
                         const nextVal = e.target.checked;
                         setProviderEnabled((prev) => ({ ...prev, [prov.id]: nextVal }));
-                        fetch(`${API_BASE}/api/admin/topup/games/${prov.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isActive: nextVal }) }).catch(() => {});
+                        apiRequest<any>(`/api/admin/topup/games/${prov.id}`, { method: "PATCH", body: JSON.stringify({ isActive: nextVal }) }).catch(() => {});
                         triggerToast(tx("Provider Status Updated", "อัปเดตสถานะค่ายเกมแล้ว"), tx(`${prov.name} set to ${nextVal ? "Active" : "Maintenance Mode"}.`, `ตั้งค่า ${prov.name} เป็น ${nextVal ? "เปิดใช้งาน" : "ปิดปรับปรุง"}`));
                       }} className="sr-only peer" type="checkbox" />
                       <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-surface-container-lowest after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:border-surface-container-high after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
@@ -239,16 +247,28 @@ export default function AdminTopUpPage() {
         onDelete={async (sku) => {
           setPackages((prev) => prev.filter((p) => p.sku !== sku));
           const numericId = Number(sku.replace(/\D/g, ""));
-          if (numericId) await fetch(`${API_BASE}/api/admin/topup/${numericId}`, { method: "DELETE" }).catch(() => {});
-          triggerToast(tx("Package Deleted", "ลบแพ็กเกจแล้ว"), tx(`Removed SKU ${sku} from catalog.`, `ลบแพ็กเกจ ${sku} ออกจากรายการแล้ว`));
+          if (numericId) {
+            try {
+              await apiRequest<any>(`/api/admin/topup/${numericId}`, { method: "DELETE" });
+              triggerToast(tx("Package Deleted", "ลบแพ็กเกจแล้ว"), tx(`Removed SKU ${sku} from catalog.`, `ลบแพ็กเกจ ${sku} ออกจากรายการแล้ว`));
+            } catch (err: any) {
+              triggerToast(tx("Delete Failed", "ลบแพ็กเกจไม่สำเร็จ"), err.message || "Failed to delete package");
+            }
+          }
         }}
         onToggleActive={async (sku) => {
           const target = packages.find((p) => p.sku === sku);
           const nextActive = target ? !target.active : true;
           setPackages((prev) => prev.map((p) => (p.sku === sku ? { ...p, active: nextActive } : p)));
           const numericId = Number(sku.replace(/\D/g, ""));
-          if (numericId) await fetch(`${API_BASE}/api/admin/topup/${numericId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isActive: nextActive }) }).catch(() => {});
-          triggerToast(tx("SKU Status Toggled", "เปลี่ยนสถานะแพ็กเกจแล้ว"), tx(`Updated availability for ${sku}.`, `อัปเดตสถานะการเปิดขายของ ${sku} แล้ว`));
+          if (numericId) {
+            try {
+              await apiRequest<any>(`/api/admin/topup/${numericId}`, { method: "PATCH", body: JSON.stringify({ isActive: nextActive }) });
+              triggerToast(tx("SKU Status Toggled", "เปลี่ยนสถานะแพ็กเกจแล้ว"), tx(`Updated availability for ${sku}.`, `อัปเดตสถานะการเปิดขายของ ${sku} แล้ว`));
+            } catch (err: any) {
+              triggerToast(tx("Update Failed", "อัปเดตไม่สำเร็จ"), err.message || "Failed to toggle status");
+            }
+          }
         }}
       />
 

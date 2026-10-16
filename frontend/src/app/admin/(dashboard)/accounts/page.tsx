@@ -6,8 +6,7 @@ import AccountsTable from "@/components/admin/accounts/AccountsTable";
 import AccountFormDrawer from "@/components/admin/accounts/AccountFormDrawer";
 import AdminToast from "@/components/admin/AdminToast";
 import { useLanguage } from "@/context/LanguageContext";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+import { apiRequest } from "@/lib/api";
 
 function mapDbAccountToAdmin(a: Record<string, any>, idx: number): AdminGameAccount {
   const isRov = a.gameCategory === "ROV" || a.platform === "rov";
@@ -54,12 +53,13 @@ export default function AdminAccountsPage() {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/admin/accounts`)
-      .then((r) => (r.ok ? r.json() : null))
+    apiRequest<any>("/api/admin/accounts")
       .then((data) => {
         if (Array.isArray(data?.accounts)) setAccounts(data.accounts.map(mapDbAccountToAdmin));
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Fetch accounts error:", err);
+      });
   }, []);
 
   const filteredAccounts = useMemo(() => {
@@ -83,10 +83,16 @@ export default function AdminAccountsPage() {
   const totalValueThb = accounts.filter((a) => a.status === "available").reduce((sum, a) => sum + a.priceThb, 0);
 
   const handleDelete = async (id: string, title: string) => {
-    setAccounts((prev) => prev.filter((a) => a.id !== id));
     const numericId = Number(id.replace(/\D/g, ""));
-    if (numericId) await fetch(`${API_BASE}/api/admin/accounts/${numericId}`, { method: "DELETE" }).catch(() => {});
-    triggerToast(tx("Listing Removed", "ลบรายการแล้ว"), tx(`Removed "${title}" from active inventory.`, `ลบ "${title}" ออกจากคลังแล้ว`));
+    if (numericId) {
+      try {
+        await apiRequest<any>(`/api/admin/accounts/${numericId}`, { method: "DELETE" });
+        setAccounts((prev) => prev.filter((a) => a.id !== id));
+        triggerToast(tx("Listing Removed", "ลบรายการแล้ว"), tx(`Removed "${title}" from active inventory.`, `ลบ "${title}" ออกจากคลังแล้ว`));
+      } catch (err: any) {
+        triggerToast(tx("Delete Failed", "ลบรายการไม่สำเร็จ"), err.message || "Failed to delete account");
+      }
+    }
   };
 
   const handleSaveAccount = async (data: Omit<AdminGameAccount, "id" | "code">, isDraft?: boolean) => {
@@ -110,36 +116,37 @@ export default function AdminAccountsPage() {
     };
 
     if (editingAccount) {
-      setAccounts((prev) => prev.map((a) => (a.id === editingAccount.id ? { ...a, ...data } : a)));
       const numericId = Number(editingAccount.id.replace(/\D/g, ""));
       if (numericId) {
         try {
-          const res = await fetch(`${API_BASE}/api/admin/accounts/${numericId}`, {
-            method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(syncPayload),
+          const res = await apiRequest<any>(`/api/admin/accounts/${numericId}`, {
+            method: "PUT",
+            body: JSON.stringify(syncPayload),
           });
-          if (res.ok) {
-            const json = await res.json();
-            if (json?.account) setAccounts((prev) => prev.map((a) => (a.id === editingAccount.id ? mapDbAccountToAdmin(json.account, numericId) : a)));
+          if (res?.account) {
+            setAccounts((prev) => prev.map((a) => (a.id === editingAccount.id ? mapDbAccountToAdmin(res.account, numericId) : a)));
           }
-        } catch {}
-      }
-      triggerToast(isDraft ? tx("Draft Saved", "บันทึกฉบับร่างแล้ว") : tx("Account Updated", "อัปเดตไอดีเกมแล้ว"), tx(`Changes to ${editingAccount.code} synced to live storefront.`, `บันทึกการแก้ไข ${editingAccount.code} ลงหน้าร้านแล้ว`));
-    } else {
-      const tempId = `${Date.now()}`;
-      const newCode = data.platform === "roblox" ? `#R-${Math.floor(Math.random() * 899 + 100)}` : `#ROV-${Math.floor(Math.random() * 899 + 100)}`;
-      setAccounts((prev) => [{ ...data, id: tempId, code: newCode }, ...prev]);
-      try {
-        const res = await fetch(`${API_BASE}/api/admin/accounts`, {
-          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(syncPayload),
-        });
-        if (res.ok) {
-          const json = await res.json();
-          if (json?.account) setAccounts((prev) => prev.map((a) => (a.id === tempId ? mapDbAccountToAdmin(json.account, json.account.id) : a)));
+          triggerToast(isDraft ? tx("Draft Saved", "บันทึกฉบับร่างแล้ว") : tx("Account Updated", "อัปเดตไอดีเกมแล้ว"), tx(`Changes to ${editingAccount.code} synced to live storefront.`, `บันทึกการแก้ไข ${editingAccount.code} ลงหน้าร้านแล้ว`));
+          setDrawerOpen(false);
+        } catch (err: any) {
+          triggerToast(tx("Update Failed", "อัปเดตไม่สำเร็จ"), err.message || "Failed to update account");
         }
-      } catch {}
-      triggerToast(isDraft ? tx("Draft Saved", "บันทึกฉบับร่างแล้ว") : tx("Account Published", "วางขายไอดีเกมแล้ว"), tx("Account safely encrypted in vault and listed on live storefront.", "บันทึกข้อมูลไอดีและเปิดขายบนหน้าร้านเรียบร้อยแล้ว"));
+      }
+    } else {
+      try {
+        const res = await apiRequest<any>("/api/admin/accounts", {
+          method: "POST",
+          body: JSON.stringify(syncPayload),
+        });
+        if (res?.account) {
+          setAccounts((prev) => [mapDbAccountToAdmin(res.account, res.account.id), ...prev]);
+        }
+        triggerToast(isDraft ? tx("Draft Saved", "บันทึกฉบับร่างแล้ว") : tx("Account Published", "วางขายไอดีเกมแล้ว"), tx("Account safely encrypted in vault and listed on live storefront.", "บันทึกข้อมูลไอดีและเปิดขายบนหน้าร้านเรียบร้อยแล้ว"));
+        setDrawerOpen(false);
+      } catch (err: any) {
+        triggerToast(tx("Publish Failed", "เพิ่มรายการไม่สำเร็จ"), err.message || "Failed to create account");
+      }
     }
-    setDrawerOpen(false);
   };
 
   return (
