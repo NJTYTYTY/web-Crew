@@ -5,6 +5,8 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost
 
 const TOKEN_KEY = 'nexus_play_token';
 const USER_KEY = 'nexus_play_user';
+const ADMIN_TOKEN_KEY = 'nexus_play_admin_token';
+const ADMIN_USER_KEY = 'nexus_play_admin_user';
 
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
@@ -37,9 +39,38 @@ export function setStoredUser(user: UserProfile | null): void {
   } catch {}
 }
 
+export function getAdminSession(): UserProfile | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(ADMIN_USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.role === 'ADMIN' && typeof parsed.username === 'string' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setAdminSession(user: UserProfile, token?: string | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(ADMIN_USER_KEY, JSON.stringify({ ...user, role: 'ADMIN' }));
+    if (token) window.localStorage.setItem(ADMIN_TOKEN_KEY, token);
+  } catch {}
+}
+
+export function clearAdminSession(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(ADMIN_USER_KEY);
+    window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+  } catch {}
+}
 
 export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getStoredToken();
+  const isAdminCall = path.startsWith('/api/admin') || (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin'));
+  const adminToken = typeof window !== 'undefined' ? window.localStorage.getItem(ADMIN_TOKEN_KEY) : null;
+  const token = (isAdminCall && adminToken) ? adminToken : getStoredToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> | undefined),

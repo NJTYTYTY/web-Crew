@@ -1,5 +1,5 @@
-export const APEX_ADMIN_LOGO_URL =
-  "https://lh3.googleusercontent.com/aida/AEtjO1XQkmaHs5f5F7m2A4e5llAtAuYyPHXMYN7SR5DWday6TJvrD9o5MQoWyRRHFCV47iT3LNZCSSW0yXPQaBowbhLw87JQ1bW4J783Eznq33rg7s52munazr7XZT3xythaPnsGC-rZ-J7xrFBBvmXMUU1-BtMNtddl7IyEAlwfgIlvknsMWmQ2NviauiFbS8e8YVeVDtretKV3jvkr3wwIreChYEdoJvoblnxX156horXtf-qdTRuLeEJMbw";
+export const NEXUS_ADMIN_LOGO_URL = "/logopic.webp";
+export const APEX_ADMIN_LOGO_URL = "/logopic.webp";
 
 export interface OverviewTransaction {
   id: string;

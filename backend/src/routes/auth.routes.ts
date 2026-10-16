@@ -127,16 +127,29 @@ router.post('/login', async (req: Request, res: Response) => {
       .limit(1);
 
     if (!found) {
-      const passwordHash = await bcrypt.hash(password, 10);
-      const isAdminName = username.toLowerCase().includes('admin') || username.toLowerCase().includes('operator');
-      [found] = await db
-        .insert(users)
-        .values({
-          username,
-          passwordHash,
-          role: isAdminName ? 'ADMIN' : 'CUSTOMER',
-        })
-        .returning();
+      // Only auto-seed if it matches one of the two default accounts and DB wasn't seeded yet
+      if (username === 'admin_iq' && password === 'admin123') {
+        const passwordHash = await bcrypt.hash(password, 10);
+        [found] = await db
+          .insert(users)
+          .values({ username: 'admin_iq', passwordHash, role: 'ADMIN' })
+          .returning();
+      } else if (username === 'alex_gamer' && password === 'password123') {
+        const passwordHash = await bcrypt.hash(password, 10);
+        [found] = await db
+          .insert(users)
+          .values({ username: 'alex_gamer', passwordHash, role: 'CUSTOMER' })
+          .returning();
+      } else {
+        res.status(401).json({ error: 'Invalid username or password' });
+        return;
+      }
+    } else {
+      const isPasswordValid = await bcrypt.compare(password, found.passwordHash);
+      if (!isPasswordValid) {
+        res.status(401).json({ error: 'Invalid username or password' });
+        return;
+      }
     }
 
     const userPayload = {

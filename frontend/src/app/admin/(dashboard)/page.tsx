@@ -86,7 +86,7 @@ export default function AdminOverviewPage() {
               </span>
             </div>
             <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
-              {tx("ApexPay Operations Command", "ศูนย์บัญชาการระบบ ApexPay")}
+              {tx("NEXUS PLAY Operations Command", "ศูนย์บัญชาการระบบ NEXUS PLAY")}
             </h1>
             <p className="font-body-md text-body-md text-on-surface-variant">
               {tx(
@@ -238,7 +238,7 @@ export default function AdminOverviewPage() {
         onExportCsv={() =>
           triggerToast(
             tx("CSV Export Ready", "ส่งออกไฟล์ CSV สำเร็จ"),
-            tx(`Exported ${transactions.length} transaction records to ApexPay-Ledger.csv`, `ส่งออกรายการธุรกรรมล่าสุด ${transactions.length} รายการไปยัง ApexPay-Ledger.csv`)
+            tx(`Exported ${transactions.length} transaction records to NexusPlay-Ledger.csv`, `ส่งออกรายการธุรกรรมล่าสุด ${transactions.length} รายการไปยัง NexusPlay-Ledger.csv`)
           )
         }
       />

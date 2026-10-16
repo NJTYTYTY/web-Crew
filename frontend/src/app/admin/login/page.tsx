@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
-import { loginApi, setStoredToken, setStoredUser } from "@/lib/api";
+import { clearAdminSession, loginApi, setAdminSession } from "@/lib/api";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -13,22 +13,57 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("admin123");
   const [showPassword, setShowPassword] = useState(false);
   const [showErrorBanner, setShowErrorBanner] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsVerifying(true);
+    setShowErrorBanner(false);
+    setErrorMessage("");
     try {
-      const res = await loginApi(username, password);
-      if (res?.token) setStoredToken(res.token);
-      setStoredUser({
-        id: res?.user?.id,
-        username: res?.user?.username || username,
-        role: res?.user?.role || "ADMIN",
-      });
-    } catch {}
-    setIsVerifying(false);
-    router.push("/admin");
+      const res = await loginApi(username.trim(), password);
+      const role = res?.user?.role;
+      if (role !== "ADMIN") {
+        clearAdminSession();
+        setErrorMessage(
+          tx(
+            "Access Denied: This account does not have ADMIN operator privileges.",
+            "ปฏิเสธการเข้าถึง: บัญชีนี้ไม่มีสิทธิ์ระดับผู้ดูแลระบบ (ADMIN)"
+          )
+        );
+        setShowErrorBanner(true);
+        setIsVerifying(false);
+        return;
+      }
+      setAdminSession(
+        {
+          id: res?.user?.id,
+          username: res?.user?.username || username.trim(),
+          role: "ADMIN",
+        },
+        res?.token
+      );
+      setIsVerifying(false);
+      router.replace("/admin");
+    } catch (err: any) {
+      // Fallback only if backend is unreachable AND exact default admin credentials are provided
+      if (err?.message?.includes("Failed to fetch") && username.trim() === "admin_iq" && password === "admin123") {
+        setAdminSession({ username: "admin_iq", role: "ADMIN" }, "offline-admin-token");
+        setIsVerifying(false);
+        router.replace("/admin");
+        return;
+      }
+      clearAdminSession();
+      setErrorMessage(
+        tx(
+          "Invalid operator username or password. Access attempt logged.",
+          "รหัสผู้ดูแลระบบหรือรหัสผ่านไม่ถูกต้อง บันทึกความพยายามเข้าถึงแล้ว"
+        )
+      );
+      setShowErrorBanner(true);
+      setIsVerifying(false);
+    }
   };
 
   return (
@@ -74,13 +109,11 @@ export default function AdminLoginPage() {
                   </button>
                 </div>
                 <p className="font-body-sm text-body-sm text-on-error-container mt-1">
-                  {tx(
-                    "Invalid operator credentials. Access attempt logged under IP ",
-                    "ข้อมูลผู้ดูแลระบบไม่ถูกต้อง บันทึกความพยายามเข้าถึงภายใต้ IP "
-                  )}
-                  <span className="font-label-sm text-label-sm font-semibold tracking-wider whitespace-nowrap">
-                    203.144.144.22
-                  </span>
+                  {errorMessage ||
+                    tx(
+                      "Invalid operator credentials. Access attempt logged under IP 203.144.144.22",
+                      "ข้อมูลผู้ดูแลระบบไม่ถูกต้อง บันทึกความพยายามเข้าถึงภายใต้ IP 203.144.144.22"
+                    )}
                 </p>
               </div>
             </div>
@@ -92,34 +125,37 @@ export default function AdminLoginPage() {
             <div className="flex items-center space-x-2 min-w-0">
               <span className="inline-block w-2 h-2 rounded-full bg-secondary-container animate-pulse shrink-0"></span>
               <span className="font-label-sm text-label-sm text-inverse-on-surface uppercase tracking-wider truncate">
-                {tx("Node: US-EAST-SECURE-09", "โหนด: US-EAST-SECURE-09")}
+                {tx("Node: NEXUS-TH-SECURE-01", "โหนด: NEXUS-TH-SECURE-01")}
               </span>
             </div>
             <div className="flex items-center space-x-1 text-surface-container-high whitespace-nowrap shrink-0">
               <span className="material-symbols-outlined text-[14px]">terminal</span>
               <span className="font-label-sm text-label-sm text-inverse-on-surface">
-                SYS.PORT 4438
+                PostgreSQL Live
               </span>
             </div>
           </div>
 
           <div className="p-6 sm:p-space-2xl flex flex-col">
             <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-primary flex items-center justify-center rounded-lg shadow-sm mb-space-md">
-                <span
-                  className="material-symbols-outlined text-on-primary text-[28px]"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  shield_person
+              <div className="w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center shadow-md shadow-indigo-500/20 mb-space-md border border-surface-container-high">
+                <img src="/logopic.webp" alt="NEXUS PLAY Logo" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex items-center gap-1.5 justify-center">
+                <span className="text-xl font-black tracking-tight text-slate-900">
+                  NEXUS<span className="text-indigo-600">PLAY</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-primary-fixed text-primary font-label-sm text-[10px] font-bold uppercase tracking-wider">
+                  ADMIN
                 </span>
               </div>
-              <h1 className="font-headline-lg text-headline-lg text-on-surface">
-                {tx("ApexPay Admin Console", "คอนโซลผู้ดูแลระบบ ApexPay")}
+              <h1 className="font-headline-md text-headline-md text-on-surface mt-1">
+                {tx("NEXUS PLAY Admin Console", "คอนโซลผู้ดูแลระบบ NEXUS PLAY")}
               </h1>
-              <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+              <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
                 {tx(
-                  "Direct Core Infrastructure Authentication",
-                  "ระบบยืนยันตัวตนโครงสร้างพื้นฐานหลักโดยตรง"
+                  "Direct Core Infrastructure & PostgreSQL Authentication",
+                  "ระบบยืนยันตัวตนผู้ดูแลระบบหลังบ้านและฐานข้อมูลหลัก"
                 )}
               </p>
               <div className="mt-space-md inline-flex items-center gap-1.5 px-space-md py-1 bg-surface-container text-on-surface-variant rounded-full whitespace-nowrap">
@@ -132,7 +168,7 @@ export default function AdminLoginPage() {
                 <span className="font-label-sm text-label-sm tracking-wide uppercase font-semibold text-error whitespace-nowrap">
                   {tx(
                     "Restricted Access • Internal Operator Only",
-                    "จำกัดสิทธิ์ • เฉพาะเจ้าหน้าที่ภายในเท่านั้น"
+                    "จำกัดสิทธิ์ • เฉพาะผู้ดูแลระบบเท่านั้น"
                   )}
                 </span>
               </div>
@@ -140,9 +176,12 @@ export default function AdminLoginPage() {
 
             <form className="mt-space-xl flex flex-col space-y-space-lg" onSubmit={handleSubmit}>
               <div className="flex flex-col space-y-1.5">
-                <label className="font-label-md text-label-md text-on-surface" htmlFor="adminUsername">
-                  {tx("Operator Identifier / UID", "รหัสประจำตัวผู้ดูแลระบบ / UID")}
-                </label>
+                <div className="flex items-center justify-between gap-2">
+                  <label className="font-label-md text-label-md text-on-surface" htmlFor="adminUsername">
+                    {tx("Operator Username", "ชื่อผู้ใช้ผู้ดูแลระบบ (Admin Username)")}
+                  </label>
+                  <span className="font-label-sm text-[11px] text-primary">Default: admin_iq</span>
+                </div>
                 <div className="relative flex items-center">
                   <span className="material-symbols-outlined absolute left-3 text-outline text-[18px] pointer-events-none">
                     badge
@@ -152,8 +191,8 @@ export default function AdminLoginPage() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     autoComplete="off"
-                    className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-colors"
-                    placeholder="operator.node@apexpay.internal"
+                    className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-colors"
+                    placeholder="admin_iq"
                     required
                     spellCheck={false}
                     type="text"
@@ -164,10 +203,10 @@ export default function AdminLoginPage() {
               <div className="flex flex-col space-y-1.5">
                 <div className="flex items-center justify-between gap-2">
                   <label className="font-label-md text-label-md text-on-surface whitespace-nowrap" htmlFor="adminPassword">
-                    {tx("Passcode & Hardware Key", "รหัสผ่านและฮาร์ดแวร์คีย์")}
+                    {tx("Admin Password", "รหัสผ่านผู้ดูแลระบบ")}
                   </label>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap shrink-0">
-                    {tx("RSA / YubiKey Ready", "รองรับ RSA / YubiKey")}
+                  <span className="font-label-sm text-[11px] text-primary whitespace-nowrap shrink-0">
+                    Default: admin123
                   </span>
                 </div>
                 <div className="relative flex items-center">
@@ -178,8 +217,8 @@ export default function AdminLoginPage() {
                     id="adminPassword"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-10 pl-9 pr-10 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-colors"
-                    placeholder="••••••••••••••••••••"
+                    className="w-full h-10 pl-9 pr-10 rounded-lg bg-surface-container-low font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-colors"
+                    placeholder="••••••••••••"
                     required
                     type={showPassword ? "text" : "password"}
                   />
@@ -206,29 +245,33 @@ export default function AdminLoginPage() {
                 </span>
                 <span className="whitespace-nowrap">
                   {isVerifying
-                    ? tx("Verifying Enclave...", "กำลังตรวจสอบสิทธิ์...")
-                    : tx("Sign In to Backoffice", "เข้าสู่ระบบหลังบ้าน")}
+                    ? tx("Verifying Admin Credentials...", "กำลังตรวจสอบสิทธิ์ผู้ดูแลระบบ...")
+                    : tx("Sign In to NEXUS PLAY Backoffice", "เข้าสู่ระบบหลังบ้าน NEXUS PLAY")}
                 </span>
               </button>
             </form>
 
             <div className="mt-space-xl pt-space-lg bg-surface-container-low rounded-lg p-space-md flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center space-x-2 whitespace-nowrap">
-                <span className="material-symbols-outlined text-primary text-[18px] shrink-0">dashboard</span>
+                <span className="material-symbols-outlined text-primary text-[18px] shrink-0">storefront</span>
                 <Link
                   className="font-label-md text-label-md text-primary hover:text-on-primary-fixed-variant transition-colors flex items-center gap-1 whitespace-nowrap"
-                  href="/admin"
+                  href="/"
                 >
-                  <span>{tx("View Live Dashboard", "ดูแดชบอร์ดสด")}</span>
+                  <span>{tx("Back to Storefront", "กลับสู่หน้าร้านค้า")}</span>
                   <span className="material-symbols-outlined text-[14px]">arrow_outward</span>
                 </Link>
               </div>
               <button
                 className="font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface bg-surface-container px-2.5 py-1 rounded transition-colors whitespace-nowrap shrink-0"
-                onClick={() => setShowErrorBanner((prev) => !prev)}
+                onClick={() => {
+                  setUsername("admin_iq");
+                  setPassword("admin123");
+                  setShowErrorBanner(false);
+                }}
                 type="button"
               >
-                {tx("Simulate Error State", "จำลองสถานะแจ้งเตือน")}
+                {tx("Fill Demo Admin", "กรอกรหัสแอดมินตัวอย่าง")}
               </button>
             </div>
           </div>
@@ -237,22 +280,13 @@ export default function AdminLoginPage() {
             <div className="flex items-center space-x-1.5 text-on-surface-variant whitespace-nowrap">
               <span className="material-symbols-outlined text-secondary text-[16px] shrink-0">verified_user</span>
               <span className="font-label-sm text-label-sm">
-                {tx("256-Bit SSL Secured", "ปลอดภัยด้วย 256-Bit SSL")}
+                {tx("256-Bit JWT & Bcrypt Secured", "ปลอดภัยด้วย JWT & Bcrypt")}
               </span>
             </div>
             <div className="font-label-sm text-label-sm text-on-surface-variant whitespace-nowrap">
-              {tx("IQ-Bank Automated Gateway Admin Node", "โหนดแอดมินเกตเวย์อัตโนมัติ IQ-Bank")}
+              {tx("NEXUS PLAY Automated Gateway", "เกตเวย์อัตโนมัติ NEXUS PLAY")}
             </div>
           </div>
-        </div>
-
-        <div className="max-w-md w-full text-center mt-space-lg px-space-md">
-          <p className="font-label-sm text-label-sm text-on-surface-variant leading-relaxed">
-            {tx(
-              "Notice: This system is restricted exclusively to authorized operators. Unauthorized connection attempts are automatically detected, captured, and reported.",
-              "ประกาศ: ระบบนี้จำกัดเฉพาะเจ้าหน้าที่ที่ได้รับอนุญาตเท่านั้น ความพยายามเชื่อมต่อโดยไม่ได้รับอนุญาตจะถูกตรวจจับและบันทึกโดยอัตโนมัติ"
-            )}
-          </p>
         </div>
       </div>
     </main>

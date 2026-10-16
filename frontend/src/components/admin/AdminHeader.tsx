@@ -2,9 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { APEX_ADMIN_LOGO_URL } from "@/data/mockAdminData";
 import { useLanguage } from "@/context/LanguageContext";
-import { getStoredUser } from "@/lib/api";
+import { clearAdminSession, getAdminSession, logoutApi } from "@/lib/api";
 
 interface AdminHeaderProps {
   onToggleMobileMenu?: () => void;
@@ -18,7 +17,7 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
   const [operatorName, setOperatorName] = useState("admin_iq");
 
   useEffect(() => {
-    const u = getStoredUser();
+    const u = getAdminSession();
     if (u?.username) setOperatorName(u.username);
   }, []);
 
@@ -27,6 +26,12 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
     if (globalQuery.trim()) {
       router.push(`/admin/orders?q=${encodeURIComponent(globalQuery.trim())}`);
     }
+  };
+
+  const handleSignOut = async () => {
+    clearAdminSession();
+    await logoutApi().catch(() => {});
+    router.replace("/admin/login");
   };
 
   return (
@@ -40,11 +45,14 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
         >
           <span className="material-symbols-outlined text-[20px]">menu</span>
         </button>
-        <img
-          alt="ApexPay Admin Logo"
-          className="h-7 sm:h-8 w-auto object-contain shrink-0 hidden sm:block"
-          src={APEX_ADMIN_LOGO_URL}
-        />
+        <div className="lg:hidden flex items-center gap-2 shrink-0">
+          <div className="w-8 h-8 rounded-lg overflow-hidden shadow-xs shrink-0">
+            <img alt="NEXUS PLAY" className="w-full h-full object-cover" src="/logopic.webp" />
+          </div>
+          <span className="hidden sm:inline text-sm font-extrabold tracking-tight text-slate-900">
+            NEXUS<span className="text-indigo-600">PLAY</span>
+          </span>
+        </div>
         <form onSubmit={handleSearchSubmit} className="relative flex items-center flex-1 max-w-xs sm:max-w-sm">
           <span className="material-symbols-outlined absolute left-3 text-[18px] text-outline pointer-events-none">
             search
@@ -88,13 +96,8 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
           </span>
         </div>
 
-        <div className="hidden md:flex items-center gap-space-xs px-space-sm py-space-xs rounded-xl bg-surface-container-low text-on-surface-variant whitespace-nowrap shrink-0">
-          <span className="material-symbols-outlined text-[16px] shrink-0">schedule</span>
-          <span className="font-label-sm text-label-sm whitespace-nowrap">UTC+7 LIVE</span>
-        </div>
-
         <div className="hidden sm:inline-flex items-center px-space-sm py-space-xs rounded-xl bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm whitespace-nowrap shrink-0">
-          {tx(`${operatorName}: ACTIVE`, `${operatorName}: ออนไลน์`)}
+          {tx(`${operatorName}: ADMIN`, `${operatorName}: แอดมิน`)}
         </div>
 
         <div className="relative shrink-0">
@@ -129,8 +132,8 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
               <div className="pt-2 space-y-2 font-body-sm text-body-sm">
                 <p className="text-on-surface font-medium">
                   {tx(
-                    "3 RoV orders awaiting manual OTP",
-                    "คำสั่งซื้อ RoV 3 รายการรอยืนยัน OTP"
+                    "NEXUS PLAY PostgreSQL connected",
+                    "เชื่อมต่อฐานข้อมูล NEXUS PLAY PostgreSQL แล้ว"
                   )}
                 </p>
                 <p className="text-on-surface-variant text-body-sm">
@@ -144,11 +147,16 @@ export default function AdminHeader({ onToggleMobileMenu }: AdminHeaderProps) {
           )}
         </div>
 
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
-          <span className="material-symbols-outlined text-on-primary text-[18px]">
-            person
+        <button
+          type="button"
+          onClick={handleSignOut}
+          className="w-9 h-9 rounded-xl bg-surface-container-low hover:bg-error-container/50 text-on-surface-variant hover:text-error flex items-center justify-center transition-colors shrink-0"
+          title={tx("Sign Out Admin", "ออกจากระบบแอดมิน")}
+        >
+          <span className="material-symbols-outlined text-[18px]">
+            logout
           </span>
-        </div>
+        </button>
       </div>
     </header>
   );
