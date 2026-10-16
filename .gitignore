@@ -12,9 +12,16 @@ backend/dist/
 # Environment variables
 .env
 .env.*
+.env.local
+frontend/.env
+frontend/.env.*
+frontend/.env.local
+backend/.env
+backend/.env.*
+backend/.env.local
 !.env.example
-frontend/.env*
-backend/.env*
+!frontend/.env.example
+!backend/.env.example
 
 # Logs
 npm-debug.log*
