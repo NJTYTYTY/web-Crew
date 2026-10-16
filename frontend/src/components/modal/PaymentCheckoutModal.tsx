@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import QRCode from 'qrcode';
 import {
   ArrowRight, Check, CheckCircle2, Clock, Download, ExternalLink, ShieldCheck, X,
 } from 'lucide-react';
@@ -15,6 +16,7 @@ export function PaymentCheckoutModal() {
 
   const [secondsLeft, setSecondsLeft] = useState(585);
   const [copiedLabel, setCopiedLabel] = useState<string | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isModalOpen) { setSecondsLeft(585); return; }
@@ -22,9 +24,41 @@ export function PaymentCheckoutModal() {
     return () => clearInterval(timer);
   }, [isModalOpen]);
 
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const payload =
+      activeOrder.qrPayload ||
+      `00020101021229370016A000000677010111011300668000000005802TH530376454${activeOrder.price
+        .toFixed(2)
+        .length.toString()
+        .padStart(2, '0')}${activeOrder.price.toFixed(2)}621705${activeOrder.txRef.length
+        .toString()
+        .padStart(2, '0')}${activeOrder.txRef}6304IQBK`;
+
+    QRCode.toDataURL(payload, {
+      width: 256,
+      margin: 1,
+      color: { dark: '#0f172a', light: '#ffffff' },
+    })
+      .then((url) => setQrDataUrl(url))
+      .catch((err) => console.error('Failed to generate QR:', err));
+  }, [isModalOpen, activeOrder.qrPayload, activeOrder.txRef, activeOrder.price]);
+
   if (!isModalOpen) return null;
 
   const formattedTime = `${Math.floor(secondsLeft / 60).toString().padStart(2, '0')}:${(secondsLeft % 60).toString().padStart(2, '0')}`;
+
+  const handleDownloadQr = () => {
+    if (!qrDataUrl) return;
+    const link = document.createElement('a');
+    link.href = qrDataUrl;
+    link.download = `PromptPay-QR-${activeOrder.txRef}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setCopiedLabel('qr');
+    setTimeout(() => setCopiedLabel(null), 1500);
+  };
 
   const copyToClipboard = (text: string, label: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
@@ -59,84 +93,78 @@ export function PaymentCheckoutModal() {
               </div>
             </div>
 
-            <div className="py-5 flex flex-col items-center">
-              <div className="bg-white p-4 rounded-2xl border-2 border-indigo-600/30 shadow-lg flex flex-col items-center relative group">
-                <div className="w-full bg-[#003d6b] text-white py-1 px-3 rounded-t-lg text-center text-[10px] font-bold tracking-wider mb-2 flex items-center justify-center space-x-1 whitespace-nowrap">
-                  <span>PROMPTPAY THAI QR PAYMENT</span>
+            {secondsLeft === 0 ? (
+              <div className="py-8 text-center space-y-3">
+                <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 mx-auto flex items-center justify-center font-bold text-lg">
+                  !
                 </div>
+                <h4 className="text-base font-bold text-slate-900">{tx('QR Code Expired', 'รหัส QR หมดอายุ')}</h4>
+                <p className="text-xs text-slate-500 max-w-xs mx-auto">
+                  {tx('The payment window has timed out. Please initiate a new order.', 'เวลาในการชำระเงินหมดลงแล้ว กรุณาสร้างคำสั่งซื้อใหม่')}
+                </p>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition"
+                >
+                  {tx('Close & Retry', 'ปิดและลองใหม่')}
+                </button>
+              </div>
+            ) : (
+              <div className="py-5 flex flex-col items-center">
+                <div className="bg-white p-4 rounded-2xl border-2 border-indigo-600/30 shadow-lg flex flex-col items-center relative group">
+                  <div className="w-full bg-[#003d6b] text-white py-1 px-3 rounded-t-lg text-center text-[10px] font-bold tracking-wider mb-2 flex items-center justify-center space-x-1 whitespace-nowrap">
+                    <span>PROMPTPAY THAI QR PAYMENT</span>
+                  </div>
 
-                <div className="w-48 h-48 sm:w-52 sm:h-52 bg-white flex items-center justify-center relative p-2 border border-slate-200 rounded-lg">
-                  <svg viewBox="0 0 100 100" className="w-full h-full text-slate-900" fill="currentColor">
-                    <rect x="0" y="0" width="30" height="30" rx="3" fill="#0f172a" />
-                    <rect x="4" y="4" width="22" height="22" rx="2" fill="#ffffff" />
-                    <rect x="8" y="8" width="14" height="14" rx="1" fill="#4f46e5" />
-                    <rect x="70" y="0" width="30" height="30" rx="3" fill="#0f172a" />
-                    <rect x="74" y="4" width="22" height="22" rx="2" fill="#ffffff" />
-                    <rect x="78" y="8" width="14" height="14" rx="1" fill="#4f46e5" />
-                    <rect x="0" y="70" width="30" height="30" rx="3" fill="#0f172a" />
-                    <rect x="4" y="74" width="22" height="22" rx="2" fill="#ffffff" />
-                    <rect x="8" y="78" width="14" height="14" rx="1" fill="#4f46e5" />
-                    <rect x="36" y="8" width="8" height="8" fill="#0f172a" />
-                    <rect x="48" y="8" width="8" height="8" fill="#0f172a" />
-                    <rect x="36" y="20" width="8" height="8" fill="#0f172a" />
-                    <rect x="48" y="20" width="8" height="8" fill="#0f172a" />
-                    <rect x="8" y="36" width="8" height="8" fill="#0f172a" />
-                    <rect x="8" y="48" width="8" height="8" fill="#0f172a" />
-                    <rect x="20" y="36" width="8" height="8" fill="#0f172a" />
-                    <rect x="20" y="48" width="8" height="8" fill="#0f172a" />
-                    <rect x="36" y="36" width="28" height="28" rx="2" fill="#10b981" />
-                    <rect x="44" y="44" width="12" height="12" fill="#ffffff" />
-                    <rect x="70" y="36" width="8" height="8" fill="#0f172a" />
-                    <rect x="84" y="36" width="8" height="8" fill="#0f172a" />
-                    <rect x="70" y="48" width="8" height="8" fill="#0f172a" />
-                    <rect x="84" y="48" width="8" height="8" fill="#0f172a" />
-                    <rect x="36" y="70" width="8" height="8" fill="#0f172a" />
-                    <rect x="48" y="70" width="8" height="8" fill="#0f172a" />
-                    <rect x="36" y="84" width="8" height="8" fill="#0f172a" />
-                    <rect x="48" y="84" width="8" height="8" fill="#0f172a" />
-                    <rect x="70" y="70" width="8" height="8" fill="#0f172a" />
-                    <rect x="84" y="70" width="8" height="8" fill="#0f172a" />
-                    <rect x="76" y="84" width="16" height="8" fill="#0f172a" />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="w-8 h-8 rounded-lg bg-white shadow-md border border-slate-200 flex items-center justify-center font-black text-xs text-indigo-600">IQ</div>
+                  <div className="w-48 h-48 sm:w-52 sm:h-52 bg-white flex items-center justify-center relative p-2 border border-slate-200 rounded-lg">
+                    {qrDataUrl ? (
+                      <img src={qrDataUrl} alt="PromptPay QR Code" className="w-full h-full object-contain" />
+                    ) : (
+                      <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-7 h-7 rounded bg-white shadow border border-slate-200 flex items-center justify-center font-black text-[10px] text-indigo-600">
+                        IQ
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full mt-3 flex items-center justify-between gap-2 text-xs text-slate-500">
+                    <span className="flex items-center space-x-1 font-mono whitespace-nowrap">
+                      <Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span id="qr-countdown" className="font-bold text-slate-800">{formattedTime}</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleDownloadQr}
+                      className="text-indigo-600 hover:text-indigo-800 font-bold flex items-center space-x-1 text-[11px] whitespace-nowrap shrink-0"
+                    >
+                      <Download className="w-3 h-3 shrink-0" />
+                      <span>{copiedLabel === 'qr' ? tx('QR Saved!', 'บันทึก QR แล้ว!') : tx('Download / Save QR', 'ดาวน์โหลดภาพ QR')}</span>
+                    </button>
                   </div>
                 </div>
 
-                <div className="w-full mt-3 flex items-center justify-between gap-2 text-xs text-slate-500">
-                  <span className="flex items-center space-x-1 font-mono whitespace-nowrap">
-                    <Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span id="qr-countdown" className="font-bold text-slate-800">{formattedTime}</span>
-                  </span>
+                <div className="w-full mt-4 bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center space-x-3">
+                  <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                  <div className="text-xs min-w-0">
+                    <div className="font-bold text-slate-800">{tx('Waiting for payment...', 'กำลังรอการชำระเงิน...')}</div>
+                    <div className="text-[11px] text-slate-500 truncate">{tx('Auto-detecting transaction from IQ-Bank Webhook', 'ระบบกำลังตรวจจับยอดโอนอัตโนมัติจาก IQ-Bank Webhook')}</div>
+                  </div>
+                </div>
+
+                <div className="w-full mt-4 pt-3 border-t border-slate-100">
                   <button
-                    type="button"
-                    onClick={() => copyToClipboard(activeOrder.txRef, 'qr')}
-                    className="text-indigo-600 hover:text-indigo-800 font-bold flex items-center space-x-1 text-[11px] whitespace-nowrap shrink-0"
+                    onClick={openSimulatorDirectly}
+                    className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 whitespace-nowrap"
                   >
-                    <Download className="w-3 h-3 shrink-0" />
-                    <span>{copiedLabel === 'qr' ? tx('QR Captured!', 'บันทึก QR แล้ว!') : tx('Download / Capture QR', 'ดาวน์โหลด / แคปภาพ QR')}</span>
+                    <ExternalLink className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{tx('Open IQ-Bank Demo Payment Simulator ↗', 'เปิดระบบจำลองการโอนเงิน IQ-Bank ↗')}</span>
                   </button>
                 </div>
               </div>
-
-              <div className="w-full mt-4 bg-slate-50 rounded-xl p-3 border border-slate-200 flex items-center space-x-3">
-                <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin shrink-0" />
-                <div className="text-xs min-w-0">
-                  <div className="font-bold text-slate-800">{tx('Waiting for payment...', 'กำลังรอการชำระเงิน...')}</div>
-                  <div className="text-[11px] text-slate-500 truncate">{tx('Auto-detecting transaction from IQ-Bank Webhook', 'ระบบกำลังตรวจจับยอดโอนอัตโนมัติจาก IQ-Bank Webhook')}</div>
-                </div>
-              </div>
-
-              <div className="w-full mt-4 pt-3 border-t border-slate-100">
-                <button
-                  onClick={openSimulatorDirectly}
-                  className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 whitespace-nowrap"
-                >
-                  <ExternalLink className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{tx('Open IQ-Bank Demo Payment Simulator ↗', 'เปิดระบบจำลองการโอนเงิน IQ-Bank ↗')}</span>
-                </button>
-              </div>
-            </div>
+            )}
           </div>
         )}
 

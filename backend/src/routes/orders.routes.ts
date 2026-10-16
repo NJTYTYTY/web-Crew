@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import {
   db, orders, payments, gameAccounts, topupPackages, topupGames, users,
 } from '../db';
@@ -47,22 +47,29 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
         res.status(400).json({ error: 'gameAccountId is required for ACCOUNT orders' });
         return;
       }
-      const [account] = await db.select().from(gameAccounts).where(eq(gameAccounts.id, gameAccountId)).limit(1);
-      if (!account) {
-        res.status(404).json({ error: 'Game account not found' });
+      // Atomic reservation to prevent TOCTOU race conditions
+      const [reservedAccount] = await db
+        .update(gameAccounts)
+        .set({ status: 'RESERVED' })
+        .where(and(eq(gameAccounts.id, gameAccountId), eq(gameAccounts.status, 'AVAILABLE')))
+        .returning();
+
+      if (!reservedAccount) {
+        const [existing] = await db.select().from(gameAccounts).where(eq(gameAccounts.id, gameAccountId)).limit(1);
+        if (!existing) {
+          res.status(404).json({ error: 'Game account not found' });
+          return;
+        }
+        res.status(409).json({
+          error:
+            existing.status === 'SOLD'
+              ? 'This game account has already been sold'
+              : 'This game account is currently reserved for checkout',
+        });
         return;
       }
-      if (account.status === 'SOLD') {
-        res.status(409).json({ error: 'This game account has already been sold' });
-        return;
-      }
-      if (account.status === 'RESERVED') {
-        res.status(409).json({ error: 'This game account is currently reserved for checkout' });
-        return;
-      }
-      totalAmount = account.price;
-      itemTitle = account.title;
-      await db.update(gameAccounts).set({ status: 'RESERVED' }).where(eq(gameAccounts.id, gameAccountId));
+      totalAmount = reservedAccount.price;
+      itemTitle = reservedAccount.title;
     } else {
       if (!topupPackageId) {
         res.status(400).json({ error: 'topupPackageId is required for TOPUP orders' });
@@ -135,6 +142,13 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
 
     res.status(201).json({ order: { ...createdOrder, title: itemTitle }, payment: createdPayment });
   } catch (err) {
+    if (req.body?.orderType === 'ACCOUNT' && req.body?.gameAccountId) {
+      await db
+        .update(gameAccounts)
+        .set({ status: 'AVAILABLE' })
+        .where(and(eq(gameAccounts.id, Number(req.body.gameAccountId)), eq(gameAccounts.status, 'RESERVED')))
+        .catch(() => {});
+    }
     console.error('Create order error:', err);
     res.status(500).json({ error: 'Failed to create order' });
   }

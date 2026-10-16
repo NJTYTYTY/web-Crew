@@ -155,16 +155,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     let id = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
     let txRef = 'IQB-TX-' + Math.floor(100000 + Math.random() * 900000);
     let dbId: number | undefined;
+    let qrPayload: string | undefined;
     try {
       const res = await createOrderApi({ orderType: 'ACCOUNT', gameAccountId: acc.dbId || Number(acc.id) });
       id = res?.order?.orderNumber || id;
       dbId = res?.order?.id;
       txRef = res?.payment?.transactionRef || txRef;
+      qrPayload = res?.payment?.qrPayload;
     } catch (err: any) {
       alert(err.message || 'Failed to checkout account');
       return;
     }
-    syncActiveOrder({ id, dbId, txRef, title: acc.title, type: 'account', price: acc.price, username: '', password: '', date: 'Just now' });
+    syncActiveOrder({ id, dbId, txRef, title: acc.title, type: 'account', price: acc.price, username: '', password: '', date: 'Just now', qrPayload });
     setSimLogs((prev) => [...prev, `[INFO] New pending order created. Active Ref: ${txRef} (฿${acc.price})`]);
     openModal('waiting');
   };
@@ -177,6 +179,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     let id = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
     let txRef = 'IQB-TX-' + Math.floor(100000 + Math.random() * 900000);
     let dbId: number | undefined;
+    let qrPayload: string | undefined;
     try {
       const res = await createOrderApi({
         orderType: 'TOPUP',
@@ -186,11 +189,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       id = res?.order?.orderNumber || id;
       dbId = res?.order?.id;
       txRef = res?.payment?.transactionRef || txRef;
+      qrPayload = res?.payment?.qrPayload;
     } catch (err: any) {
       alert(err.message || 'Failed to checkout top-up');
       return;
     }
-    syncActiveOrder({ id, dbId, txRef, title: `${gameLabel} - ${selectedPackage?.label || 'Package'}`, type: 'topup', price, username: isIdPass ? robloxUser : `UID: ${uidInput}`, date: 'Just now' });
+    syncActiveOrder({ id, dbId, txRef, title: `${gameLabel} - ${selectedPackage?.label || 'Package'}`, type: 'topup', price, username: isIdPass ? robloxUser : `UID: ${uidInput}`, date: 'Just now', qrPayload });
     setSimLogs((prev) => [...prev, `[INFO] Standby for Top-Up payment dispatch. Active Ref: ${txRef}`]);
     openModal('waiting');
   };
@@ -241,22 +245,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const triggerWebhookSuccess = async () => {
-    await triggerIqBankSimulatorApi({ transactionRef: activeOrder.txRef, status: 'SUCCESS', amount: activeOrder.price }).catch(() => {});
-    setSimLogs((prev) => [...prev, '[WEBHOOK DISPATCH] POST /api/webhooks/iqbank HTTP/1.1 (200 OK)', `[IQ-BANK SUCCESS] Payment verified for ${activeOrder.txRef}. Amount: ฿${activeOrder.price} — Storefront tab updated!`]);
-    refreshStoreCatalog();
     try {
-      localStorage.setItem('nexusplay_payment_event', JSON.stringify({ status: 'SUCCESS', txRef: activeOrder.txRef, order: activeOrder, ts: Date.now() }));
-      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        const bc = new BroadcastChannel('nexusplay_payment_channel');
-        bc.postMessage({ type: 'PAYMENT_SUCCESS', order: activeOrder }); bc.close();
-      }
-    } catch {}
-    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/iq-bank-simulator')) openModal('success');
+      await triggerIqBankSimulatorApi({ transactionRef: activeOrder.txRef, status: 'SUCCESS', amount: activeOrder.price });
+      setSimLogs((prev) => [...prev, '[WEBHOOK DISPATCH] POST /api/webhooks/iqbank HTTP/1.1 (200 OK)', `[IQ-BANK SUCCESS] Payment verified for ${activeOrder.txRef}. Amount: ฿${activeOrder.price} — Storefront tab updated!`]);
+      refreshStoreCatalog();
+      try {
+        localStorage.setItem('nexusplay_payment_event', JSON.stringify({ status: 'SUCCESS', txRef: activeOrder.txRef, order: activeOrder, ts: Date.now() }));
+        if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+          const bc = new BroadcastChannel('nexusplay_payment_channel');
+          bc.postMessage({ type: 'PAYMENT_SUCCESS', order: activeOrder }); bc.close();
+        }
+      } catch {}
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/iq-bank-simulator')) openModal('success');
+    } catch (err: any) {
+      setSimLogs((prev) => [...prev, `[WEBHOOK DISPATCH ERROR] Failed to trigger payment: ${err.message || 'Error'}`]);
+      throw err;
+    }
   };
 
   const triggerWebhookFailed = async () => {
-    await triggerIqBankSimulatorApi({ transactionRef: activeOrder.txRef, status: 'FAILED', amount: activeOrder.price }).catch(() => {});
-    setSimLogs((prev) => [...prev, '[WEBHOOK ERROR] Transaction canceled or expired by user bank app.']);
+    try {
+      await triggerIqBankSimulatorApi({ transactionRef: activeOrder.txRef, status: 'FAILED', amount: activeOrder.price });
+      setSimLogs((prev) => [...prev, '[WEBHOOK DISPATCH] Transaction canceled or expired by user bank app.']);
+    } catch (err: any) {
+      setSimLogs((prev) => [...prev, `[WEBHOOK ERROR] Failed to trigger cancellation: ${err.message || 'Error'}`]);
+      throw err;
+    }
   };
 
   const revealOrderCredentials = (u: string, p: string, title?: string) => {
@@ -279,7 +293,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       uidInput, setUidInput, robloxUser, setRobloxUser, robloxPass, setRobloxPass,
       selectTopupGame, selectPackage, handleTopupCheckout, buyAccount,
       customerOrders, seedNewDemoOrder, revealOrderCredentials,
-      isModalOpen, modalState, activeOrder, openModal, closeModal, setModalState,
+      isModalOpen, modalState, activeOrder, syncActiveOrder, openModal, closeModal, setModalState,
       openSimulatorDirectly, simLogs, simulateQRUpload, triggerWebhookSuccess, triggerWebhookFailed,
       selectedAccountForDetail, openAccountDetail, closeAccountDetail, isAuthPromptOpen, closeAuthPrompt,
     }}>

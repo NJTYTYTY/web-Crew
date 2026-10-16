@@ -107,7 +107,9 @@ export default function AdminTopUpPage() {
   };
 
   const handleSavePackage = async (data: { game: "Roblox" | "RoV" | "FreeFire"; name: string; denomination: string; cost: number; price: number; tag: string }) => {
-    const gameId = data.game === "RoV" ? 1 : data.game === "FreeFire" ? 2 : 3;
+    const targetSlug = data.game === "RoV" ? "rov" : data.game === "FreeFire" ? "freefire" : "roblox";
+    const foundProv = providers.find((p) => p.id === targetSlug);
+    const gameId = (foundProv as any)?.dbGameId || (data.game === "RoV" ? 1 : data.game === "FreeFire" ? 2 : 3);
     const payload = { gameId, packageName: data.name, bonusTag: data.tag === "Standard" ? "" : data.tag, price: data.price, isActive: true };
 
     if (editingPkg) {

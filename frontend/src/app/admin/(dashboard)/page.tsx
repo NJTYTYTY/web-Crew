@@ -68,6 +68,37 @@ export default function AdminOverviewPage() {
     }, 600);
   };
 
+  const handleExportTransactionsCsv = () => {
+    if (!transactions || transactions.length === 0) {
+      triggerToast(tx("No transactions to export", "ไม่มีรายการธุรกรรมสำหรับส่งออก"), "");
+      return;
+    }
+    const headers = ["Order ID", "Customer", "Item / Game", "Amount", "IQ-Bank Ref", "Status", "Timestamp"];
+    const rows = transactions.map((t) => [
+      `"${t.id.replace(/"/g, '""')}"`,
+      `"${t.customerName.replace(/"/g, '""')}"`,
+      `"${t.gameSku.replace(/"/g, '""')}"`,
+      `"${t.amount.replace(/"/g, '""')}"`,
+      `"${t.iqBankRef.replace(/"/g, '""')}"`,
+      `"${t.status}"`,
+      `"${t.timestamp}"`,
+    ]);
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "NexusPlay-Ledger.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    triggerToast(
+      tx("CSV Export Ready", "ส่งออกไฟล์ CSV สำเร็จ"),
+      tx(`Exported ${transactions.length} transaction records to NexusPlay-Ledger.csv`, `ส่งออกรายการธุรกรรมล่าสุด ${transactions.length} รายการไปยัง NexusPlay-Ledger.csv`)
+    );
+  };
+
   return (
     <div className="flex flex-col w-full px-4 sm:px-6 lg:px-gutter-desktop py-space-xl gap-space-xl">
       {/* Top Welcome Banner & System Health */}
@@ -235,12 +266,7 @@ export default function AdminOverviewPage() {
       <RecentTransactionsTable
         transactions={transactions}
         onInspect={(txn) => setSelectedTxn(txn)}
-        onExportCsv={() =>
-          triggerToast(
-            tx("CSV Export Ready", "ส่งออกไฟล์ CSV สำเร็จ"),
-            tx(`Exported ${transactions.length} transaction records to NexusPlay-Ledger.csv`, `ส่งออกรายการธุรกรรมล่าสุด ${transactions.length} รายการไปยัง NexusPlay-Ledger.csv`)
-          )
-        }
+        onExportCsv={handleExportTransactionsCsv}
       />
 
       {/* Sticky Quick Actions Toolbar */}

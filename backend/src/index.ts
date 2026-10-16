@@ -19,7 +19,14 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json({ limit: '15mb' }));
+app.use(
+  express.json({
+    limit: '15mb',
+    verify: (req: any, _res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 
 // Health Check Endpoint
 app.get('/api/health', (_req: Request, res: Response) => {
@@ -50,7 +57,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 NEXUS PLAY Backend listening on http://localhost:${PORT}`);
+  console.log(`NEXUS PLAY Backend listening on http://localhost:${PORT}`);
 });
 
 const shutdown = () => {

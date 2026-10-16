@@ -120,6 +120,7 @@ export interface StoreContextValue {
   isModalOpen: boolean;
   modalState: ModalStateName;
   activeOrder: ActiveOrder;
+  syncActiveOrder: (nextOrder: ActiveOrder) => void;
   openModal: (state?: ModalStateName) => void;
   closeModal: () => void;
   setModalState: (state: ModalStateName) => void;

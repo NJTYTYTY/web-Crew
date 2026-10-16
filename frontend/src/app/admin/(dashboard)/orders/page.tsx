@@ -55,6 +55,48 @@ export default function AdminOrdersPage() {
     });
   }, [orders, searchVal, typeFilter, paymentFilter, fulfillmentFilter]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const totalPages = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchVal, typeFilter, paymentFilter, fulfillmentFilter]);
+
+  const pagedOrders = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredOrders.slice(start, start + pageSize);
+  }, [filteredOrders, currentPage, pageSize]);
+
+  const handleExportCsv = (dataToExport: typeof orders, filename = "orders-export.csv") => {
+    if (!dataToExport || dataToExport.length === 0) {
+      showToast(tx("No records to export", "ไม่มีข้อมูลสำหรับส่งออก"));
+      return;
+    }
+    const headers = ["Order ID", "Customer", "Type", "Target / Item", "Amount (THB)", "IQ-Bank Ref", "Payment Status", "Fulfillment Status"];
+    const rows = dataToExport.map((o) => [
+      `"${o.id.replace(/"/g, '""')}"`,
+      `"${o.customerName.replace(/"/g, '""')}"`,
+      `"${o.type}"`,
+      `"${(o.targetTitle + ' ' + o.targetSubtitle).replace(/"/g, '""')}"`,
+      o.amount.toFixed(2),
+      `"${o.iqRef.replace(/"/g, '""')}"`,
+      `"${o.payment}"`,
+      `"${o.fulfillment}"`,
+    ]);
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\r\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast(tx(`Exported ${dataToExport.length} orders to ${filename}`, `ส่งออก ${dataToExport.length} รายการไปยัง ${filename} สำเร็จ`));
+  };
+
   const handleCopy = (text: string, customMsg?: string) => {
     if (typeof navigator !== "undefined" && navigator.clipboard) navigator.clipboard.writeText(text);
     showToast(customMsg || `${tx("Copied", "คัดลอกแล้ว")}: ${text}`);
@@ -119,7 +161,7 @@ export default function AdminOrdersPage() {
             <span className={`material-symbols-outlined text-[18px] ${isRefreshing ? "animate-spin" : ""}`}>sync</span>
             <span>{tx("Force Sync", "บังคับซิงค์")}</span>
           </button>
-          <button type="button" onClick={() => showToast(tx(`Exporting ${orders.length} records to IQ-Bank-Audit-Logs.csv`, `กำลังส่งออก ${orders.length} รายการไปยัง IQ-Bank-Audit-Logs.csv`))} className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-primary text-on-primary hover:bg-primary-container text-label-md font-label-md transition-all shadow-sm whitespace-nowrap shrink-0">
+          <button type="button" onClick={() => handleExportCsv(orders, "IQ-Bank-Audit-Logs.csv")} className="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-primary text-on-primary hover:bg-primary-container text-label-md font-label-md transition-all shadow-sm whitespace-nowrap shrink-0">
             <span className="material-symbols-outlined text-[18px]">file_download</span>
             <span>{tx("Export Logs", "ส่งออกล็อก")}</span>
           </button>
@@ -213,7 +255,7 @@ export default function AdminOrdersPage() {
               </tr>
             </thead>
             <tbody className="text-on-surface font-body-sm text-body-sm">
-              {filteredOrders.map((row) => (
+              {pagedOrders.map((row) => (
                 <tr key={row.id} className="h-14 bg-surface-container-lowest hover:bg-surface-container-low/60 transition-colors">
                   <td className="px-space-md font-label-md text-label-md font-semibold text-primary whitespace-nowrap">#{row.id}</td>
                   <td className="px-space-md whitespace-nowrap">
@@ -260,16 +302,41 @@ export default function AdminOrdersPage() {
 
         <div className="p-space-md bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-sm text-label-sm text-on-surface-variant">
           <div className="flex items-center gap-space-sm whitespace-nowrap">
-            <span>{tx("Showing", "แสดง")} <strong className="text-on-surface">{filteredOrders.length}</strong> {tx(`of ${orders.length} records`, `จาก ${orders.length} รายการ`)}</span>
+            <span>{tx("Showing", "แสดง")} <strong className="text-on-surface">{Math.min(filteredOrders.length, pagedOrders.length)}</strong> {tx(`of ${filteredOrders.length} filtered (${orders.length} total)`, `จาก ${filteredOrders.length} ที่กรอง (${orders.length} ทั้งหมด)`)}</span>
             <span className="hidden sm:inline">|</span>
             <span className="hidden sm:inline">{tx("IQ-Bank Gateway Latency:", "ความหน่วงเกตเวย์ IQ-Bank:")} <strong className="text-secondary">42ms</strong></span>
           </div>
           <div className="flex items-center gap-1 shrink-0">
-            <button type="button" disabled className="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface disabled:opacity-40 whitespace-nowrap">{tx("Previous", "ก่อนหน้า")}</button>
-            <button type="button" className="px-space-sm py-1 rounded bg-primary text-on-primary">1</button>
-            <button type="button" className="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface">2</button>
-            <button type="button" className="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface">3</button>
-            <button type="button" className="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface whitespace-nowrap">{tx("Next", "ถัดไป")}</button>
+            <button
+              type="button"
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              className="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface disabled:opacity-40 whitespace-nowrap"
+            >
+              {tx("Previous", "ก่อนหน้า")}
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                type="button"
+                onClick={() => setCurrentPage(page)}
+                className={`px-space-sm py-1 rounded ${
+                  currentPage === page
+                    ? "bg-primary text-on-primary"
+                    : "bg-surface-container hover:bg-surface-container-high text-on-surface"
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              type="button"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              className="px-space-sm py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface disabled:opacity-40 whitespace-nowrap"
+            >
+              {tx("Next", "ถัดไป")}
+            </button>
           </div>
         </div>
       </div>

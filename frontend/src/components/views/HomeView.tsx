@@ -139,7 +139,27 @@ export function HomeView() {
           </div>
 
           <div className="absolute bottom-3 inset-x-6 z-20 flex items-center justify-between gap-4">
-            <span className="text-[11px] font-medium text-slate-300/90 truncate hidden sm:inline">{currentSlide.title}</span>
+            {currentSlide.linkUrl ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (currentSlide.linkUrl?.startsWith('/topup') || currentSlide.linkUrl === 'topup') {
+                    switchView('topup');
+                  } else if (currentSlide.linkUrl?.startsWith('/accounts') || currentSlide.linkUrl === 'accounts') {
+                    switchView('accounts');
+                  } else if (currentSlide.linkUrl?.startsWith('/orders') || currentSlide.linkUrl === 'orders') {
+                    switchView('orders');
+                  } else if (typeof window !== 'undefined') {
+                    window.location.href = currentSlide.linkUrl;
+                  }
+                }}
+                className="text-[11px] font-medium text-slate-300 hover:text-white underline underline-offset-2 transition truncate hidden sm:inline text-left cursor-pointer"
+              >
+                {currentSlide.title} &rarr;
+              </button>
+            ) : (
+              <span className="text-[11px] font-medium text-slate-300/90 truncate hidden sm:inline">{currentSlide.title}</span>
+            )}
             <div className="flex items-center gap-2 ml-auto">
               <button type="button" onClick={() => setActiveSlideIdx((prev) => (prev - 1 + slides.length) % slides.length)} className="w-6 h-6 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white border border-white/15 flex items-center justify-center transition" aria-label="Previous slide">
                 <ChevronLeft className="w-3.5 h-3.5" />

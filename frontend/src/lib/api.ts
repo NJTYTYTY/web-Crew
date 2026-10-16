@@ -151,8 +151,8 @@ export function normalizeAccounts(res: any): AccountProduct[] | null {
       skinsOrWeaponsCount: specs.skinsOrWeaponsCount || a.skinsOrWeaponsCount || undefined,
       price: Number(a.price),
       tags: Array.isArray(a.highlightTags) ? a.highlightTags : Array.isArray(a.tags) ? a.tags : [],
-      stock: a.status === 'SOLD' || a.stock === 'sold_out' ? 'sold_out' : 'in_stock',
-      image: a.imageUrl || a.image || (isRov ? '/game-logos/rov/rov-banner.png' : '/game-logos/roblox/blox-fruits.png'),
+      stock: a.status === 'SOLD' || a.status === 'RESERVED' || a.stock === 'sold_out' ? 'sold_out' : 'in_stock',
+      image: a.imageUrl || a.image || (isRov ? '/game-account_sale/rov1.png' : '/game-account_sale/roblox01.png'),
       revealedUser: a.accountUsername || '',
       revealedPass: a.accountPassword || '',
     };

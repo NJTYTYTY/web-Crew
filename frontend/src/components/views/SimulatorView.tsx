@@ -9,11 +9,12 @@ import { useLanguage } from '@/context/LanguageContext';
 
 export function SimulatorView() {
   const {
-    activeOrder, simLogs, simulateQRUpload, triggerWebhookSuccess, triggerWebhookFailed, switchView,
+    activeOrder, simLogs, simulateQRUpload, triggerWebhookSuccess, triggerWebhookFailed, switchView, customerOrders, syncActiveOrder,
   } = useStore();
   const { tx } = useLanguage();
 
   const [bannerNotice, setBannerNotice] = useState<string | null>(null);
+  const pendingOrders = customerOrders.filter((o) => o.status === 'PENDING');
 
   const handleLoadQr = () => {
     simulateQRUpload();
@@ -27,24 +28,42 @@ export function SimulatorView() {
   };
 
   const handleTriggerSuccess = async () => {
-    await triggerWebhookSuccess();
-    setBannerNotice(
-      tx(
-        `✅ Payment Confirmed for ${activeOrder.txRef} (฿${activeOrder.price}.00)! Switch back to your previous Storefront tab — the QR popup has automatically moved to the next step!`,
-        `✅ ยืนยันโอนเงินสำเร็จสำหรับ ${activeOrder.txRef} (฿${activeOrder.price}.00)! สลับกลับไปที่แท็บหน้าร้านเดิมได้เลย — หน้าต่างป๊อปอัปได้เข้าสู่ขั้นตอนถัดไปให้อัตโนมัติแล้ว!`
-      )
-    );
+    try {
+      await triggerWebhookSuccess();
+      setBannerNotice(
+        tx(
+          `[SUCCESS] Payment Confirmed for ${activeOrder.txRef} (฿${activeOrder.price}.00)! Switch back to your previous Storefront tab — the QR popup has automatically moved to the next step!`,
+          `[สำเร็จ] ยืนยันโอนเงินสำเร็จสำหรับ ${activeOrder.txRef} (฿${activeOrder.price}.00)! สลับกลับไปที่แท็บหน้าร้านเดิมได้เลย — หน้าต่างป๊อปอัปได้เข้าสู่ขั้นตอนถัดไปให้อัตโนมัติแล้ว!`
+        )
+      );
+    } catch (err: any) {
+      setBannerNotice(
+        tx(
+          `[ERROR] Simulation failed: ${err.message || 'Transaction not found in database'}`,
+          `[ผิดพลาด] จำลองไม่สำเร็จ: ${err.message || 'ไม่พบรายการนี้ในฐานข้อมูล'}`
+        )
+      );
+    }
   };
 
   const handleTriggerFail = async () => {
-    await triggerWebhookFailed();
-    setBannerNotice(
-      tx(
-        'Simulated Failed Transaction: The order QR code timed out or was rejected by IQ-Bank.',
-        'จำลองรายการล้มเหลว: QR Code หมดอายุหรือถูกปฏิเสธโดยระบบธนาคาร IQ-Bank'
-      )
-    );
-    setTimeout(() => setBannerNotice(null), 3500);
+    try {
+      await triggerWebhookFailed();
+      setBannerNotice(
+        tx(
+          '[FAILED] Simulated Failed Transaction: The order QR code timed out or was rejected by IQ-Bank.',
+          '[ยกเลิก] จำลองรายการล้มเหลว: QR Code หมดอายุหรือถูกปฏิเสธโดยระบบธนาคาร IQ-Bank'
+        )
+      );
+      setTimeout(() => setBannerNotice(null), 3500);
+    } catch (err: any) {
+      setBannerNotice(
+        tx(
+          `[ERROR] Simulation failed: ${err.message || 'Transaction not found in database'}`,
+          `[ผิดพลาด] จำลองไม่สำเร็จ: ${err.message || 'ไม่พบรายการนี้ในฐานข้อมูล'}`
+        )
+      );
+    }
   };
 
   return (
@@ -125,6 +144,48 @@ export function SimulatorView() {
                   {tx('Load Active Pending QR Code', 'ดึงข้อมูล QR รายการล่าสุด')}
                 </button>
               </div>
+
+              {pendingOrders.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-emerald-800/40">
+                  <span className="text-[11px] font-semibold text-emerald-300 block mb-2">
+                    {tx('Or select an active pending order from your account:', 'หรือเลือกรายการที่กำลังรอชำระของคุณ:')}
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {pendingOrders.map((ord) => (
+                      <button
+                        key={ord.id}
+                        type="button"
+                        onClick={() => {
+                          syncActiveOrder({
+                            id: ord.id,
+                            dbId: ord.dbId,
+                            txRef: ord.ref,
+                            title: ord.title,
+                            type: ord.type.includes('Top-Up') ? 'topup' : 'account',
+                            price: ord.amount,
+                            username: ord.revealedUser,
+                            date: ord.date,
+                          });
+                          setBannerNotice(
+                            tx(
+                              `Selected ${ord.id} (${ord.ref} - ฿${ord.amount})`,
+                              `เลือกรายการ ${ord.id} (${ord.ref} - ฿${ord.amount}) แล้ว`
+                            )
+                          );
+                          setTimeout(() => setBannerNotice(null), 3000);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-mono border transition ${
+                          activeOrder.txRef === ord.ref
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-bold'
+                            : 'bg-slate-900/80 text-emerald-300 border-emerald-700/50 hover:border-emerald-400'
+                        }`}
+                      >
+                        {ord.id} (฿{ord.amount})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Step 2: Parsed Transaction Data */}

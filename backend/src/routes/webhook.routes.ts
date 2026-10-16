@@ -160,9 +160,9 @@ async function processVerifiedWebhook(
 router.post('/webhooks/iqbank', async (req: Request, res: Response) => {
   try {
     const signature = req.headers['x-iqbank-signature'] as string | undefined;
-    const rawString = JSON.stringify(req.body);
+    const rawPayload = (req as any).rawBody ? (req as any).rawBody.toString('utf8') : JSON.stringify(req.body);
 
-    const isValidSig = verifyIqBankSignature(rawString, signature);
+    const isValidSig = verifyIqBankSignature(rawPayload, signature);
     if (!isValidSig) {
       res.status(401).json({
         error: 'Invalid x-iqbank-signature HMAC-SHA256 digest',

@@ -3,6 +3,7 @@
 import React from "react";
 import { OverviewTransaction } from "@/data/mockAdminData";
 import { useLanguage } from "@/context/LanguageContext";
+import { apiRequest } from "@/lib/api";
 
 interface TransactionInspectorDrawerProps {
   transaction: OverviewTransaction | null;
@@ -124,20 +125,25 @@ export default function TransactionInspectorDrawer({
                   type="button"
                   onClick={async () => {
                     const cleanOrderId = transaction.id.replace("#", "");
-                    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-                    await fetch(`${apiBase}/api/admin/orders/${encodeURIComponent(cleanOrderId)}`, {
-                      method: "PATCH",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ status: "PAID", fulfillmentStatus: "COMPLETED" }),
-                    }).catch(() => {});
-                    onActionToast(
-                      tx("Order Resolved in DB", "อัปเดตสถานะในฐานข้อมูลเรียบร้อย"),
-                      tx(
-                        `Order ${transaction.id} marked as PAID & COMPLETED in PostgreSQL.`,
-                        `อัปเดตคำสั่งซื้อ ${transaction.id} เป็นชำระเงินและจัดส่งสำเร็จในฐานข้อมูลแล้ว`
-                      )
-                    );
-                    onClose();
+                    try {
+                      await apiRequest(`/api/admin/orders/${encodeURIComponent(cleanOrderId)}`, {
+                        method: "PATCH",
+                        body: JSON.stringify({ status: "PAID", fulfillmentStatus: "COMPLETED" }),
+                      });
+                      onActionToast(
+                        tx("Order Resolved in DB", "อัปเดตสถานะในฐานข้อมูลเรียบร้อย"),
+                        tx(
+                          `Order ${transaction.id} marked as PAID & COMPLETED in PostgreSQL.`,
+                          `อัปเดตคำสั่งซื้อ ${transaction.id} เป็นชำระเงินและจัดส่งสำเร็จในฐานข้อมูลแล้ว`
+                        )
+                      );
+                      onClose();
+                    } catch (err: any) {
+                      onActionToast(
+                        tx("Resolve Failed", "อัปเดตไม่สำเร็จ"),
+                        err.message || tx("Failed to resolve order", "ไม่สามารถอัปเดตคำสั่งซื้อได้")
+                      );
+                    }
                   }}
                   className="w-full py-2 bg-error-container text-on-error-container hover:opacity-90 rounded-lg font-label-sm text-label-sm text-left px-3 flex items-center justify-between"
                 >
