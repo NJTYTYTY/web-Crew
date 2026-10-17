@@ -8,8 +8,10 @@ interface PackageFormDrawerProps {
   open: boolean;
   editingPackage: AdminTopUpPackage | null;
   onClose: () => void;
+  availableGames?: { id: number; name: string; slug: string }[];
   onSave: (data: {
-    game: "Roblox" | "RoV" | "FreeFire";
+    game: string;
+    gameId?: number;
     name: string;
     denomination: string;
     cost: number;
@@ -18,9 +20,15 @@ interface PackageFormDrawerProps {
   }) => void;
 }
 
-export default function PackageFormDrawer({ open, editingPackage, onClose, onSave }: PackageFormDrawerProps) {
+export default function PackageFormDrawer({
+  open,
+  editingPackage,
+  onClose,
+  onSave,
+  availableGames,
+}: PackageFormDrawerProps) {
   const { tx } = useLanguage();
-  const [game, setGame] = useState<"Roblox" | "RoV" | "FreeFire">("Roblox");
+  const [game, setGame] = useState<string>("Roblox");
   const [name, setName] = useState("");
   const [denomination, setDenomination] = useState("");
   const [cost, setCost] = useState("");
@@ -77,8 +85,12 @@ export default function PackageFormDrawer({ open, editingPackage, onClose, onSav
       alert("Please enter a valid retail price (> 0)");
       return;
     }
+    const matchedGame = availableGames?.find(
+      (g) => g.name.toLowerCase() === game.toLowerCase() || g.slug.toLowerCase() === game.toLowerCase()
+    );
     onSave({
       game,
+      gameId: matchedGame?.id,
       name: name.trim(),
       denomination: denomination.trim() || name.trim(),
       cost: numCost > 0 ? numCost : Math.round(numPrice * 0.8),
@@ -120,10 +132,24 @@ export default function PackageFormDrawer({ open, editingPackage, onClose, onSav
                   {tx("Target Game Protocol", "ค่ายเกมและโปรโตคอล")}
                 </label>
                 <div className="relative">
-                  <select value={game} onChange={(e) => setGame(e.target.value as "Roblox" | "RoV" | "FreeFire")} className="w-full h-10 px-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer">
-                    <option value="Roblox">{tx("Roblox (Bot Queue Dispatch)", "Roblox (ส่งผ่านคิวบอท)")}</option>
-                    <option value="RoV">{tx("Arena of Valor / RoV (IQ-Bank API)", "RoV (เชื่อมต่อ IQ-Bank API)")}</option>
-                    <option value="FreeFire">{tx("Free Fire (Garena Webhook)", "Free Fire (Garena เว็บฮุค)")}</option>
+                  <select
+                    value={game}
+                    onChange={(e) => setGame(e.target.value)}
+                    className="w-full h-10 px-space-md bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary appearance-none cursor-pointer"
+                  >
+                    {availableGames && availableGames.length > 0 ? (
+                      availableGames.map((g) => (
+                        <option key={g.id} value={g.name}>
+                          {g.name} ({g.slug})
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Roblox">{tx("Roblox (Bot Queue Dispatch)", "Roblox (ส่งผ่านคิวบอท)")}</option>
+                        <option value="RoV">{tx("Arena of Valor / RoV (IQ-Bank API)", "RoV (เชื่อมต่อ IQ-Bank API)")}</option>
+                        <option value="FreeFire">{tx("Free Fire (Garena Webhook)", "Free Fire (Garena เว็บฮุค)")}</option>
+                      </>
+                    )}
                   </select>
                   <span className="material-symbols-outlined absolute right-space-md top-2.5 text-outline pointer-events-none text-[20px]">expand_more</span>
                 </div>

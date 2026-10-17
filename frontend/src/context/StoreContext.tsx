@@ -58,17 +58,24 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     fetchAccountsApi().then((r) => { const a = normalizeAccounts(r); if (a) setAccountProducts(a); }).catch(() => {});
     fetchTopupGamesApi().then((r) => {
       const m = normalizeTopupGames(r); const meta = normalizeTopupGamesMeta(r);
-      if (meta) setTopupGamesMeta(meta);
+      if (meta) {
+        setTopupGamesMeta(meta);
+        setActiveTopupGame((prev) => {
+          if (prev && meta[prev] && meta[prev].isActive) return prev;
+          const activeKeys = Object.keys(meta).filter((k) => meta[k].isActive);
+          return activeKeys[0] || 'rov';
+        });
+      }
       if (m) {
         setPackagesData(m);
         setSelectedPackage((prev) => {
-          const allPkgs = [...(m.rov || []), ...(m.freefire || []), ...(m.roblox || [])];
-          return allPkgs.find((p) => p.id === prev?.id) || m.rov[2] || m.rov[0];
+          const allPkgs = Object.values(m).flat();
+          return allPkgs.find((p) => p.id === prev?.id) || (m[activeTopupGame] && m[activeTopupGame][0]) || allPkgs[0] || null;
         });
       }
     }).catch(() => {});
     fetchOrdersApi().then((r) => { if (Array.isArray(r?.orders)) setCustomerOrders(r.orders); }).catch(() => {});
-  }, []);
+  }, [activeTopupGame]);
 
   useEffect(() => {
     if (!pathname) return;
@@ -129,8 +136,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const selectTopupGame = (gameKey: TopupGameKey) => {
     setActiveTopupGame(gameKey);
-    const pkgs = packagesData[gameKey] || initialPackagesData[gameKey];
-    setSelectedPackage(pkgs[2] || pkgs[0]);
+    const pkgs = packagesData[gameKey] || initialPackagesData[gameKey] || [];
+    setSelectedPackage(pkgs[2] || pkgs[0] || null);
   };
 
   const selectPackage = (pkgId: string) => {
@@ -173,8 +180,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const executeTopupCheckout = async () => {
     if (!selectedPackage || !selectedPackage.dbId) return;
-    const isIdPass = (topupGamesMeta[activeTopupGame]?.inputMode || (activeTopupGame === 'roblox' ? 'ID_PASS' : 'UID')) === 'ID_PASS';
-    const gameLabel = topupGamesMeta[activeTopupGame]?.name || (activeTopupGame === 'roblox' ? 'Roblox Robux' : activeTopupGame === 'rov' ? 'RoV Coupons' : 'Free Fire Diamonds');
+    const activeMeta = topupGamesMeta[activeTopupGame];
+    const isIdPass = (activeMeta?.inputMode || (activeTopupGame === 'roblox' ? 'ID_PASS' : 'UID')) === 'ID_PASS';
+    const gameLabel = activeMeta?.name || 'Game Top-Up';
     const price = selectedPackage.price;
     let id = 'ORD-' + Math.floor(10000 + Math.random() * 90000);
     let txRef = 'IQB-TX-' + Math.floor(100000 + Math.random() * 900000);
@@ -184,7 +192,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const res = await createOrderApi({
         orderType: 'TOPUP',
         topupPackageId: selectedPackage.dbId,
-        targetMetadata: isIdPass ? { robloxUsername: robloxUser, robloxPassword: robloxPass } : { playerUid: uidInput },
+        targetMetadata: isIdPass
+          ? { username: robloxUser, password: robloxPass, robloxUsername: robloxUser, robloxPassword: robloxPass }
+          : { playerUid: uidInput },
       });
       id = res?.order?.orderNumber || id;
       dbId = res?.order?.id;

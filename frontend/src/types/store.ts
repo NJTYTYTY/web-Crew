@@ -2,7 +2,7 @@ export type StoreViewName = 'home' | 'accounts' | 'topup' | 'orders' | 'auth' | 
 
 export type AuthMode = 'login' | 'register';
 
-export type TopupGameKey = 'rov' | 'freefire' | 'roblox';
+export type TopupGameKey = string;
 
 export type ModalStateName = 'waiting' | 'success' | 'fulfillment';
 
@@ -18,7 +18,7 @@ export interface BannerItem {
 export interface AccountProduct {
   id: string;
   dbId?: number;
-  game: 'Roblox' | 'RoV';
+  game: string;
   title: string;
   description?: string;
   levelOrRank?: string;
@@ -44,16 +44,16 @@ export interface TopupPackage {
 }
 
 export interface TopupGameMeta {
-  slug: TopupGameKey;
+  slug: string;
   name: string;
   iconUrl: string;
   inputMode: 'UID' | 'ID_PASS';
   isActive: boolean;
 }
 
-export type TopupGamesMetaByKey = Record<TopupGameKey, TopupGameMeta>;
+export type TopupGamesMetaByKey = Record<string, TopupGameMeta>;
 
-export type PackagesByGame = Record<TopupGameKey, TopupPackage[]>;
+export type PackagesByGame = Record<string, TopupPackage[]>;
 
 export interface CustomerOrder {
   id: string;

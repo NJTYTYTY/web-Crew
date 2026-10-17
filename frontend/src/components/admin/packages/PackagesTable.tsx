@@ -5,7 +5,7 @@ import { AdminTopUpPackage } from "@/data/mockAdminData";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface PackagesTableProps {
-  selectedGame: "roblox" | "rov" | "freefire";
+  selectedGame: string;
   packages: AdminTopUpPackage[];
   onOpenNew: () => void;
   onEdit: (pkg: AdminTopUpPackage) => void;
@@ -13,13 +13,11 @@ interface PackagesTableProps {
   onToggleActive: (sku: string) => void;
 }
 
-const GAME_META = {
+const GAME_META: Record<string, { titleEn: string; titleTh: string; icon: string }> = {
   roblox: { titleEn: "Roblox Top-Up Packages", titleTh: "แพ็กเกจเติมเกม Roblox", icon: "token" },
   rov: { titleEn: "Arena of Valor (RoV) Top-Up Packages", titleTh: "แพ็กเกจเติมคูปอง RoV", icon: "sports_esports" },
   freefire: { titleEn: "Free Fire Top-Up Packages", titleTh: "แพ็กเกจเติมเพชร Free Fire", icon: "local_fire_department" },
 };
-
-const GAME_NAME_MAP = { roblox: "Roblox", rov: "RoV", freefire: "FreeFire" } as const;
 
 export default function PackagesTable({
   selectedGame,
@@ -31,9 +29,20 @@ export default function PackagesTable({
 }: PackagesTableProps) {
   const { tx } = useLanguage();
   const [skuFilter, setSkuFilter] = useState<"all" | "popular" | "high-margin">("all");
-  const meta = GAME_META[selectedGame];
+  const meta = GAME_META[selectedGame.toLowerCase()] || {
+    titleEn: `${selectedGame.toUpperCase()} Top-Up Packages`,
+    titleTh: `แพ็กเกจเติมเกม ${selectedGame}`,
+    icon: "sports_esports",
+  };
 
-  const gamePackages = packages.filter((pkg) => pkg.game === GAME_NAME_MAP[selectedGame]);
+  const gamePackages = packages.filter((pkg) => {
+    const pkgGame = (pkg.game || "").toLowerCase();
+    const sel = selectedGame.toLowerCase();
+    if (sel === "rov") return pkgGame === "rov" || pkgGame.includes("rov") || pkgGame.includes("valor");
+    if (sel === "freefire") return pkgGame === "freefire" || pkgGame.includes("fire");
+    if (sel === "roblox") return pkgGame === "roblox";
+    return pkgGame === sel || pkgGame.includes(sel) || sel.includes(pkgGame);
+  });
   const activeCount = gamePackages.filter((pkg) => pkg.active).length;
   const totalValue = gamePackages.filter((pkg) => pkg.active).reduce((sum, pkg) => sum + pkg.price, 0);
   const avgMargin =

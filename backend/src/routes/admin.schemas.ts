@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const accountSchema = z.object({
-  gameCategory: z.enum(['ROBLOX', 'ROV']),
+  gameCategory: z.string().trim().min(1, 'Game category is required').max(50),
   title: z.string().min(1),
   description: z.string().optional().nullable(),
   highlightTags: z.array(z.string()).default([]),
@@ -27,6 +27,19 @@ export const packageSchema = z.object({
   packageName: z.string().min(1),
   bonusTag: z.string().optional().nullable(),
   price: z.coerce.number().int().positive('Price must be greater than 0'),
+  isActive: z.boolean().default(true),
+});
+
+export const gameCreateSchema = z.object({
+  name: z.string().trim().min(1, 'Game name is required'),
+  slug: z
+    .string()
+    .trim()
+    .min(1, 'Game slug is required')
+    .max(50)
+    .regex(/^[a-z0-9_-]+$/, 'Slug must be lowercase alphanumeric with hyphens or underscores'),
+  iconUrl: z.string().trim().min(1, 'Icon URL is required'),
+  inputMode: z.enum(['UID', 'ID_PASS']),
   isActive: z.boolean().default(true),
 });
 

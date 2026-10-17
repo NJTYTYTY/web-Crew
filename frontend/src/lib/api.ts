@@ -110,7 +110,13 @@ export interface CreateOrderRequestPayload {
   orderType: 'ACCOUNT' | 'TOPUP';
   gameAccountId?: number;
   topupPackageId?: number;
-  targetMetadata?: { playerUid?: string; robloxUsername?: string; robloxPassword?: string };
+  targetMetadata?: {
+    playerUid?: string;
+    robloxUsername?: string;
+    robloxPassword?: string;
+    username?: string;
+    password?: string;
+  };
 }
 
 export const createOrderApi = (payload: CreateOrderRequestPayload) =>
@@ -136,12 +142,14 @@ export function normalizeAccounts(res: any): AccountProduct[] | null {
   const list = Array.isArray(res) ? res : res?.accounts;
   if (!Array.isArray(list)) return null;
   return list.map((a: any, idx: number) => {
-    const isRov = a.gameCategory === 'ROV' || a.game === 'RoV';
+    const rawCat = (a.gameCategory || a.game || 'Game').trim();
+    const gameDisplayName = rawCat.toUpperCase() === 'ROV' ? 'RoV' : rawCat.toUpperCase() === 'ROBLOX' ? 'Roblox' : rawCat;
+    const isRov = gameDisplayName === 'RoV';
     const specs = a.specs || {};
     return {
       id: `acc-${a.id ?? idx + 1}`,
       dbId: a.id,
-      game: isRov ? 'RoV' : 'Roblox',
+      game: gameDisplayName,
       title: a.title || 'Game Account',
       description: a.description ?? '',
       levelOrRank: specs.levelOrRank || a.levelOrRank || (isRov ? 'Conqueror / Master Rank' : 'Max Level 2550'),
@@ -164,8 +172,8 @@ export function normalizeTopupGames(res: any): PackagesByGame | null {
   if (!Array.isArray(list)) return null;
   const mapped: PackagesByGame = { ...initialPackagesData };
   list.forEach((g: any) => {
-    const slug = (g.slug || '').toLowerCase() as TopupGameKey;
-    if ((slug === 'rov' || slug === 'freefire' || slug === 'roblox') && Array.isArray(g.packages)) {
+    const slug = (g.slug || '').toLowerCase().trim();
+    if (slug && Array.isArray(g.packages)) {
       mapped[slug] = g.packages.map((p: any, i: number) => ({
         id: `${slug}-${p.id ?? i + 1}`,
         dbId: p.id,
@@ -184,12 +192,12 @@ export function normalizeTopupGamesMeta(res: any): TopupGamesMetaByKey | null {
   if (!Array.isArray(list) || list.length === 0) return null;
   const mapped: TopupGamesMetaByKey = { ...initialTopupGamesMeta };
   list.forEach((g: any) => {
-    const slug = (g.slug || '').toLowerCase() as TopupGameKey;
-    if (slug === 'rov' || slug === 'freefire' || slug === 'roblox') {
+    const slug = (g.slug || '').toLowerCase().trim();
+    if (slug) {
       mapped[slug] = {
         slug,
-        name: g.name || initialTopupGamesMeta[slug].name,
-        iconUrl: g.iconUrl || initialTopupGamesMeta[slug].iconUrl,
+        name: g.name || initialTopupGamesMeta[slug]?.name || g.slug,
+        iconUrl: g.iconUrl || initialTopupGamesMeta[slug]?.iconUrl || '/game-logos/rov/rov-icon.png',
         inputMode: g.inputMode === 'ID_PASS' ? 'ID_PASS' : 'UID',
         isActive: g.isActive !== false,
       };

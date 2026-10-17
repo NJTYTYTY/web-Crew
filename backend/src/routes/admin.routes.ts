@@ -7,6 +7,7 @@ import { requireAdmin } from '../middleware/auth';
 import {
   accountSchema,
   bannerSchema,
+  gameCreateSchema,
   gameUpdateSchema,
   orderUpdateSchema,
   packageSchema,
@@ -49,7 +50,7 @@ router.get('/overview', async (_req: Request, res: Response) => {
         ...ord,
         username: customer?.username || 'customer',
         itemTitle: account?.title || (game ? `${game.name} — ${pkg?.packageName}` : pkg?.packageName) || 'Order Item',
-        gameName: account ? (account.gameCategory === 'ROV' ? 'RoV' : 'Roblox') : game?.name || 'Roblox',
+        gameName: account ? (account.gameCategory === 'ROV' ? 'RoV' : account.gameCategory === 'ROBLOX' ? 'Roblox' : account.gameCategory) : game?.name || 'Top-Up',
         transactionRef: payment?.transactionRef || 'N/A',
         paymentStatus: payment?.status || (ord.status === 'PAID' ? 'SUCCESS' : 'WAITING'),
         rawWebhookPayload: payment?.rawWebhookPayload || null,
@@ -191,6 +192,67 @@ router.post('/topup', async (req: Request, res: Response) => {
   } catch (err) {
     console.error('Create package error:', err);
     res.status(500).json({ error: 'Failed to create top-up package' });
+  }
+});
+
+router.post('/topup/games', async (req: Request, res: Response) => {
+  try {
+    const parsed = gameCreateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0]?.message || 'Invalid game payload' });
+      return;
+    }
+    const slug = parsed.data.slug.toLowerCase();
+    const [existing] = await db
+      .select({ id: topupGames.id })
+      .from(topupGames)
+      .where(eq(topupGames.slug, slug))
+      .limit(1);
+
+    if (existing) {
+      res.status(409).json({ error: `Game with slug "${slug}" already exists` });
+      return;
+    }
+
+    const [created] = await db
+      .insert(topupGames)
+      .values({ ...parsed.data, slug })
+      .returning();
+    res.status(201).json({ game: created });
+  } catch (err) {
+    console.error('Create game error:', err);
+    res.status(500).json({ error: 'Failed to create top-up game' });
+  }
+});
+
+router.delete('/topup/games/:slug', async (req: Request, res: Response) => {
+  try {
+    const slug = String(req.params.slug || '').toLowerCase();
+    const [game] = await db.select().from(topupGames).where(eq(topupGames.slug, slug)).limit(1);
+    if (!game) {
+      res.status(404).json({ error: 'Top-up game not found' });
+      return;
+    }
+
+    const pkgs = await db.select({ id: topupPackages.id }).from(topupPackages).where(eq(topupPackages.gameId, game.id));
+    if (pkgs.length > 0) {
+      const pkgIds = pkgs.map((p) => p.id);
+      const allOrders = await db.select({ id: orders.id, topupPackageId: orders.topupPackageId }).from(orders);
+      const hasOrders = allOrders.some((o) => o.topupPackageId && pkgIds.includes(o.topupPackageId));
+      if (hasOrders) {
+        res.status(409).json({
+          error: `Cannot delete "${game.name}" because packages under it have order history. Please deactivate it instead.`,
+        });
+        return;
+      }
+      await db.delete(topupPackages).where(eq(topupPackages.gameId, game.id));
+    }
+
+    await db.delete(topupGames).where(eq(topupGames.id, game.id));
+    res.json({ success: true, message: `Game ${game.name} deleted successfully` });
+  } catch (err) {
+    console.error('Delete game error:', err);
+    res.status(500).json({ error: 'Failed to delete top-up game' });
   }
 });
 

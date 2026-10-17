@@ -17,6 +17,8 @@ const createOrderSchema = z.object({
       playerUid: z.string().trim().optional(),
       robloxUsername: z.string().trim().optional(),
       robloxPassword: z.string().optional(),
+      username: z.string().trim().optional(),
+      password: z.string().optional(),
     })
     .optional(),
 });
@@ -92,14 +94,14 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
           return;
         }
       } else if (game.inputMode === 'ID_PASS') {
-        const robloxUser = targetMetadata?.robloxUsername?.trim();
-        const robloxPass = targetMetadata?.robloxPassword;
-        if (!robloxUser || robloxUser.length < 3) {
-          res.status(400).json({ error: 'Roblox username is required (minimum 3 characters)' });
+        const loginUser = (targetMetadata?.username || targetMetadata?.robloxUsername)?.trim();
+        const loginPass = targetMetadata?.password || targetMetadata?.robloxPassword;
+        if (!loginUser || loginUser.length < 3) {
+          res.status(400).json({ error: `${game.name} username is required (minimum 3 characters)` });
           return;
         }
-        if (!robloxPass || robloxPass.length < 4) {
-          res.status(400).json({ error: 'Roblox password is required (minimum 4 characters)' });
+        if (!loginPass || loginPass.length < 4) {
+          res.status(400).json({ error: `${game.name} password is required (minimum 4 characters)` });
           return;
         }
       }

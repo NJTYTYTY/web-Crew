@@ -8,9 +8,24 @@ import { useLanguage } from '@/context/LanguageContext';
 export function AccountMarketplaceView() {
   const { accountProducts, buyAccount, openAccountDetail } = useStore();
   const { tx } = useLanguage();
-  const [categoryFilter, setCategoryFilter] = useState<'all' | 'Roblox' | 'RoV'>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [availabilityFilter, setAvailabilityFilter] = useState<'all' | 'available' | 'sold'>('all');
   const [sortOption, setSortOption] = useState<'featured' | 'price-asc' | 'price-desc'>('featured');
+
+  const availableCategories = useMemo(() => {
+    const list = ['all'];
+    const seen = new Set<string>();
+    accountProducts.forEach((a) => {
+      const cat = a.game?.trim();
+      if (cat && !seen.has(cat.toLowerCase())) {
+        seen.add(cat.toLowerCase());
+        list.push(cat);
+      }
+    });
+    if (!seen.has('roblox')) list.push('Roblox');
+    if (!seen.has('rov')) list.push('RoV');
+    return list;
+  }, [accountProducts]);
 
   const filteredAndSorted = useMemo(() => {
     let base =
@@ -26,14 +41,14 @@ export function AccountMarketplaceView() {
     return base;
   }, [accountProducts, categoryFilter, availabilityFilter, sortOption]);
 
-  const filterBtnClass = (cat: 'all' | 'Roblox' | 'RoV') =>
+  const filterBtnClass = (cat: string) =>
     `acc-filter px-3 py-1.5 rounded-lg transition whitespace-nowrap shrink-0 ${
-      categoryFilter === cat ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+      categoryFilter.toLowerCase() === cat.toLowerCase() ? 'bg-white text-indigo-600 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
     }`;
 
   const availBtnClass = (avail: 'all' | 'available' | 'sold') =>
     `px-3 py-1.5 rounded-lg transition whitespace-nowrap shrink-0 ${
-      availabilityFilter === avail ? 'bg-white text-indigo-600 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+      availabilityFilter === avail ? 'bg-white text-indigo-600 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
     }`;
 
   return (
@@ -59,19 +74,20 @@ export function AccountMarketplaceView() {
             {/* Filter Controls */}
             <div className="flex flex-wrap items-center gap-2">
               <div className="bg-slate-100 p-1 rounded-xl flex items-center space-x-1 text-xs font-bold overflow-x-auto hide-scrollbar max-w-full">
-                <button onClick={() => setCategoryFilter('all')} id="filter-all" className={filterBtnClass('all')}>
-                  {tx('All Games', 'ทุกเกม')}
-                </button>
-                <button
-                  onClick={() => setCategoryFilter('Roblox')}
-                  id="filter-roblox"
-                  className={filterBtnClass('Roblox')}
-                >
-                  Roblox
-                </button>
-                <button onClick={() => setCategoryFilter('RoV')} id="filter-rov" className={filterBtnClass('RoV')}>
-                  RoV (Arena of Valor)
-                </button>
+                {availableCategories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setCategoryFilter(cat)}
+                    id={`filter-${cat.toLowerCase()}`}
+                    className={filterBtnClass(cat)}
+                  >
+                    {cat === 'all'
+                      ? tx('All Games', 'ทุกเกม')
+                      : cat.toLowerCase() === 'rov'
+                      ? 'RoV (Arena of Valor)'
+                      : cat}
+                  </button>
+                ))}
               </div>
 
               {/* Availability Filter */}

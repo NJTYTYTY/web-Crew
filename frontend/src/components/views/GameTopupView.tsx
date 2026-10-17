@@ -23,13 +23,14 @@ export function GameTopupView() {
       activeTopupGame === g ? 'border-indigo-600 bg-indigo-50/50' : 'border-slate-200 hover:border-slate-300 bg-white'
     }`;
 
-  const gameTitle = topupGamesMeta[activeTopupGame]?.name || (activeTopupGame === 'freefire' ? 'Free Fire' : activeTopupGame === 'roblox' ? 'Roblox Robux' : 'Arena of Valor (RoV)');
-  const isIdPassMode = (topupGamesMeta[activeTopupGame]?.inputMode || (activeTopupGame === 'roblox' ? 'ID_PASS' : 'UID')) === 'ID_PASS';
+  const activeMeta = topupGamesMeta[activeTopupGame];
+  const gameTitle = activeMeta?.name || 'Game Top-Up';
+  const isIdPassMode = (activeMeta?.inputMode || (activeTopupGame === 'roblox' ? 'ID_PASS' : 'UID')) === 'ID_PASS';
   const stepOneTitle = isIdPassMode
-    ? tx('Enter Game Credentials (ID-Pass)', 'กรอกข้อมูลไอดีเกม (ID-Pass)')
-    : activeTopupGame === 'rov'
-    ? tx('Enter RoV OpenID / UID', 'กรอกหมายเลข OpenID / UID เกม RoV')
-    : tx('Enter Player UID', 'กรอกหมายเลข Player UID');
+    ? tx(`Enter ${gameTitle} Credentials (ID-Pass)`, `กรอกข้อมูลไอดีเกม ${gameTitle} (ID-Pass)`)
+    : tx(`Enter ${gameTitle} Player UID`, `กรอกหมายเลข Player UID สำหรับ ${gameTitle}`);
+
+  const availableGames = Object.values(topupGamesMeta).filter((g) => g.isActive !== false);
 
   return (
     <div id="view-topup" className="page-view">
@@ -48,28 +49,25 @@ export function GameTopupView() {
           <div className="lg:col-span-8 space-y-6">
             <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">{tx('Select Game to Top Up', 'เลือกเกมที่ต้องการเติม')}</label>
-              <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-                <button onClick={() => selectTopupGame('rov')} id="topup-tab-rov" className={gameTabClass('rov')}>
-                  <img src={topupGamesMeta.rov?.iconUrl || '/game-logos/rov/rov-icon.png'} alt="RoV" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
-                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">{topupGamesMeta.rov?.name || 'Arena of Valor'}</span>
-                  <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">
-                    {topupGamesMeta.rov?.inputMode === 'ID_PASS' ? tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว') : tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}
-                  </span>
-                </button>
-                <button onClick={() => selectTopupGame('freefire')} id="topup-tab-freefire" className={gameTabClass('freefire')}>
-                  <img src={topupGamesMeta.freefire?.iconUrl || '/game-logos/freefire/freefire-icon.png'} alt="Free Fire" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
-                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">{topupGamesMeta.freefire?.name || 'Free Fire'}</span>
-                  <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">
-                    {topupGamesMeta.freefire?.inputMode === 'ID_PASS' ? tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว') : tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}
-                  </span>
-                </button>
-                <button onClick={() => selectTopupGame('roblox')} id="topup-tab-roblox" className={gameTabClass('roblox')}>
-                  <img src={topupGamesMeta.roblox?.iconUrl || '/game-logos/roblox/roblox-icon.png'} alt="Roblox" className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform" />
-                  <span className="text-xs font-bold text-slate-900 whitespace-nowrap">{topupGamesMeta.roblox?.name || 'Roblox Robux'}</span>
-                  <span className="text-[10px] text-indigo-600 font-semibold mt-0.5 whitespace-nowrap">
-                    {topupGamesMeta.roblox?.inputMode === 'UID' ? tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว') : tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว')}
-                  </span>
-                </button>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3">
+                {availableGames.map((game) => (
+                  <button
+                    key={game.slug}
+                    onClick={() => selectTopupGame(game.slug)}
+                    id={`topup-tab-${game.slug}`}
+                    className={gameTabClass(game.slug)}
+                  >
+                    <img
+                      src={game.iconUrl || '/game-logos/rov/rov-icon.png'}
+                      alt={game.name}
+                      className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform"
+                    />
+                    <span className="text-xs font-bold text-slate-900 line-clamp-1">{game.name}</span>
+                    <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">
+                      {game.inputMode === 'ID_PASS' ? tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว') : tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
 

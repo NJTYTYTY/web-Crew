@@ -9,18 +9,24 @@ import { useLanguage } from "@/context/LanguageContext";
 import { apiRequest } from "@/lib/api";
 
 function mapDbAccountToAdmin(a: Record<string, any>, idx: number): AdminGameAccount {
-  const isRov = a.gameCategory === "ROV" || a.platform === "rov";
+  const rawCat = String(a.gameCategory || a.platform || "roblox").trim();
+  const catUpper = rawCat.toUpperCase();
+  const isRov = catUpper === "ROV";
+  const isRoblox = catUpper === "ROBLOX";
+  const platform = isRov ? "rov" : isRoblox ? "roblox" : rawCat.toLowerCase();
+  const platformLabel = isRov ? "RoV (Garena)" : isRoblox ? "Roblox" : a.platformLabel || rawCat;
+  const prefix = isRov ? "#ROV" : isRoblox ? "#R" : `#${rawCat.slice(0, 3).toUpperCase()}`;
   const specs = a.specs || {};
   const priceNum = Number(a.price ?? a.priceThb ?? 450);
   const tags = Array.isArray(a.highlightTags) ? a.highlightTags : Array.isArray(a.tags) ? a.tags : ["Clean ID"];
   return {
     id: String(a.id ?? idx + 1),
-    code: isRov ? `#ROV-00${a.id ?? idx + 1}` : `#R-00${a.id ?? idx + 1}`,
+    code: `${prefix}-00${a.id ?? idx + 1}`,
     title: String(a.title || ""),
     subtitle: String(specs.emailStatus || a.subtitle || "100% Clean ID • Instant Ownership"),
     subIcon: isRov ? "verified_user" : "vpn_key",
-    platform: isRov ? "rov" : "roblox",
-    platformLabel: isRov ? "RoV (Garena)" : "Roblox",
+    platform: platform as any,
+    platformLabel,
     spec1: String(specs.levelOrRank || a.spec1 || (isRov ? "Ex-Supreme Rank" : "Lv. 2550 (MAX)")),
     spec2: String(specs.heroesOrFruitsCount || a.spec2 || tags.slice(0, 2).join(" • ")),
     spec3: String(specs.skinsOrWeaponsCount || a.spec3 || tags[2] || "Full Access"),
@@ -41,7 +47,7 @@ export default function AdminAccountsPage() {
   const { tx } = useLanguage();
   const [accounts, setAccounts] = useState<AdminGameAccount[]>(INITIAL_GAME_ACCOUNTS);
   const [searchQuery, setSearchQuery] = useState("");
-  const [gameFilter, setGameFilter] = useState<"all" | "roblox" | "rov">("all");
+  const [gameFilter, setGameFilter] = useState<string>("all");
   const [stockFilter, setStockFilter] = useState<"all" | "available" | "sold">("all");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<AdminGameAccount | null>(null);
@@ -62,9 +68,24 @@ export default function AdminAccountsPage() {
       });
   }, []);
 
+  const availableCategories = useMemo(() => {
+    const list = ["all"];
+    const seen = new Set<string>();
+    accounts.forEach((a) => {
+      const p = (a.platform || "").toLowerCase().trim();
+      if (p && !seen.has(p)) {
+        seen.add(p);
+        list.push(p);
+      }
+    });
+    if (!seen.has("roblox")) list.push("roblox");
+    if (!seen.has("rov")) list.push("rov");
+    return list;
+  }, [accounts]);
+
   const filteredAccounts = useMemo(() => {
     return accounts.filter((acc) => {
-      const matchesGame = gameFilter === "all" || acc.platform === gameFilter;
+      const matchesGame = gameFilter === "all" || acc.platform.toLowerCase() === gameFilter.toLowerCase();
       const matchesStock = stockFilter === "all" || acc.status === stockFilter;
       const q = searchQuery.toLowerCase().trim();
       const matchesSearch =
@@ -96,8 +117,16 @@ export default function AdminAccountsPage() {
   };
 
   const handleSaveAccount = async (data: Omit<AdminGameAccount, "id" | "code">, isDraft?: boolean) => {
+    const rawPlatform = (data.platform || "roblox").toString().trim();
+    const gameCat =
+      rawPlatform.toLowerCase() === "rov"
+        ? "ROV"
+        : rawPlatform.toLowerCase() === "roblox"
+        ? "ROBLOX"
+        : rawPlatform.toUpperCase();
+
     const syncPayload = {
-      gameCategory: data.platform === "rov" ? "ROV" : "ROBLOX",
+      gameCategory: gameCat,
       title: data.title,
       description: data.description,
       highlightTags: data.tags,
@@ -195,15 +224,31 @@ export default function AdminAccountsPage() {
           </div>
 
           <div className="flex items-center bg-surface-container-low p-1 rounded-xl overflow-x-auto max-w-full">
-            {([
-              { id: "all", labelEn: "All Platforms", labelTh: "ทุกแพลตฟอร์ม" },
-              { id: "roblox", labelEn: "Roblox", labelTh: "Roblox" },
-              { id: "rov", labelEn: "RoV", labelTh: "RoV" },
-            ] as const).map((btn) => (
-              <button key={btn.id} type="button" onClick={() => setGameFilter(btn.id)} className={gameFilter === btn.id ? "px-space-md py-1 rounded-lg font-label-sm text-label-sm bg-surface-container-lowest text-primary font-semibold shadow-sm transition-all whitespace-nowrap shrink-0" : "px-space-md py-1 rounded-lg font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all whitespace-nowrap shrink-0"}>
-                {tx(btn.labelEn, btn.labelTh)}
-              </button>
-            ))}
+            {availableCategories.map((cat) => {
+              const isSel = gameFilter === cat;
+              const label =
+                cat === "all"
+                  ? tx("All Platforms", "ทุกแพลตฟอร์ม")
+                  : cat === "rov"
+                  ? "RoV"
+                  : cat === "roblox"
+                  ? "Roblox"
+                  : cat.toUpperCase();
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setGameFilter(cat)}
+                  className={
+                    isSel
+                      ? "px-space-md py-1 rounded-lg font-label-sm text-label-sm bg-surface-container-lowest text-primary font-semibold shadow-sm transition-all whitespace-nowrap shrink-0"
+                      : "px-space-md py-1 rounded-lg font-label-sm text-label-sm text-on-surface-variant hover:text-on-surface transition-all whitespace-nowrap shrink-0"
+                  }
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex items-center bg-surface-container-low p-1 rounded-xl overflow-x-auto max-w-full">

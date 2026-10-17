@@ -42,7 +42,7 @@ export const banners = pgTable('banners', {
 // 3. Game Accounts Marketplace Table (Roblox & RoV)
 export const gameAccounts = pgTable('game_accounts', {
   id: serial('id').primaryKey(),
-  gameCategory: gameCategoryEnum('game_category').notNull(),
+  gameCategory: varchar('game_category', { length: 50 }).notNull(),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   highlightTags: jsonb('highlight_tags').$type<string[]>().default([]).notNull(),

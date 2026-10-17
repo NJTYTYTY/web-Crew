@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export interface EditableGameProvider {
-  slug: "rov" | "freefire" | "roblox";
+  slug: string;
   name: string;
   iconUrl: string;
   isActive: boolean;
@@ -14,7 +14,7 @@ interface GameLogoEditModalProps {
   open: boolean;
   provider: EditableGameProvider | null;
   onClose: () => void;
-  onSave: (slug: "rov" | "freefire" | "roblox", data: { name: string; iconUrl: string; isActive: boolean }) => void;
+  onSave: (slug: string, data: { name: string; iconUrl: string; isActive: boolean }) => void;
 }
 
 const GAME_LOGO_PRESETS = [

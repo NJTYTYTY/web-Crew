@@ -4,7 +4,7 @@ import {
   db, pool, users, banners, gameAccounts, topupGames, topupPackages, orders, payments,
 } from '../src/db';
 import { verifyIqBankSignature, signIqBankPayload } from '../src/routes/webhook.routes';
-import { accountSchema, orderUpdateSchema } from '../src/routes/admin.schemas';
+import { accountSchema, orderUpdateSchema, gameCreateSchema } from '../src/routes/admin.schemas';
 
 let passedTests = 0;
 let totalTests = 0;
@@ -188,8 +188,105 @@ async function runTests() {
 
   assert(pendingTopups === 2, `pendingTopups accurately filters TOPUP orders (expected 2, got ${pendingTopups})`);
 
+  // Test 6: Dynamic Game Titles & Multi-Category Architecture
+  console.log('\n--- 6. Dynamic Game Titles & Multi-Category Architecture ---');
+
+  // Pre-cleanup in case of prior aborted run
+  await db.delete(topupPackages).where(eq(topupPackages.packageName, '1000 Valorant Points'));
+  await db.delete(topupGames).where(eq(topupGames.slug, 'test-valorant'));
+  await db.delete(gameAccounts).where(eq(gameAccounts.title, 'TEST_VALORANT_ACCOUNT'));
+
+  // 6.1 Schema Validation
+  const validGame = gameCreateSchema.safeParse({
+    name: 'Genshin Impact',
+    slug: 'genshin-impact',
+    inputMode: 'UID',
+    iconUrl: '/logos/genshin.png',
+    isActive: true,
+  });
+  assert(validGame.success === true, 'gameCreateSchema validates valid new game definition');
+
+  const invalidSlugGame = gameCreateSchema.safeParse({
+    name: 'Genshin Impact',
+    slug: 'Genshin Impact BAD!',
+    inputMode: 'UID',
+  });
+  assert(invalidSlugGame.success === false, 'gameCreateSchema rejects slug containing spaces or uppercase');
+
+  // 6.2 Dynamic Game Insertion
+  const [createdTestGame] = await db
+    .insert(topupGames)
+    .values({
+      name: 'Test Valorant Title',
+      slug: 'test-valorant',
+      inputMode: 'UID',
+      iconUrl: '/game_icon/valorant.png',
+      isActive: true,
+    })
+    .returning();
+
+  assert(Boolean(createdTestGame?.id), 'Dynamic game title inserted into topup_games');
+  assert(createdTestGame?.slug === 'test-valorant', 'Dynamic game title has correct slug');
+
+  // 6.3 Duplicate Slug Conflict Detection
+  const existingGame = await db.query.topupGames.findFirst({
+    where: eq(topupGames.slug, 'test-valorant'),
+  });
+  assert(Boolean(existingGame), 'Database query correctly detects existing game slug to prevent duplicates');
+
+  // 6.4 Dynamic Topup Package Linked to New Game
+  const [createdPackage] = await db
+    .insert(topupPackages)
+    .values({
+      gameId: createdTestGame.id,
+      packageName: '1000 Valorant Points',
+      bonusTag: '+100 Bonus',
+      price: 319,
+      isActive: true,
+    })
+    .returning();
+
+
+  assert(Boolean(createdPackage?.id), 'Dynamic top-up package created and linked to custom game ID');
+  assert(createdPackage?.gameId === createdTestGame.id, 'Package gameId references dynamic game title');
+
+  // 6.5 Dynamic Game Account Category Creation (Arbitrary String)
+  const [createdCustomAccount] = await db
+    .insert(gameAccounts)
+    .values({
+      gameCategory: 'VALORANT',
+      title: 'TEST_VALORANT_ACCOUNT',
+      description: 'Diamond 3 with Prime Vandal',
+      price: 1850,
+      imageUrl: '/game-account_sale/valorant.png',
+      status: 'AVAILABLE',
+      accountUsername: 'test_val_user',
+      accountPassword: 'test_val_pass',
+    })
+    .returning();
+
+  assert(Boolean(createdCustomAccount?.id), 'Game account created with dynamic category VALORANT');
+  assert(createdCustomAccount?.gameCategory === 'VALORANT', 'gameAccounts.gameCategory persists arbitrary category');
+
+  // 6.6 Category Discovery Query
+  const rawCategories = await db
+    .selectDistinct({ category: gameAccounts.gameCategory })
+    .from(gameAccounts);
+  const categoryNames = rawCategories.map((c) => c.category);
+  assert(categoryNames.includes('VALORANT'), 'Distinct categories query returns newly added game category');
+
+  // 6.7 Safe Cleanup
+  await db.delete(topupPackages).where(eq(topupPackages.id, createdPackage.id));
+  await db.delete(topupGames).where(eq(topupGames.id, createdTestGame.id));
+  await db.delete(gameAccounts).where(eq(gameAccounts.id, createdCustomAccount.id));
+
+  const [verifyCleanedGame] = await db.select().from(topupGames).where(eq(topupGames.id, createdTestGame.id)).limit(1);
+  const [verifyCleanedAcc] = await db.select().from(gameAccounts).where(eq(gameAccounts.id, createdCustomAccount.id)).limit(1);
+  assert(!verifyCleanedGame && !verifyCleanedAcc, 'Test dynamic game, package, and account cleaned up cleanly');
+
   console.log(`\n=== RESULTS: ${passedTests}/${totalTests} TESTS PASSED ===\n`);
   await pool.end();
+
 }
 
 runTests().catch((err) => {

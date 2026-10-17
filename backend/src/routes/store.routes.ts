@@ -20,6 +20,20 @@ router.get('/banners', async (_req: Request, res: Response) => {
   }
 });
 
+// GET /api/accounts/categories — List distinct active categories in marketplace
+router.get('/accounts/categories', async (_req: Request, res: Response) => {
+  try {
+    const rows = await db
+      .selectDistinct({ gameCategory: gameAccounts.gameCategory })
+      .from(gameAccounts);
+    const categories = rows.map((r) => r.gameCategory).filter(Boolean);
+    res.json({ categories });
+  } catch (err) {
+    console.error('Fetch categories error:', err);
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+});
+
 // GET /api/accounts — List marketplace accounts (NEVER exposes accountUsername or accountPassword)
 router.get('/accounts', async (req: Request, res: Response) => {
   try {
@@ -35,7 +49,7 @@ router.get('/accounts', async (req: Request, res: Response) => {
 
     const conditions = [];
 
-    if (rawCategory === 'ROBLOX' || rawCategory === 'ROV') {
+    if (rawCategory && rawCategory !== 'ALL') {
       conditions.push(eq(gameAccounts.gameCategory, rawCategory));
     }
 

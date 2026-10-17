@@ -18,7 +18,9 @@ const ACCOUNT_IMG_PRESETS = [
 
 export default function AccountFormDrawer({ open, editingAccount, onClose, onSave }: AccountFormDrawerProps) {
   const { tx } = useLanguage();
-  const [platform, setPlatform] = useState<"roblox" | "rov">("roblox");
+  const [platform, setPlatform] = useState<string>("roblox");
+  const [customPlatform, setCustomPlatform] = useState("");
+  const [isCustomPlatform, setIsCustomPlatform] = useState(false);
   const [title, setTitle] = useState("");
   const [priceThb, setPriceThb] = useState("450");
   const [spec1, setSpec1] = useState("");
@@ -38,7 +40,15 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
 
   useEffect(() => {
     if (editingAccount) {
-      setPlatform(editingAccount.platform);
+      const p = editingAccount.platform.toLowerCase();
+      if (p === "roblox" || p === "rov" || p === "freefire" || p === "valorant") {
+        setPlatform(p);
+        setIsCustomPlatform(false);
+      } else {
+        setPlatform(p);
+        setCustomPlatform(editingAccount.platformLabel || p);
+        setIsCustomPlatform(true);
+      }
       setTitle(editingAccount.title);
       setPriceThb(String(editingAccount.priceThb));
       setSpec1(editingAccount.spec1);
@@ -54,7 +64,7 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
       setEmailStatus(editingAccount.subtitle || "100% Clean ID (No Phone / No Email Linked)");
       setStatus(editingAccount.status);
     } else {
-      setPlatform("roblox"); setTitle(""); setPriceThb("450"); setSpec1(""); setSpec2(""); setSpec3("");
+      setPlatform("roblox"); setCustomPlatform(""); setIsCustomPlatform(false); setTitle(""); setPriceThb("450"); setSpec1(""); setSpec2(""); setSpec3("");
       setServerRegion("Global / SEA Optimized"); setDescription(""); setImageUrl("/game-account_sale/roblox01.png");
       setTags(["Human V4 T10", "CDK + 6 Melee", "Clean ID"]); setUsername(""); setPassword(""); setPin("");
       setEmailStatus("100% Clean ID (No Phone / No Email Linked)"); setStatus("available");
@@ -89,14 +99,24 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
       alert("Please enter account login password");
       return;
     }
-    const defaultImg = INITIAL_GAME_ACCOUNTS[platform === "roblox" ? 0 : 1].imageUrl;
+
+    const activePlatform = (isCustomPlatform && customPlatform.trim() ? customPlatform.trim() : platform).toLowerCase();
+    const platformLabel = isCustomPlatform && customPlatform.trim()
+      ? customPlatform.trim()
+      : platform === "rov"
+      ? "RoV (Garena)"
+      : platform === "roblox"
+      ? "Roblox"
+      : platform.toUpperCase();
+
+    const defaultImg = platform === "rov" ? "/game-account_sale/rov1.png" : "/game-account_sale/roblox01.png";
     onSave(
       {
         title: title.trim(),
         subtitle: emailStatus.trim() || "100% Clean ID • Instant Ownership",
         subIcon: "vpn_key",
-        platform,
-        platformLabel: platform === "roblox" ? "Roblox" : "RoV (Garena)",
+        platform: activePlatform as any,
+        platformLabel,
         spec1: spec1.trim() || (platform === "roblox" ? "Lv. 2550 (MAX)" : "Ex-Supreme Rank"),
         spec2: spec2.trim() || tags.slice(0, 2).join(" • ") || "Verified Full Access",
         spec3: spec3.trim() || tags[2] || "Instant Escrow Delivery",
@@ -140,16 +160,54 @@ export default function AccountFormDrawer({ open, editingAccount, onClose, onSav
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-md">
             <div className="sm:col-span-2 flex flex-col gap-space-xs">
               <label className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">{tx("Platform Category", "หมวดหมู่แพลตฟอร์มเกม")}</label>
-              <div className="grid grid-cols-2 gap-space-sm p-1 bg-surface-container-low rounded-xl">
-                <button type="button" onClick={() => { setPlatform("roblox"); setServerRegion("Global / SEA Optimized"); }} className={`flex items-center justify-center gap-space-xs py-space-sm px-space-sm rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${platform === "roblox" ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"}`}>
-                  <span className="material-symbols-outlined text-[18px]">smart_toy</span>
-                  <span>Roblox</span>
-                </button>
-                <button type="button" onClick={() => { setPlatform("rov"); setServerRegion("Garena Thailand (TH)"); }} className={`flex items-center justify-center gap-space-xs py-space-sm px-space-sm rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${platform === "rov" ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"}`}>
-                  <span className="material-symbols-outlined text-[18px]">sports_esports</span>
-                  <span>RoV (Garena)</span>
+              <div className="flex flex-wrap gap-1.5 p-1 bg-surface-container-low rounded-xl">
+                {[
+                  { id: "roblox", label: "Roblox", icon: "smart_toy" },
+                  { id: "rov", label: "RoV", icon: "sports_esports" },
+                  { id: "freefire", label: "Free Fire", icon: "local_fire_department" },
+                  { id: "valorant", label: "Valorant", icon: "gamepad" },
+                ].map((p) => {
+                  const isSel = !isCustomPlatform && platform === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => {
+                        setIsCustomPlatform(false);
+                        setPlatform(p.id);
+                        if (p.id === "rov") setServerRegion("Garena Thailand (TH)");
+                        else if (p.id === "roblox") setServerRegion("Global / SEA Optimized");
+                      }}
+                      className={`flex items-center justify-center gap-space-xs py-1.5 px-3 rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${
+                        isSel ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[16px]">{p.icon}</span>
+                      <span>{p.label}</span>
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => setIsCustomPlatform(true)}
+                  className={`flex items-center justify-center gap-space-xs py-1.5 px-3 rounded-lg font-label-sm text-label-sm transition-all whitespace-nowrap ${
+                    isCustomPlatform ? "bg-surface-container-lowest text-primary font-bold shadow-sm" : "text-on-surface-variant hover:text-on-surface font-medium"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[16px]">edit</span>
+                  <span>{tx("+ Other Game", "+ เกมอื่นๆ")}</span>
                 </button>
               </div>
+              {isCustomPlatform && (
+                <input
+                  type="text"
+                  value={customPlatform}
+                  onChange={(e) => setCustomPlatform(e.target.value)}
+                  placeholder={tx("Enter game title (e.g. Genshin Impact, Minecraft)", "พิมพ์ชื่อเกม (เช่น Genshin Impact, Minecraft)")}
+                  className={inputCls}
+                  required
+                />
+              )}
             </div>
             <div className="flex flex-col gap-space-xs">
               <label className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">{tx("Stock Status", "สถานะสินค้า")}</label>
