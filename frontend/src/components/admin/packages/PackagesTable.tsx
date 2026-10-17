@@ -36,13 +36,18 @@ export default function PackagesTable({
   };
 
   const gamePackages = packages.filter((pkg) => {
-    const pkgGame = (pkg.game || "").toLowerCase();
-    const sel = selectedGame.toLowerCase();
+    const sel = selectedGame.toLowerCase().trim();
+    const pkgSlug = (pkg.gameSlug || "").toLowerCase().trim();
+    if (pkgSlug) {
+      return pkgSlug === sel;
+    }
+    const pkgGame = (pkg.game || "").toLowerCase().trim();
+    if (sel === "roblox") return pkgGame.includes("roblox") || pkgGame.includes("rbx");
     if (sel === "rov") return pkgGame === "rov" || pkgGame.includes("rov") || pkgGame.includes("valor");
     if (sel === "freefire") return pkgGame === "freefire" || pkgGame.includes("fire");
-    if (sel === "roblox") return pkgGame === "roblox";
     return pkgGame === sel || pkgGame.includes(sel) || sel.includes(pkgGame);
   });
+
   const activeCount = gamePackages.filter((pkg) => pkg.active).length;
   const totalValue = gamePackages.filter((pkg) => pkg.active).reduce((sum, pkg) => sum + pkg.price, 0);
   const avgMargin =

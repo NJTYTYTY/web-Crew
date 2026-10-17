@@ -116,17 +116,20 @@ export interface AdminTopUpPackage {
   cost: number;
   price: number;
   denomination: string;
-  game: "Roblox" | "RoV" | "FreeFire";
+  game: string;
+  gameSlug?: string;
+  gameId?: number;
   active: boolean;
 }
 
 export const INITIAL_TOPUP_PACKAGES: AdminTopUpPackage[] = [
-  { sku: "RBX-0800-STD", name: "800 Robux", subtitle: "SKU: RBX-0800-STD • In-Game Value: R$ 800", icon: "diamond", iconStyle: "surface", tag: "Standard", tagStyle: "standard", cost: 240, price: 290, denomination: "800", game: "Roblox", active: true },
-  { sku: "RBX-1700-POP", name: "1,700 Robux", subtitle: "SKU: RBX-1700-POP • In-Game Value: R$ 1,700", icon: "stars", iconStyle: "primary", tag: "Hot Deal", tagStyle: "secondary", cost: 480, price: 590, denomination: "1700", game: "Roblox", active: true },
-  { sku: "RBX-4500-VIP", name: "4,500 Robux + Bonus", subtitle: "SKU: RBX-4500-VIP • In-Game Value: R$ 4,500 + 400", icon: "military_tech", iconStyle: "tertiary", tag: "+400 Extra (20% OFF)", tagStyle: "tertiary", cost: 1180, price: 1490, denomination: "4500", game: "Roblox", active: true },
-  { sku: "ROV-0350-BUN", name: "350 RoV Coupons", subtitle: "SKU: ROV-0350-BUN • In-Game Value: 350 Coupons", icon: "stars", iconStyle: "surface", tag: "+25 Bonus", tagStyle: "secondary", cost: 115, price: 149, denomination: "350", game: "RoV", active: true },
-  { sku: "ROV-1200-MAX", name: "1,200 RoV Coupons", subtitle: "SKU: ROV-1200-MAX • In-Game Value: 1,200 Coupons", icon: "workspace_premium", iconStyle: "surface", tag: "Best Seller", tagStyle: "primary", cost: 395, price: 490, denomination: "1200", game: "RoV", active: true },
+  { sku: "RBX-0800-STD", name: "800 Robux", subtitle: "SKU: RBX-0800-STD • In-Game Value: R$ 800", icon: "diamond", iconStyle: "surface", tag: "Standard", tagStyle: "standard", cost: 240, price: 290, denomination: "800", game: "Roblox", gameSlug: "roblox", active: true },
+  { sku: "RBX-1700-POP", name: "1,700 Robux", subtitle: "SKU: RBX-1700-POP • In-Game Value: R$ 1,700", icon: "stars", iconStyle: "primary", tag: "Hot Deal", tagStyle: "secondary", cost: 480, price: 590, denomination: "1700", game: "Roblox", gameSlug: "roblox", active: true },
+  { sku: "RBX-4500-VIP", name: "4,500 Robux + Bonus", subtitle: "SKU: RBX-4500-VIP • In-Game Value: R$ 4,500 + 400", icon: "military_tech", iconStyle: "tertiary", tag: "+400 Extra (20% OFF)", tagStyle: "tertiary", cost: 1180, price: 1490, denomination: "4500", game: "Roblox", gameSlug: "roblox", active: true },
+  { sku: "ROV-0350-BUN", name: "350 RoV Coupons", subtitle: "SKU: ROV-0350-BUN • In-Game Value: 350 Coupons", icon: "stars", iconStyle: "surface", tag: "+25 Bonus", tagStyle: "secondary", cost: 115, price: 149, denomination: "350", game: "RoV", gameSlug: "rov", active: true },
+  { sku: "ROV-1200-MAX", name: "1,200 RoV Coupons", subtitle: "SKU: ROV-1200-MAX • In-Game Value: 1,200 Coupons", icon: "workspace_premium", iconStyle: "surface", tag: "Best Seller", tagStyle: "primary", cost: 395, price: 490, denomination: "1200", game: "RoV", gameSlug: "rov", active: true },
 ];
+
 
 export interface AdminOrderItem {
   id: string;

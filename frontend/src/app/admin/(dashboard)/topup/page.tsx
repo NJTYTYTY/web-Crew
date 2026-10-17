@@ -107,7 +107,9 @@ export default function AdminTopUpPage() {
                 cost: Math.round(price * 0.78),
                 price,
                 denomination: String(pkg.packageName || ""),
-                game: gameName as any,
+                game: gameName,
+                gameSlug: slug,
+                gameId: pkg.gameId,
                 active: pkg.isActive !== false,
               };
             })
@@ -201,6 +203,8 @@ export default function AdminTopUpPage() {
       isActive: true,
     };
 
+    const matchedSlug = (data.gameId ? providers.find((p) => p.dbGameId === data.gameId)?.id : "") || foundProv?.id || data.game.toLowerCase();
+
     if (editingPkg) {
       const numericId = Number(editingPkg.sku.replace(/\D/g, ""));
       if (numericId) {
@@ -209,7 +213,8 @@ export default function AdminTopUpPage() {
             method: "PATCH",
             body: JSON.stringify(payload),
           });
-          setPackages((prev) => prev.map((p) => (p.sku === editingPkg.sku ? { ...p, ...data, game: data.game as any } : p)));
+          setPackages((prev) => prev.map((p) => (p.sku === editingPkg.sku ? { ...p, ...data, game: data.game, gameSlug: matchedSlug, gameId } : p)));
+          loadTopupData();
           triggerToast(
             tx("SKU Updated", "อัปเดตแพ็กเกจแล้ว"),
             tx(`Updated ${editingPkg.sku} pricing on storefront.`, `อัปเดตราคาแพ็กเกจ ${editingPkg.sku} บนหน้าร้านแล้ว`)
@@ -239,11 +244,14 @@ export default function AdminTopUpPage() {
             cost: data.cost,
             price: data.price,
             denomination: data.denomination,
-            game: data.game as any,
+            game: data.game,
+            gameSlug: matchedSlug,
+            gameId,
             active: true,
           },
           ...prev,
         ]);
+        loadTopupData();
         triggerToast(
           tx("SKU Published", "เพิ่มแพ็กเกจสำเร็จ"),
           tx(`${data.name} added to live storefront.`, `เพิ่มแพ็กเกจ ${data.name} ลงหน้าร้านแล้ว`)
@@ -253,6 +261,7 @@ export default function AdminTopUpPage() {
         triggerToast(tx("Publish Failed", "เพิ่มแพ็กเกจไม่สำเร็จ"), err.message || "Failed to create package");
       }
     }
+
   };
 
   return (
