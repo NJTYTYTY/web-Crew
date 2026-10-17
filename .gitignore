@@ -38,3 +38,6 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local study guide and presentation notes (do not commit)
+study-guide/
