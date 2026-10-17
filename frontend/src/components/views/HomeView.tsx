@@ -22,6 +22,17 @@ const DEFAULT_HERO_SLIDES: HeroSlideItem[] = [
   { id: '4', title: 'Verified Roblox & RoV Accounts — 100% Clean Handover', imageUrl: '/pic-banner-slide/roblox.jpeg', linkUrl: '/accounts', sortOrder: 4 },
 ];
 
+function getGameBadgeColor(game: string): string {
+  const lower = (game || '').toLowerCase().trim();
+  if (lower === 'roblox') return 'bg-indigo-600';
+  if (lower === 'rov' || lower.includes('arena of valor')) return 'bg-rose-600';
+  if (lower.includes('free fire') || lower.includes('freefire')) return 'bg-amber-600';
+  if (lower.includes('valorant')) return 'bg-red-500';
+  if (lower.includes('genshin')) return 'bg-teal-600';
+  if (lower.includes('minecraft')) return 'bg-emerald-600';
+  return 'bg-purple-600';
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export function HomeView() {
@@ -260,7 +271,7 @@ export function HomeView() {
               <div key={acc.id} onClick={() => openAccountDetail(acc)} className="cursor-pointer bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-md hover:border-indigo-300 transition group flex flex-col justify-between">
                 <div className="relative h-36 bg-slate-900 overflow-hidden">
                   <img src={acc.image} alt={acc.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap ${acc.game === 'Roblox' ? 'bg-indigo-600' : 'bg-red-600'}`}>{acc.game}</span>
+                  <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-bold text-white whitespace-nowrap ${getGameBadgeColor(acc.game)}`}>{acc.game}</span>
                   <div className="absolute bottom-2 right-2 bg-white/95 px-2 py-0.5 rounded shadow text-xs font-black text-slate-900 whitespace-nowrap">฿{acc.price}</div>
                 </div>
                 <div className="p-3.5">

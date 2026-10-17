@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import {
-  AlertTriangle, Hash, HelpCircle, Info, Lock, QrCode, ShieldCheck, Sparkles, User, Zap,
+  AlertTriangle, Hash, HelpCircle, Info, Lock, QrCode, Search, ShieldCheck, Sparkles, User, X, Zap,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -16,6 +16,7 @@ export function GameTopupView() {
   const { tx } = useLanguage();
 
   const [showUidHelp, setShowUidHelp] = useState(false);
+  const [gameSearch, setGameSearch] = useState('');
   const pkgs = packagesData[activeTopupGame] || [];
 
   const gameTabClass = (g: TopupGameKey) =>
@@ -31,6 +32,10 @@ export function GameTopupView() {
     : tx(`Enter ${gameTitle} Player UID`, `กรอกหมายเลข Player UID สำหรับ ${gameTitle}`);
 
   const availableGames = Object.values(topupGamesMeta).filter((g) => g.isActive !== false);
+  const filteredGames = availableGames.filter((g) =>
+    g.name.toLowerCase().includes(gameSearch.toLowerCase()) ||
+    g.slug.toLowerCase().includes(gameSearch.toLowerCase())
+  );
 
   return (
     <div id="view-topup" className="page-view">
@@ -48,27 +53,66 @@ export function GameTopupView() {
           {/* Left: Top-up Configurator (8 Cols) */}
           <div className="lg:col-span-8 space-y-6">
             <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">{tx('Select Game to Top Up', 'เลือกเกมที่ต้องการเติม')}</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3">
-                {availableGames.map((game) => (
-                  <button
-                    key={game.slug}
-                    onClick={() => selectTopupGame(game.slug)}
-                    id={`topup-tab-${game.slug}`}
-                    className={gameTabClass(game.slug)}
-                  >
-                    <img
-                      src={game.iconUrl || '/game-logos/rov/rov-icon.png'}
-                      alt={game.name}
-                      className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform"
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
+                  {tx('Select Game to Top Up', 'เลือกเกมที่ต้องการเติม')} ({availableGames.length})
+                </label>
+                {availableGames.length > 3 && (
+                  <div className="relative w-full sm:w-52">
+                    <input
+                      type="text"
+                      value={gameSearch}
+                      onChange={(e) => setGameSearch(e.target.value)}
+                      placeholder={tx('Search game...', 'ค้นหาชื่อเกม...')}
+                      className="w-full pl-8 pr-7 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition"
                     />
-                    <span className="text-xs font-bold text-slate-900 line-clamp-1">{game.name}</span>
-                    <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">
-                      {game.inputMode === 'ID_PASS' ? tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว') : tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}
-                    </span>
-                  </button>
-                ))}
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    {gameSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setGameSearch('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
+
+              {filteredGames.length === 0 ? (
+                <div className="py-6 text-center text-slate-400 text-xs">
+                  <p>{tx('No games found matching your search.', 'ไม่พบเกมที่ตรงกับการค้นหา')}</p>
+                  <button
+                    type="button"
+                    onClick={() => setGameSearch('')}
+                    className="mt-2 text-indigo-600 font-semibold hover:underline"
+                  >
+                    {tx('Clear search', 'ล้างการค้นหา')}
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3 max-h-[380px] overflow-y-auto pr-1">
+                  {filteredGames.map((game) => (
+                    <button
+                      key={game.slug}
+                      onClick={() => selectTopupGame(game.slug)}
+                      id={`topup-tab-${game.slug}`}
+                      className={gameTabClass(game.slug)}
+                    >
+                      <img
+                        src={game.iconUrl || '/game-logos/rov/rov-icon.png'}
+                        alt={game.name}
+                        className="w-11 h-11 rounded-xl object-cover mb-2 shadow-sm group-hover:scale-105 transition-transform"
+                      />
+                      <span className="text-xs font-bold text-slate-900 line-clamp-1">{game.name}</span>
+                      <span className="text-[10px] text-emerald-600 font-semibold mt-0.5 whitespace-nowrap">
+                        {game.inputMode === 'ID_PASS' ? tx('ID-Pass Bot Fast', 'ระบบ ID-Pass บอทไว') : tx('UID Instant Top-Up', 'เติมผ่าน UID เข้าไว')}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs space-y-6">
@@ -112,31 +156,52 @@ export function GameTopupView() {
                     <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-amber-800 text-xs flex items-start space-x-2.5">
                       <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                       <div>
-                        <span className="font-bold">{tx('Important Notice for Robux Top-Up:', 'คำแนะนำสำคัญสำหรับการเติม Robux:')}</span>
+                        <span className="font-bold">
+                          {activeTopupGame.toLowerCase() === 'roblox'
+                            ? tx('Important Notice for Robux Top-Up:', 'คำแนะนำสำคัญสำหรับการเติม Robux:')
+                            : tx(`Important Notice for ${gameTitle} Top-Up:`, `คำแนะนำสำคัญสำหรับการเติม ${gameTitle}:`)}
+                        </span>
                         <p className="mt-0.5 text-amber-700">
-                          {tx(
-                            'Please temporarily disable 2-Step Verification (2FA / Authenticator) on your Roblox account so our automated bot can log in and purchase the Robux package.',
-                            'กรุณาปิดการยืนยันตัวตน 2 ชั้น (2FA / รหัสอีเมล) ชั่วคราว เพื่อให้บอทอัตโนมัติสามารถเข้าสู่ระบบและเติมแพ็กเกจ Robux ได้ทันที'
-                          )}
+                          {activeTopupGame.toLowerCase() === 'roblox'
+                            ? tx(
+                                'Please temporarily disable 2-Step Verification (2FA / Authenticator) on your Roblox account so our automated bot can log in and purchase the Robux package.',
+                                'กรุณาปิดการยืนยันตัวตน 2 ชั้น (2FA / รหัสอีเมล) ชั่วคราว เพื่อให้บอทอัตโนมัติสามารถเข้าสู่ระบบและเติมแพ็กเกจ Robux ได้ทันที'
+                              )
+                            : tx(
+                                `Please ensure your ${gameTitle} credentials are correct. Our automated delivery bot will securely log in to fulfill your top-up package.`,
+                                `กรุณาตรวจสอบชื่อผู้ใช้และรหัสผ่านเกม ${gameTitle} ให้ถูกต้อง เพื่อให้ระบบบอทอัตโนมัติสามารถเข้าสู่ระบบและส่งมอบแพ็กเกจได้ทันที`
+                              )}
                         </p>
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">{tx('Roblox Username', 'ชื่อผู้ใช้ Roblox (Username)')} <span className="text-red-500">*</span></label>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          {tx(`${gameTitle} Username / ID`, `ชื่อผู้ใช้ ${gameTitle} (Username / ID)`)} <span className="text-red-500">*</span>
+                        </label>
                         <div className="relative">
                           <input
-                            type="text" id="input-roblox-user" value={robloxUser} onChange={(e) => setRobloxUser(e.target.value)} placeholder={tx('Roblox username', 'ชื่อผู้ใช้ Roblox')}
+                            type="text"
+                            id="input-roblox-user"
+                            value={robloxUser}
+                            onChange={(e) => setRobloxUser(e.target.value)}
+                            placeholder={tx(`${gameTitle} username`, `ชื่อผู้ใช้ ${gameTitle}`)}
                             className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition"
                           />
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><User className="w-4 h-4" /></div>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">{tx('Roblox Password', 'รหัสผ่าน Roblox (Password)')} <span className="text-red-500">*</span></label>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          {tx(`${gameTitle} Password`, `รหัสผ่าน ${gameTitle} (Password)`)} <span className="text-red-500">*</span>
+                        </label>
                         <div className="relative">
                           <input
-                            type="password" id="input-roblox-pass" value={robloxPass} onChange={(e) => setRobloxPass(e.target.value)} placeholder={tx('Roblox password', 'รหัสผ่าน Roblox')}
+                            type="password"
+                            id="input-roblox-pass"
+                            value={robloxPass}
+                            onChange={(e) => setRobloxPass(e.target.value)}
+                            placeholder={tx(`${gameTitle} password`, `รหัสผ่าน ${gameTitle}`)}
                             className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition"
                           />
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Lock className="w-4 h-4" /></div>
